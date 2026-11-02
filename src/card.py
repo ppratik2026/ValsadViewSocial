@@ -472,6 +472,11 @@ def render_card(story: NewsStory, cfg: dict, out_path: Path, background: Path | 
         page_html = brand.brand_page(story, date, cfg["card"]["handle"], _data_url(cutout) if cutout else None,
                                      image_url, row_style)
         fit_script = brand.FIT
+    elif design == "viral":
+        from src.viral import FIT as VIRAL_FIT, viral_page
+        page_html = viral_page(story, font, image_url, date, cfg["card"]["handle"], mood,
+                               cfg["content"].get("places", []))
+        fit_script = VIRAL_FIT
     elif design == "bulletin":
         from src.bulletin import FIT, bulletin_page
         page_html = bulletin_page(story, font, image_url, date, cfg["card"]["handle"], mood,
@@ -516,6 +521,9 @@ def render_card(story: NewsStory, cfg: dict, out_path: Path, background: Path | 
             vcfg = cfg["video"]
             if design == "brand":
                 _capture_intro(page, intro_dir, vcfg.get("intro_seconds", 3.4), vcfg["fps"], BRAND_STEPS, flash=False)
+            elif design == "viral":
+                from src.viral import VIRAL_STEPS
+                _capture_intro(page, intro_dir, vcfg.get("intro_seconds", 3.4), vcfg["fps"], VIRAL_STEPS, flash=False)
             else:
                 _capture_intro(page, intro_dir, vcfg.get("intro_seconds", 3.4), vcfg["fps"])
         browser.close()

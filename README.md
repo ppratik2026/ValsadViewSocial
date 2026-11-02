@@ -115,6 +115,17 @@ Har run ka folder `output/<date-time>/` mein banta hai, usmein yeh files hoti ha
 
 ## 5. Poster design
 
+**Default: `viral` design** (`src/viral.py`), popular Gujarati news pages ke posters jaisa:
+- upar badi **realistic picture** (free Pollinations AI, `POLLINATIONS_API_KEY` ho to behtar), na mile to Pexels photo, na mile to code se bana scene. Kisi asli insaan ka chehra kabhi nahi.
+- **"🚨 બ્રેકિંગ ન્યૂઝ | વાપી - વલસાડ"** patti: news mein jo shaher hai wo apne aap aata hai (`content.places`)
+- laal brush patti par moti headline, har doosri line peeli, sabse zaroori shabd/number bada
+- tarikh/rakam ki chips, ✅ points ka box, neeche peeli patti par sawal + "કોમેન્ટ કરીને જરૂર જણાવો"
+- 5 rang (crime: laal-kaala, mausam: storm blue, info: purple, paisa: navy, khushkhabar: green) aur 2 layout (picture upar / picture poore poster ke peeche). Kaunsa chal raha hai, `data/report.md` mein dikhta hai aur wahi zyada aata hai.
+
+Purane designs (`brand`, `bulletin`, `mag`, ...) bhi hain: `config.yaml` → `card.designs` mein naam likho.
+
+### Purana Gemini poster tareeka
+
 `card.style: "ai_poster"` (default): **Gemini ka image model poora poster banata hai**, jaise viral Gujarati news pages ke posters hote hain. Usmein badi headline, 3D illustration, info boxes, aur schedule/list wali news ke liye rangeen table hoti hai. Har baar style alag hota hai.
 
 - Image models kabhi-kabhi Gujarati mein spelling ya number galat likh dete hain. Isliye har poster ko Gemini **dobara padh kar check karta hai**. Galti mile to poster dobara banta hai (`poster_attempts`, default 3).

@@ -38,14 +38,17 @@ card:
   handle: "@valsadview"
   # Designs that may be used: bulletin, mag, hero, split, paper (classic is the fallback).
   # The news mood (breaking / money / info / happy) decides which of these fit; one of them is picked at random.
-  designs: ["brand"]              # brand = one fixed layout on every post (only the category colour changes), so
-                                  # the profile grid looks like one page; others: bulletin, mag, hero, split, paper
+  designs: ["viral"]              # viral = like the popular Gujarati news posters: big realistic picture, place tag
+                                  # ("વાપી - વલસાડ"), red brush headline, points box, question strip (src/viral.py);
+                                  # others: brand (one fixed layout), bulletin, mag, hero, split, paper
   # how the brand poster draws its three facts: each post takes the next one in this order, after the last one
   # it starts again from the first (views per style: data/report.md, "rows")
   row_styles: [cols, split, neon, circles, strips, tv, notes, capsules, stats, keys, bento, aurora,
                hub, stairs, arrows, paper, magazine, road, rope, puzzle, train, calendar, film,
                clipboard, tvs, balloons, station, detective, stamps]
-  picture: "cartoon"              # cartoon = a flat 2D cartoon scene of the story (Gemini first; generic characters,
+  picture: "photo"                # photo = realistic AI picture (free Pollinations), else Pexels stock photo, else a
+                                  # drawn scene; never a real person's face (for the viral design);
+                                  # cartoon = a flat 2D cartoon scene of the story (Gemini first; generic characters,
                                   # never a real person's likeness), else a 3D cut-out, else a big 3D icon;
                                   # cutout = only 3D object cut-outs; scene = AI scenes and real photos allowed
   stamps: false                   # true = "ARRESTED" / "APPROVED" style stamps when the story says so
@@ -88,6 +91,10 @@ llm_providers:
     type: gemini
     key_env: GEMINI_API_KEY
     models: ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-3.1-flash-lite"]
+  - name: github                      # GitHub Models: free in GitHub Actions with the workflow's own GITHUB_TOKEN
+    url: "https://models.github.ai/inference/chat/completions"     # (needs "models: read", set in the workflows)
+    key_env: GITHUB_TOKEN
+    models: ["openai/gpt-4.1", "openai/gpt-4.1-mini"]
   - name: groq                        # free key, no card: https://console.groq.com/keys; each model has its own daily quota
     url: "https://api.groq.com/openai/v1/chat/completions"
     key_env: GROQ_API_KEY

@@ -138,6 +138,12 @@ def generate_free_ai_image(prompt: str, out_path: Path, style: str = "3d", keyle
     if style == "cartoon":
         full = f"{prompt}. {CARTOON_STYLE}. {NO_TEXT}"
         size, params = "1536x1024", {"width": 1536, "height": 1100}
+    elif style == "photo":
+        # realistic news-photo look (the viral design); people only from behind or far away, never a real person
+        full = (f"{prompt}, photorealistic news photograph, cinematic dramatic lighting, rich saturated colours, "
+                f"Indian setting, sharp focus, people only seen from behind or far away with no recognisable faces, "
+                f"no real person. {NO_TEXT}")
+        size, params = "1024x1536", {"width": 1080, "height": 2040}
     else:
         # stylised 3D characters keep it clearly illustrative: never a real, recognisable person
         full = (f"{prompt}, Pixar style 3D render, cinematic news thumbnail, vivid colours, dramatic rim lighting, "

@@ -136,7 +136,25 @@ def cmd_run(args, cfg):
         design = choose_design(story, cfg)
         background = cutout = None
         story.stamp = "" if not cfg["card"].get("stamps", False) else story.stamp
-        if cfg["card"].get("picture", "cutout") == "cartoon":
+        if cfg["card"].get("picture", "cutout") == "photo":
+            # the viral design: a realistic AI picture (free Pollinations), else a stock photo, else a drawn scene;
+            # never a real person's photo or likeness
+            story.person = ""
+            if "viral" in cfg["card"].get("designs", []):
+                design = "viral"
+            from src.backgrounds import fetch_stock_background, generate_free_ai_image
+            from src.scenes import BY_CATEGORY, draw_scene
+            background = generate_free_ai_image(story.image_prompt, work_dir / "photo.jpg", "photo") \
+                if story.image_prompt else None
+            if not background:
+                try:
+                    background = fetch_stock_background(story.image_keywords, work_dir / "background.jpg")
+                except Exception as e:   # Pexels is optional
+                    print(f"   Pexels failed: {e}")
+            if not background:
+                background = draw_scene(story.scene or BY_CATEGORY.get(story.category, "city"), story.props,
+                                        work_dir / "scene-drawn.png")
+        elif cfg["card"].get("picture", "cutout") == "cartoon":
             # a flat 2D cartoon scene of the story (generic characters, never a real person's likeness)
             from src.backgrounds import generate_free_ai_image, generate_gemini_cartoon
             story.person = ""
