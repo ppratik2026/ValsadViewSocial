@@ -355,12 +355,18 @@ def _shorten(text: str, limit: int) -> str:
 def _plain_card(item: FeedItem, category: str, article: str, hashtags_count: int) -> dict:
     """Card text taken straight from the news item, for when no AI is reachable (all free quotas used up), so
     the hour is still posted. Adds nothing new: the headline, the first sentences and the date of the story."""
-    head, rest = item.title, ""
+    title = item.title.replace(item.source, "").strip(" -|") if item.source else item.title
+    head, rest = title, ""
     for sep in (":", "|", " - "):
-        if sep in item.title:
-            head, rest = (part.strip() for part in item.title.split(sep, 1))
+        if sep in title:
+            head, rest = (part.strip() for part in title.split(sep, 1))
             break
+    if rest and len(head.split()) <= 2:   # "વલસાડ: સગીરાનું અપહરણ ..." -> the place is not the headline
+        head, rest = rest, ""
+    if item.source:   # Google News adds the paper's name to the text
+        article = article.replace(item.source, "")
     sentences = [x.strip() for x in re.split(r"(?<=[.।!?])\s+", article) if 20 < len(x.strip())]
+    sentences = [x for x in sentences if x.rstrip(" .") != title.rstrip(" .")] or sentences
     short = [x.rstrip(".") for x in sentences[1:] if len(x) <= 90][:3]   # facts for the three rows
     date = item.published.astimezone(IST)
     summary = _shorten(sentences[0] if sentences else rest, 200)

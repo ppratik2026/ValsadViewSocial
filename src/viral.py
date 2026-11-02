@@ -179,7 +179,7 @@ def _points(story) -> list[str]:
     points = [p for p in story.points if p.strip()][:5]
     if len(points) < 2 and story.summary:   # no points: the summary, one sentence per row
         points = [s.strip() for s in re.split(r"(?<=[.!?।])\s+", story.summary) if s.strip()][:4]
-    return points
+    return [p for p in points if story.headline not in p]   # never the headline a second time
 
 
 def _chips(story) -> str:

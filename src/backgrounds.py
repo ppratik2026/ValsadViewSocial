@@ -85,6 +85,9 @@ def fetch_openverse_photo(keywords: list[str], out_path: Path) -> tuple[Path, st
                 continue
             results = [r for r in resp.json().get("results", [])
                        if (r.get("width") or 0) >= 900 and (r.get("height") or 0) >= 600]
+        except requests.Timeout:
+            print("Openverse is not answering, skipping it this time.")
+            return None
         except (requests.RequestException, ValueError) as e:
             print(f"Openverse search failed: {e}")
             continue

@@ -92,10 +92,6 @@ llm_providers:
     type: gemini
     key_env: GEMINI_API_KEY
     models: ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-3.1-flash-lite"]
-  - name: github                      # GitHub Models: free in GitHub Actions with the workflow's own GITHUB_TOKEN
-    url: "https://models.github.ai/inference/chat/completions"     # (needs "models: read", set in the workflows)
-    key_env: GITHUB_TOKEN
-    models: ["openai/gpt-4.1", "openai/gpt-4.1-mini"]
   - name: groq                        # free key, no card: https://console.groq.com/keys; each model has its own daily quota
     url: "https://api.groq.com/openai/v1/chat/completions"
     key_env: GROQ_API_KEY
