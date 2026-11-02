@@ -208,12 +208,20 @@ TEMPLATE_RULES = [
     ("event", ["filmstrip", "neon", "polaroid"]),
     ("prices", ["receipt", "versus"]),
     ("place", ["map"]),
-    ("viral", ["comic", "lockscreen", "neon"]),
+    ("viral", ["comic", "lockscreen", "neon", "radio", "collage"]),
+    ("countdown", ["countdown"]),
+    ("percent", ["percent"]),
+    ("crime", ["crimetape", "folder"]),
+    ("travel", ["roadsign", "billboard"]),
+    ("government", ["letter", "folder"]),
+    ("education", ["notebook"]),
 ]
-GENERAL = ["card", "diagonal", "paper", "chat", "polaroid", "lockscreen", "comic", "neon", "map"]
+GENERAL = ["card", "diagonal", "paper", "chat", "polaroid", "lockscreen", "comic", "neon", "map", "billboard", "collage",
+           "radio", "notebook", "letter"]
 ALL_TEMPLATES = ["police", "storm", "bignews", "tips", "card", "tv", "paper", "quote", "timeline", "versus", "alert",
                  "notice", "stats", "polaroid", "magazine", "chat", "diagonal", "ticket", "map", "calendar", "receipt",
-                 "scoreboard", "comic", "neon", "lockscreen", "chalkboard", "filmstrip"]
+                 "scoreboard", "comic", "neon", "lockscreen", "chalkboard", "filmstrip", "notebook", "billboard", "letter",
+                 "crimetape", "collage", "radio", "countdown", "percent", "folder", "roadsign"]
 TOPIC_WORDS = {
     "travel": r"ટ્રેન|રેલ|બસ|એસટી|ફ્લાઇટ|વિમાન|હાઇવે|train|bus|flight|railway",
     "sports": r"ક્રિકેટ|મેચ|સ્પર્ધા|મેડલ|ખેલ|ટુર્નામેન્ટ|ગોલ્ડ|ચેમ્પિયન|cricket|match",
@@ -247,6 +255,11 @@ def _kinds(story, mood: str) -> set[str]:
         kinds.add("date")
     if story.category == "trending":
         kinds.add("viral")
+    from src.viral_plus import days_left, find_percent
+    if days_left(story):
+        kinds.add("countdown")
+    if find_percent(story):
+        kinds.add("percent")
     return kinds
 
 
@@ -264,6 +277,8 @@ def choose_template(story, mood: str, allowed: list[str] | None = None) -> str:
             fitting += [n for n in names if n not in fitting]
     if not _from_compare(story):
         fitting = [t for t in fitting if t != "versus"]
+    # these two only make sense with their number: never as a general pick
+    fitting = [t for t in fitting if (t != "countdown" or "countdown" in kinds) and (t != "percent" or "percent" in kinds)]
     fitting = [t for t in fitting if t in allowed] + [t for t in GENERAL if t in allowed and t not in fitting]
     from src.history import load_history
     recent = [(p.get("style") or {}).get("template") for p in load_history()[-4:]]
@@ -287,7 +302,8 @@ def viral_page(story, font: str, image_url: str | None, date: str, handle: str, 
         from src.viral_layouts import LAYOUTS
         from src.viral_extra import EXTRA_LAYOUTS
         from src.viral_more import MORE_LAYOUTS
-        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS}.get(template)
+        from src.viral_plus import PLUS_LAYOUTS
+        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS, **PLUS_LAYOUTS}.get(template)
         if page:
             return page(story, font, image_url, date, handle, _place_tag(story, places or []), ASKS)
     tag_text, looks = MOOD_LOOK.get(mood, MOOD_LOOK["info"])
@@ -365,4 +381,5 @@ VIRAL_STEPS = [
 from src.viral_layouts import MORE_STEPS  # noqa: E402  (the other layouts' elements)
 from src.viral_more import MORE_STEPS2  # noqa: E402
 from src.viral_extra import EXTRA_STEPS  # noqa: E402
-VIRAL_STEPS = VIRAL_STEPS + EXTRA_STEPS + MORE_STEPS2 + MORE_STEPS
+from src.viral_plus import PLUS_STEPS  # noqa: E402
+VIRAL_STEPS = VIRAL_STEPS + PLUS_STEPS + EXTRA_STEPS + MORE_STEPS2 + MORE_STEPS
