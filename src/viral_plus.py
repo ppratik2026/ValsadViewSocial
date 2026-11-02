@@ -499,7 +499,7 @@ PLUS_LAYOUTS = {
 
 PLUS_STEPS = [
     [".tape", "slideL", 0.1, 0.4, 0.2],
-    [".board, .sign, .player, .ring, .chart, .paper, .torn", "zoomIn", 0.05, 0.45, 0],
+    [".board, .sign, .player, .ring, .chart, .paper, .torn", "settle", 0.0, 0.5, 0],
     [".stampx, .postmark, .stamp2", "slam", 0.9, 0.4, 0.15],
     [".wave i", "riseUp", 0.6, 0.3, 0.02],
     [".clip, .pic", "popIn", 0.6, 0.35, 0],

@@ -71,6 +71,8 @@ video:
   fps: 30
   intro_animation: true           # first seconds: banner drops, headline punches in, stamp slams, points pop
   intro_seconds: 3.4
+  full_motion: true               # viral design: the poster keeps moving for the whole reel (picture pans, points
+                                  # light up one by one, LIVE/siren blinks, ticker scrolls, "?" bounces at the end)
   music_volume: 0.9               # music from assets/music/*.mp3 (random pick each run)
 
 free:

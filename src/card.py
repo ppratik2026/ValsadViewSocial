@@ -251,6 +251,7 @@ ANIM_CSS = """<style>
   100% { transform: var(--t0); } }
 @keyframes riseUp { from { transform: translateY(160%) var(--t0); opacity: 0; } to { transform: var(--t0); opacity: 1; } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes settle { from { transform: scale(1.12) var(--t0); } to { transform: var(--t0); } }
 @keyframes glow { 0%, 100% { filter: none; } 50% { filter: brightness(1.5) drop-shadow(0 0 18px currentColor); } }
 @keyframes flash { from { opacity: .95; } to { opacity: 0; } }
 @keyframes shake { 0%, 100% { translate: 0 0; } 20% { translate: -14px 6px; } 40% { translate: 12px -8px; }
@@ -323,11 +324,16 @@ BRAND_STEPS = [
 
 
 def _capture_intro(page, frames_dir: Path, seconds: float, fps: int, steps: list | None = None,
-                   flash: bool = True) -> None:
-    """Screenshot the intro animation frame by frame (deterministic, no screen recording)."""
+                   flash: bool = True, live_until: float | None = None) -> None:
+    """Screenshot the intro animation frame by frame (deterministic, no screen recording). With live_until, the
+    poster keeps moving after the intro (src/reel_motion.py) and the frames cover the whole reel."""
     frames_dir.mkdir(parents=True, exist_ok=True)
     page.add_style_tag(content=ANIM_CSS.removeprefix("<style>").removesuffix("</style>"))
     page.evaluate(ANIM_JS, [steps or ANIM_STEPS, flash])
+    if live_until and live_until > seconds:
+        from src.reel_motion import add_live_motion
+        add_live_motion(page, min(seconds, 3.0), live_until)
+        seconds = live_until
     for n in range(int(seconds * fps)):
         page.evaluate("t => document.getAnimations().forEach(a => a.currentTime = t)", n * 1000 / fps)
         page.screenshot(path=str(frames_dir / f"f{n:04d}.jpg"), type="jpeg", quality=92)
@@ -522,8 +528,12 @@ def render_card(story: NewsStory, cfg: dict, out_path: Path, background: Path | 
             if design == "brand":
                 _capture_intro(page, intro_dir, vcfg.get("intro_seconds", 3.4), vcfg["fps"], BRAND_STEPS, flash=False)
             elif design == "viral":
+                from src.video_builder import reel_seconds
                 from src.viral import VIRAL_STEPS
-                _capture_intro(page, intro_dir, vcfg.get("intro_seconds", 3.4), vcfg["fps"], VIRAL_STEPS, flash=False)
+                # the whole reel moves (picture, reading guide, blinking ...), not only its first seconds
+                live = reel_seconds(mood, len(story.points)) if vcfg.get("full_motion", True) else None
+                _capture_intro(page, intro_dir, vcfg.get("intro_seconds", 3.4), vcfg["fps"], VIRAL_STEPS, flash=False,
+                               live_until=live)
             else:
                 _capture_intro(page, intro_dir, vcfg.get("intro_seconds", 3.4), vcfg["fps"])
         browser.close()

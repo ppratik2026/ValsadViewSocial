@@ -494,7 +494,7 @@ EXTRA_LAYOUTS = {
 }
 
 EXTRA_STEPS = [
-    [".tk, .cal, .bill, .board, .panel", "zoomIn", 0.05, 0.45, 0],
+    [".tk, .cal, .bill, .board, .panel", "settle", 0.0, 0.5, 0],
     [".pin", "dropIn", 0.0, 0.5, 0],
     [".boom", "slam", 0.1, 0.4, 0],
     [".clock, .sign, .topic, .title", "fadeIn", 0.0, 0.4, 0],

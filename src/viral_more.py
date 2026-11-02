@@ -85,7 +85,8 @@ TV_CSS = """
   .item .num { color: #ffd60a; }
   .ticker { display: flex; margin: 0 -30px; background: #ffd60a; color: #111; font-size: 34px; font-weight: 800; }
   .ticker b { background: #e10600; color: #fff; padding: 12px 22px; white-space: nowrap; }
-  .ticker span { padding: 12px 18px; white-space: nowrap; overflow: hidden; }
+  .ticker span { padding: 12px 18px; white-space: nowrap; overflow: hidden; flex: 1; }
+  .ticker em { display: inline-block; font-style: normal; }
 """
 
 
@@ -100,7 +101,7 @@ def tv_page(story, font, image_url, date, handle, place, asks):
     <div class="items">{items}</div>
     <div class="grow"></div>
     {_askbar(story, asks)}
-    <div class="ticker"><b>તાજા સમાચાર</b><span>{esc(tick)}</span></div>
+    <div class="ticker"><b>તાજા સમાચાર</b><span><em>{esc(tick)} ✦ {esc(tick)}</em></span></div>
     {_foot(story, date)}
   </div>"""
     return _page(_base(font, 40) + TV_CSS, font, body)
@@ -614,7 +615,7 @@ MORE_LAYOUTS = {
 
 MORE_STEPS2 = [
     [".live, .mast, .sign, .band, .qmark, .top", "dropIn", 0.0, 0.4, 0],
-    [".screen, .pola, .photo", "zoomIn", 0.1, 0.45, 0],
+    [".pola", "settle", 0.0, 0.5, 0],
     [".slant", "slideL", 0.15, 0.45, 0],
     [".side", "slideAlt", 0.9, 0.4, 0.1],
     [".bolt, .stamp, .seal", "slam", 1.2, 0.4, 0],
