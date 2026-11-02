@@ -46,8 +46,9 @@ card:
   row_styles: [cols, split, neon, circles, strips, tv, notes, capsules, stats, keys, bento, aurora,
                hub, stairs, arrows, paper, magazine, road, rope, puzzle, train, calendar, film,
                clipboard, tvs, balloons, station, detective, stamps]
-  picture: "photo"                # photo = realistic AI picture (free Pollinations), else Pexels stock photo, else a
-                                  # drawn scene; never a real person's face (for the viral design);
+  picture: "photo"                # photo = free stock photo: Pexels (free PEXELS_API_KEY), else an openly licensed
+                                  # photo from Openverse (no key, credit shown on the poster), else a realistic AI
+                                  # picture, else a drawn scene; never a real person's photo (for the viral design);
                                   # cartoon = a flat 2D cartoon scene of the story (Gemini first; generic characters,
                                   # never a real person's likeness), else a 3D cut-out, else a big 3D icon;
                                   # cutout = only 3D object cut-outs; scene = AI scenes and real photos allowed

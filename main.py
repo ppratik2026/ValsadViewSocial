@@ -137,20 +137,27 @@ def cmd_run(args, cfg):
         background = cutout = None
         story.stamp = "" if not cfg["card"].get("stamps", False) else story.stamp
         if cfg["card"].get("picture", "cutout") == "photo":
-            # the viral design: a realistic AI picture (free Pollinations), else a stock photo, else a drawn scene;
-            # never a real person's photo or likeness
+            # the viral design: a free stock photo (Pexels with the free key, else an openly licensed photo from
+            # Openverse), else a realistic AI picture, else a drawn scene; never a real person's photo
             story.person = ""
             if "viral" in cfg["card"].get("designs", []):
                 design = "viral"
-            from src.backgrounds import fetch_stock_background, generate_free_ai_image
+            from src.backgrounds import fetch_openverse_photo, fetch_stock_background, generate_free_ai_image
             from src.scenes import BY_CATEGORY, draw_scene
-            background = generate_free_ai_image(story.image_prompt, work_dir / "photo.jpg", "photo") \
-                if story.image_prompt else None
+            from src.viral import stock_keywords
+            keywords = stock_keywords(story)
+            print(f"   Photo searches: {keywords}")
+            background = None
+            try:
+                background = fetch_stock_background(keywords, work_dir / "background.jpg")
+            except Exception as e:   # Pexels is optional
+                print(f"   Pexels failed: {e}")
             if not background:
-                try:
-                    background = fetch_stock_background(story.image_keywords, work_dir / "background.jpg")
-                except Exception as e:   # Pexels is optional
-                    print(f"   Pexels failed: {e}")
+                found = fetch_openverse_photo(keywords, work_dir / "openverse.jpg")
+                if found:
+                    background, story.photo_credit = found
+            if not background and story.image_prompt:
+                background = generate_free_ai_image(story.image_prompt, work_dir / "photo.jpg", "photo")
             if not background:
                 background = draw_scene(story.scene or BY_CATEGORY.get(story.category, "city"), story.props,
                                         work_dir / "scene-drawn.png")

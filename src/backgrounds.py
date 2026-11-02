@@ -70,6 +70,42 @@ def fetch_stock_background(keywords: list[str], out_path: Path) -> Path | None:
     return None
 
 
+OPENVERSE = "https://api.openverse.org/v1/images/"
+
+
+def fetch_openverse_photo(keywords: list[str], out_path: Path) -> tuple[Path, str] | None:
+    """A free, openly licensed photo (Wikimedia, Flickr ...) from Openverse, no key needed. Returns the path and
+    the credit line the licence asks for ("ફોટો: name / CC BY 2.0"), or None."""
+    for keyword in keywords:
+        try:
+            resp = requests.get(OPENVERSE, headers={"User-Agent": "ValsadViewReels/1.0"}, timeout=30, params={
+                "q": keyword, "license_type": "commercial", "mature": "false", "size": "large", "page_size": 20})
+            if resp.status_code != 200:
+                print(f"Openverse search failed for {keyword!r}: {resp.status_code}")
+                continue
+            results = [r for r in resp.json().get("results", [])
+                       if (r.get("width") or 0) >= 900 and (r.get("height") or 0) >= 600]
+        except (requests.RequestException, ValueError) as e:
+            print(f"Openverse search failed: {e}")
+            continue
+        random.shuffle(results)
+        for r in results[:4]:
+            try:
+                with requests.get(r["url"], headers={"User-Agent": "ValsadViewReels/1.0"}, timeout=60) as dl:
+                    if dl.status_code != 200 or not dl.headers.get("content-type", "").startswith("image/"):
+                        continue
+                    out_path.write_bytes(dl.content)
+            except requests.RequestException:
+                continue
+            lic = f"CC {str(r.get('license', '')).upper()} {r.get('license_version') or ''}".strip()
+            if str(r.get("license", "")).lower() in ("cc0", "pdm"):
+                lic = "Public domain"
+            creator = (r.get("creator") or "").strip()[:40]
+            print(f"Background: Openverse photo for {keyword!r} ({creator or 'unknown'}, {lic})")
+            return out_path, f"ફોટો: {creator} / {lic}" if creator else f"ફોટો: {lic}"
+    return None
+
+
 POLLINATIONS_IMAGE = "https://image.pollinations.ai/prompt/"
 
 

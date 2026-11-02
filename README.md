@@ -116,7 +116,7 @@ Har run ka folder `output/<date-time>/` mein banta hai, usmein yeh files hoti ha
 ## 5. Poster design
 
 **Default: `viral` design** (`src/viral.py`), popular Gujarati news pages ke posters jaisa:
-- upar badi **realistic picture** (free Pollinations AI, `POLLINATIONS_API_KEY` ho to behtar), na mile to Pexels photo, na mile to code se bana scene. Kisi asli insaan ka chehra kabhi nahi.
+- upar badi **free stock photo**: pehle Pexels (free `PEXELS_API_KEY` secret, [pexels.com/api](https://www.pexels.com/api/)), na ho to Openverse ki free-license photo (bina key, photo ka credit poster par likha aata hai), na mile to free AI picture, aur wo bhi na mile to code se bana scene. Kisi neta ya asli insaan ki photo nahi.
 - **"🚨 બ્રેકિંગ ન્યૂઝ | વાપી - વલસાડ"** patti: news mein jo shaher hai wo apne aap aata hai (`content.places`)
 - laal brush patti par moti headline, har doosri line peeli, sabse zaroori shabd/number bada
 - tarikh/rakam ki chips, ✅ points ka box, neeche peeli patti par sawal + "કોમેન્ટ કરીને જરૂર જણાવો"

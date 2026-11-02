@@ -76,6 +76,28 @@ MOOD_LOOK = {
 }
 WEATHER = re.compile(r"વરસાદ|માવઠ|વાવાઝોડ|આગાહી|ચક્રવાત|હવામાન|ઠંડી|ગરમી|પૂર|દરિયો|દરિયા|rain|cyclone|weather", re.I)
 
+# stock photo searches when the AI gave none (or as extra tries): English, places and objects, never people's names
+STOCK_SEARCHES = {
+    "crime": ["police checkpoint night", "police car lights night", "police barricade road"],
+    "politics": ["election rally crowd india", "microphones podium speech", "indian parliament"],
+    "government": ["indian government office", "official documents stamp", "india road construction"],
+    "trending": ["india city street traffic", "crowd india street", "smartphone news"],
+    "good_news": ["indian students celebrating", "trophy medal winner", "indian festival celebration"],
+}
+WEATHER_SEARCHES = ["monsoon rain storm", "dark storm clouds sea", "cyclone waves coast"]
+MONEY_SEARCHES = ["indian rupee notes", "petrol pump fuel", "market vegetables india"]
+
+
+def stock_keywords(story) -> list[str]:
+    """What to search for on the stock photo sites: the AI's own searches first, then ones for the topic."""
+    text = f"{story.headline} {story.summary}"
+    extra = (WEATHER_SEARCHES if WEATHER.search(text)
+             else MONEY_SEARCHES if re.search(r"₹|ભાવ|પેટ્રોલ|ડીઝલ|price", text, re.I)
+             else STOCK_SEARCHES.get(story.category, STOCK_SEARCHES["trending"]))
+    own = [k for k in story.image_keywords if k and k.lower() not in ("gujarat", "valsad", "india news")]
+    return own[:3] + extra
+
+
 ASKS = ["તમારું શું માનવું છે?", "તમારો મત શું છે?", "આ વિશે તમે શું કહેશો?"]
 
 CSS = """
