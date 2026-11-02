@@ -1,0 +1,143 @@
+# Valsad View: Local News Reels → Instagram (auto)
+
+**Page:** [@valsadview](https://www.instagram.com/valsadview/). **Area:** Valsad, Vapi, Daman, Silvassa, Ahwa (Dang), Navsari.
+
+Yeh tool roz apne aap:
+
+1. Valsad, Vapi, Daman, Silvassa, Ahwa-Dang aur Navsari ki asli, taaza news dhundta hai (crime, sara samachar, sarkari jaherat). Local news na mile to South Gujarat/Gujarat ki news leta hai.
+2. Us news ka ek **colourful Gujarati news card** (1080×1920 image) banata hai
+3. Image ko **12–21 second ki Reel** mein badalta hai (poora 9:16 poster, intro animation + music, koi zoom nahi)
+4. **Instagram pe Reel post** karta hai (official Instagram API, password ki zaroorat nahi)
+
+Do mode hain (`config.yaml` → `provider`):
+
+| | `free` (default) | `gemini` |
+|---|---|---|
+| News | Google News + Gujarati news sites ke RSS feeds | Gemini + Google Search |
+| Gujarati text | **GitHub Models** (OpenAI GPT-4.1, GitHub Actions mein free) | Gemini |
+| Poster | Template design (`src/card.py`) | Gemini ka poora AI poster |
+| Kharcha | **₹0** | Gemini billing |
+
+```
+free:   RSS news → GitHub Models (Gujarati text) → Card image (HTML → PNG) → Reel MP4 (FFmpeg) → Instagram API
+```
+
+## ⭐ Roz ka tareeka: poora automatic
+
+**Scheduler** (`scheduler.yml`) roz **subah 10 se raat 12 baje tak har 2 ghante** (10, 12, 2, 4, 6, 8, 10 baje aur raat 12, yaani 8 post) apne aap post karta hai. Gap badalna ho to `config.yaml` → `schedule.every_hours`. GitHub ka apna schedule busy hone pe runs chhod deta tha, isliye yeh job lagataar chalta hai aur ~5.5 ghante baad khud ko dobara start karta hai. Rokna ho to: Actions → Scheduler (every 2 hours) → "..." → Disable workflow. Har post mein:
+
+1. News dhundhta hai aur Gujarati text likhta hai.
+2. Poster banata hai, Gemini-style posters jaisa ("bulletin" design: upar label, laal patti pe headline, bada number box, ✅ points, picture, CTA patti).
+   - **Picture** AI banata hai, bina text ke. Free **`POLLINATIONS_API_KEY`** secret ho to behtar model (gptimage) use hota hai: [enter.pollinations.ai](https://enter.pollinations.ai) pe GitHub se login karo → key banao. Card nahi lagta.
+   - **Gujarati text** hamara code asli font mein likhta hai, isliye spelling hamesha sahi rehti hai. Free image AI Gujarati akshar tod deta hai, isliye poster ka text AI se nahi likhwaya jaata.
+   - `GEMINI_API_KEY` pe billing chalu ho to poora poster Gemini banata hai (sabse best quality).
+3. 12–21 sec ki reel (poora 9:16 poster, intro animation, mood ke hisaab se gaana) banake **Instagram pe post** karta hai.
+   Category baari-baari se aati hai: sarkari jaherat → crime → good news → phir se sarkari …
+
+> Shuru ke kuch din `publish` ka tick hata ke chalao aur Artifacts mein poster check karo.
+
+Purana semi-automatic tareeka (Issue mein Gemini prompt → aap Gemini app se poster banao → comment karo) ab bhi haath se chal sakta hai: **Actions → Prepare post (Gemini prompt) → Run workflow**.
+
+### Har post se pehle aur baad (automatic)
+
+- **5 categories baari-baari se:** sarkari jaherat → rajneeti → crime → trending → good news. Rajneeti aur trending mein poore Bharat ki news chalti hai. Rajneeti ke bayaan hamesha bolne wale ke naam se aur nishpaksh likhe jaate hain.
+- **Breaking news turant:** har 20 minute pe taaza khabrein dekhi jaati hain. Sach mein badi news ho to ghante ka intezaar nahi hota (din mein zyada se zyada 3 extra, `config.yaml` → `schedule.max_breaking_per_day`).
+- **Poster ki jaanch:** Gemini poster ki image dekh ke 10 mein se number deta hai: kata text, toote akshar, khaali jagah, galat stamp ya sticker. 7 se kam aaye to doosre design mein dobara banta hai.
+- **Stamp/stickers:** "ARRESTED / APPROVED" jaisa stamp sirf tab lagta hai jab news mein wahi baat ho. Stickers lagbhag har 3 mein se 1 reel pe, asli photo pe kabhi nahi.
+- **Page analysis:** har 3 ghante pe Instagram se har reel ke views, reach, shares, saves aate hain (`data/stats.json`). **`data/report.md`** mein top reels aur kaunsa design, rang, category aur ghanta chal raha hai, sab likha hota hai. Naye posters mein jo chal raha hai woh zyada aata hai, aur naye look bhi aazmaye jaate rehte hain.
+
+## 1. Zaroori keys
+
+| Key | Kahan se milegi |
+|---|---|
+| `IG_ACCESS_TOKEN` | Meta app → Instagram API → API setup with Instagram login → **Generate token** |
+| `IG_USER_ID` | Usi page pe account ke neeche likha number (`17841422688299078`) |
+| `POLLINATIONS_API_KEY` | **Optional**, free: [enter.pollinations.ai](https://enter.pollinations.ai). Behtar AI picture ke liye. Na do to bina key wali free picture |
+| `PEXELS_API_KEY` | **Optional**, free: [pexels.com/api](https://www.pexels.com/api/). Card ke peeche photo ke liye. Na do to emoji/colour design lagta hai |
+| `GEMINI_API_KEY` | Sirf `provider: "gemini"` ke liye (billing chahiye). Free mode mein zaroorat nahi |
+
+`free` mode mein AI ke liye koi key zaroori nahi hai. Tool in free AI services ko order mein try karta hai (`config.yaml` → `llm_providers`):
+
+1. **GitHub Models**: GitHub Actions ka apna `GITHUB_TOKEN`, koi key nahi
+2. **Groq**: optional `GROQ_API_KEY` secret. Free key [console.groq.com/keys](https://console.groq.com/keys) se milti hai, card nahi chahiye
+3. **OpenRouter**: optional `OPENROUTER_API_KEY` secret. Free key [openrouter.ai/keys](https://openrouter.ai/keys) se milti hai, card nahi chahiye
+4. **Pollinations**: koi key nahi, lekin dheema ho sakta hai
+
+Ek reel mein 2 AI requests lagti hain. Groq ki free key daal doge to sabse bharosemand rahega.
+
+> ⚠️ Token/keys kabhi chat, code ya GitHub pe paste mat karna. Sirf `.env` (local) ya GitHub Secrets mein.
+
+## 2. GitHub Actions pe roz automatic chalana (recommended)
+
+1. GitHub repo → **Settings → Secrets and variables → Actions → New repository secret**
+2. Upar wali keys add karo (same naam ke saath). Free mode mein sirf `IG_ACCESS_TOKEN` aur `IG_USER_ID` zaroori hain.
+3. **Actions** tab → **Valsad View reel** → **Run workflow**.
+   - Pehli baar `publish` ka tick hata kar chalao. Video **Artifacts** mein milega, use download karke dekh lo.
+   - Theek lage to tick laga kar chalao, Reel post ho jayegi.
+4. Roz ki posting **Scheduler (every 2 hours)** karta hai (upar dekho). Pehli baar Actions → Scheduler (every 2 hours) → Run workflow se chalu karo, uske baad woh khud chalta rahega. Posting ka gap `config.yaml` → `schedule.every_hours` mein badlo.
+
+### Token auto-refresh (60 din wali problem)
+
+Instagram token 60 din mein expire hota hai. `refresh-token.yml` har hafte use naya kar deta hai. Iske liye:
+
+1. GitHub → Settings → Developer settings → **Fine-grained personal access token** banao.
+   - Sirf is repo ka access do.
+   - Permission: **Secrets: Read and write**.
+2. Use repo secret **`GH_PAT`** naam se save karo.
+
+## 3. Apne computer pe chalana
+
+```bash
+pip install -r requirements.txt
+python -m playwright install chromium
+# ffmpeg bhi install hona chahiye (Windows: winget install ffmpeg, Mac: brew install ffmpeg)
+
+cp .env.example .env        # .env mein keys bharo
+python main.py check        # token sahi hai ya nahi
+python main.py run --no-publish             # sirf video banao, output/ mein dekho
+python main.py publish output/<folder>/reel.mp4 --caption-file output/<folder>/caption.txt
+python main.py run                          # news → reel → post, sab ek saath
+python main.py run --category government    # sirf ek category
+```
+
+Har run ka folder `output/<date-time>/` mein banta hai, usmein yeh files hoti hain:
+- `research.md`: Gemini ko kaunsi news mili aur kin sources se
+- `story.json`, `caption.txt`, `background.png`, `card.png`, `reel.mp4`
+
+## 4. Music 🎵
+
+`assets/music/` folder mein apni `.mp3` (ya `.m4a`, `.wav`) files daal do. GitHub pe: repo → `assets/music` folder → **Add file → Upload files** → files chuno → **Commit changes**. Har reel mein ek random gaana lag jayega (beech ke kisi hisse se, fade in/out ke saath).
+
+**Zaroori:** Instagram API se Instagram ki apni music library (trending audio) attach **nahi** ho sakti. Yeh Instagram ki limit hai. Isliye:
+- **Bollywood ya trending film songs mat daalna.** Copyright ki wajah se Reel mute ho sakti hai, ya account pe strike aa sakti hai.
+- Royalty-free music use karo, jaise [Pixabay Music](https://pixabay.com/music/), YouTube Audio Library, ya [Uppbeat](https://uppbeat.io).
+- Agar trending audio hi chahiye, to `--no-publish` se video banao aur phone se manually upload karo. Upload karte waqt Instagram app mein trending audio add kar sakte ho.
+
+## 5. Poster design
+
+`card.style: "ai_poster"` (default): **Gemini ka image model poora poster banata hai**, jaise viral Gujarati news pages ke posters hote hain. Usmein badi headline, 3D illustration, info boxes, aur schedule/list wali news ke liye rangeen table hoti hai. Har baar style alag hota hai.
+
+- Image models kabhi-kabhi Gujarati mein spelling ya number galat likh dete hain. Isliye har poster ko Gemini **dobara padh kar check karta hai**. Galti mile to poster dobara banta hai (`poster_attempts`, default 3).
+- Teeno baar fail hua to tool apna **template card** (`src/card.py`) use karta hai, taaki galat number wala poster kabhi post na ho.
+- Har try `output/<folder>/poster_try1.png`, `poster_try2.png` mein save hota hai, taaki aap dekh sako.
+- `card.style: "template"` karoge to hamesha fixed template design banega.
+
+## 6. Settings (`config.yaml`)
+
+- `content.categories`: kaun si news chahiye (crime / good_news / government)
+- `content.places` / `content.places_extra`: page ke local shaher. Inki news pehle aati hai. Naya shaher jodna ho to yahan likho
+- `content.extra_instructions`: jaise "sirf Ahmedabad ki news" ya "exam aur job news ko priority do"
+- `card.handle`: card pe dikhne wala Instagram handle
+- `gemini.text_model` / `gemini.image_model`: Gemini models. Google naya model laaye ya purana band kare to yahan naam badal do
+- `gemini.ai_background`: `false` karoge to AI image nahi banegi, sirf Pexels photo ya theme colours
+- Colours/themes badalne hain to `src/card.py` mein `THEMES` dekho
+- `video.seconds`: reel ki length (12–15 achha hai)
+
+## 7. News ke niyam (built-in)
+
+Gemini ko yeh niyam diye gaye hain:
+- Sirf web pe mile **asli sources** ki baatein. Koi number ya date guess nahi karega.
+- Crime news mein victim (khaaskar sexual offence ke cases) ya bachchon ki pehchaan nahi batayega. Jinka case abhi chal raha hai unhe sirf "આરોપી" kahega.
+- Har card aur caption pe **source ka naam** dikhega.
+
+Phir bhi shuru ke kuch din `--no-publish` se check karke post karna better hai. Galat news se page ki credibility aur legal dono ka risk hai.

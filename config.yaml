@@ -1,0 +1,129 @@
+# Which AI to use:
+#   free:   RSS news feeds + GitHub Models (free OpenAI models) + template card. No paid API.
+#   gemini: Gemini + Google Search + full AI posters. Needs a Gemini key with billing.
+provider: "free"
+
+# What the reels are about.
+content:
+  region: "Valsad district and nearby (Valsad, Vapi, Daman, Silvassa, Ahwa-Dang, Navsari) in South Gujarat"
+  language: "Gujarati"
+  # Local places of this page (Gujarati names). Google News is searched for these, and stories that name one of
+  # them (or a name in places_en) are preferred over the rest of Gujarat.
+  places: ["વલસાડ", "વાપી", "દમણ", "સેલવાસ", "આહવા", "ડાંગ", "નવસારી"]
+  # more local names that mark a story as local (towns, talukas, English spellings)
+  places_extra: ["સેલવાસા", "દાદરા નગર હવેલી", "દાનહ", "સંઘપ્રદેશ", "પારડી", "ઉમરગામ", "ધરમપુર", "કપરાડા",
+                 "બીલીમોરા", "ગણદેવી", "ચીખલી", "સાપુતારા", "વઘઈ", "સુબીર", "વાંસદા", "જલાલપોર", "ખેરગામ",
+                 "Valsad", "Vapi", "Daman", "Silvassa", "Ahwa", "Dang", "Navsari", "Saputara", "Pardi",
+                 "Umbergaon", "Dharampur", "Bilimora", "Chikhli", "Dadra"]
+  # Categories to look for. Remove any you don't want.
+  # Posts take the categories in turn, in this order (government, politics, crime, trending, good news, again ...).
+  # politics and trending may be national news; the others prefer Gujarat stories.
+  categories:
+    government: "સરકારી જાહેરાત (government announcements, schemes, exam dates, rules, prices, roads, water, power cuts)"
+    politics: "રાજકારણ (political statements and fights: local MLAs/MPs, BJP, Congress, AAP, elections; local first, then Gujarat or national)"
+    crime: "ક્રાઇમ ન્યૂઝ (crime and police news)"
+    trending: "ટ્રેન્ડિંગ (the news everyone is talking about today: local events, weather, rain, sea, viral, cricket, India)"
+    good_news: "સારા સમાચાર (only truly happy news: achievements, medals, awards, new facilities, relief or help for people; never a disease outbreak, death, accident, crime, disaster, price rise or warning)"
+  max_news_age_hours: 48
+  hashtags_count: 5               # Instagram suggests 3-5 relevant hashtags
+  page_hashtags: ["valsadview"]   # added to every caption
+  extra_instructions: ""
+
+# Look of the news card. Colour themes per category are in src/card.py (THEMES).
+card:
+  # ai_poster: Gemini designs the whole poster (text + illustration), checked for mistakes before use.
+  # template:  fixed HTML design (src/card.py) with an AI/stock background. Also the fallback for ai_poster.
+  style: "template"               # every post uses the brand template with the row styles below, in turn;
+                                  # "ai_poster" would let Gemini draw the whole poster instead (skips the styles)
+  handle: "@valsadview"
+  # Designs that may be used: bulletin, mag, hero, split, paper (classic is the fallback).
+  # The news mood (breaking / money / info / happy) decides which of these fit; one of them is picked at random.
+  designs: ["brand"]              # brand = one fixed layout on every post (only the category colour changes), so
+                                  # the profile grid looks like one page; others: bulletin, mag, hero, split, paper
+  # how the brand poster draws its three facts: each post takes the next one in this order, after the last one
+  # it starts again from the first (views per style: data/report.md, "rows")
+  row_styles: [cols, split, neon, circles, strips, tv, notes, capsules, stats, keys, bento, aurora,
+               hub, stairs, arrows, paper, magazine, road, rope, puzzle, train, calendar, film,
+               clipboard, tvs, balloons, station, detective, stamps]
+  picture: "cartoon"              # cartoon = a flat 2D cartoon scene of the story (Gemini first; generic characters,
+                                  # never a real person's likeness), else a 3D cut-out, else a big 3D icon;
+                                  # cutout = only 3D object cut-outs; scene = AI scenes and real photos allowed
+  stamps: false                   # true = "ARRESTED" / "APPROVED" style stamps when the story says so
+  bulletin_share: 0.6             # how often the bulletin design (closest to the Gemini posters) is used
+  stickers: false                 # true = corner banner ("NEW RULE") and tag stickers ("IMPORTANT") ...
+  sticker_share: 0.3              # ... on about this share of the reels (never on a real person's photo)
+  min_check_score: 7              # the AI checks each poster (1-10); below this it is made again in another design
+  min_post_score: 5               # below this the poster is not posted at all (the hour is tried again later)
+  font: "random"                  # "random" = a different Gujarati font each post, or a Google Font name
+
+video:
+  seconds: 15                     # Instagram needs at least 3s; 12-15s works well for news reels
+  fps: 30
+  intro_animation: true           # first seconds: banner drops, headline punches in, stamp slams, points pop
+  intro_seconds: 3.4
+  music_volume: 0.9               # music from assets/music/*.mp3 (random pick each run)
+
+free:
+  ai_images: false                # true = try AI cartoon pictures first (needs image quota); false = scenes drawn in code
+  # no AI reachable at all (every free quota used up): still post, with the card text taken from the article
+  allow_plain_card: true
+  # Whole poster (picture + Gujarati text) from the free image AI. Off: those models garble Gujarati letters.
+  # The picture comes from the AI (POLLINATIONS_API_KEY gives the better gptimage model) and the text is
+  # written by the card design, so it is always spelled right. Put e.g. ["gptimage"] here to try it anyway.
+  ai_poster_models: []
+  # Extra RSS feeds (Gujarati news sites). Google News searches per category are always added.
+  # A feed that fails or doesn't exist is skipped, so it's safe to add more.
+  feeds:
+    - "https://tv9gujarati.com/feed"
+    - "https://www.gujaratfirst.com/feed"
+    - "https://connectgujarat.com/feed"
+    - "https://www.gujaratsamachar.com/rss/top-stories"
+
+# Free LLMs for the "free" provider, tried in order (OpenAI-compatible chat APIs).
+# If none answers, the card is made from the news headline itself, without AI.
+# A provider with key_env is only used when that secret is set. If a model is unknown or its free
+# daily limit is used up, the next model / provider is tried.
+llm_providers:
+  - name: gemini                      # GEMINI_API_KEY: the free tier includes text models (not images)
+    type: gemini
+    key_env: GEMINI_API_KEY
+    models: ["gemini-3.8-flash", "gemini-3.5-flash", "gemini-3.1-flash-lite"]
+  - name: groq                        # free key, no card: https://console.groq.com/keys; each model has its own daily quota
+    url: "https://api.groq.com/openai/v1/chat/completions"
+    key_env: GROQ_API_KEY
+    models: ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3-32b", "llama-3.1-8b-instant"]
+  - name: openrouter                  # free key, no card: https://openrouter.ai/keys
+    url: "https://openrouter.ai/api/v1/chat/completions"
+    key_env: OPENROUTER_API_KEY
+    models: ["openai/gpt-oss-120b:free", "meta-llama/llama-3.3-70b-instruct:free"]
+  - name: pollinations-key            # the free POLLINATIONS_API_KEY (also used for the pictures)
+    url: "https://gen.pollinations.ai/v1/chat/completions"
+    key_env: POLLINATIONS_API_KEY
+    models: ["openai-large", "openai"]
+  - name: pollinations                # free, no key at all (rate limited)
+    url: "https://text.pollinations.ai/openai"
+    models: ["openai"]
+
+gemini:
+  text_model: "gemini-3.8-flash"        # news search + card text (Google Search grounding)
+  image_model: "gemini-2.5-flash-image" # background illustration for the template card
+  # Used whenever GEMINI_API_KEY is set (also in free mode); needs billing on the key.
+  # Image models for the full poster, tried in order. The Pro model gives the best design and Gujarati text;
+  # if it is unavailable or not enabled on your key, the next one is used.
+  poster_models: ["gemini-3-pro-image", "gemini-3.1-flash-image", "gemini-2.5-flash-image"]
+  poster_attempts: 3                    # regenerate if the proof-read finds mistakes
+  ai_background: true                   # false = Pexels photo / theme colours only
+  # cartoon scenes for the brand template (picture: cartoon), tried in order before the free services
+  cartoon_models: []   # empty: no image quota needed, the cartoon scenes are drawn in code (src/scenes.py)
+
+schedule:
+  every_hours: 2                  # one reel every 2 hours from 10:00 to midnight IST (10, 12, 14 ... 22, 0)
+  max_breaking_per_day: 3         # extra posts for really big breaking news, between the regular posts
+
+instagram:
+  api_version: "v21.0"
+  # up to 3 public Instagram accounts invited as collaborators on every reel, e.g. ["friendpage"]; the reel
+  # then shows on their profile too once they accept the invite (in their Instagram notifications)
+  collaborators: []
+  first_comment: true             # post a question as the first comment under each reel
+  share_to_feed: true
