@@ -201,10 +201,27 @@ TEMPLATE_RULES = [
     ("good_news", ["polaroid", "magazine", "card"]),
     ("trending", ["chat", "magazine", "tv", "diagonal"]),
     ("steps", ["timeline", "tips"]),
+    ("travel", ["ticket", "map"]),
+    ("date", ["calendar", "ticket"]),
+    ("sports", ["scoreboard", "filmstrip", "polaroid"]),
+    ("education", ["chalkboard", "calendar", "notice"]),
+    ("event", ["filmstrip", "neon", "polaroid"]),
+    ("prices", ["receipt", "versus"]),
+    ("place", ["map"]),
+    ("viral", ["comic", "lockscreen", "neon"]),
 ]
-GENERAL = ["card", "diagonal", "paper", "chat", "polaroid"]
+GENERAL = ["card", "diagonal", "paper", "chat", "polaroid", "lockscreen", "comic", "neon", "map"]
 ALL_TEMPLATES = ["police", "storm", "bignews", "tips", "card", "tv", "paper", "quote", "timeline", "versus", "alert",
-                 "notice", "stats", "polaroid", "magazine", "chat", "diagonal"]
+                 "notice", "stats", "polaroid", "magazine", "chat", "diagonal", "ticket", "map", "calendar", "receipt",
+                 "scoreboard", "comic", "neon", "lockscreen", "chalkboard", "filmstrip"]
+TOPIC_WORDS = {
+    "travel": r"ટ્રેન|રેલ|બસ|એસટી|ફ્લાઇટ|વિમાન|હાઇવે|train|bus|flight|railway",
+    "sports": r"ક્રિકેટ|મેચ|સ્પર્ધા|મેડલ|ખેલ|ટુર્નામેન્ટ|ગોલ્ડ|ચેમ્પિયન|cricket|match",
+    "education": r"પરીક્ષા|શાળા|પરિણામ|વિદ્યાર્થી|કોલેજ|ભરતી|exam|GSEB|result",
+    "event": r"ફિલ્મ|મૂવી|સિનેમા|ગરબા|ઉત્સવ|મેળો|કાર્યક્રમ|તહેવાર|festival",
+    "prices": r"₹|ભાવ|કિંમત|ભાડું|ફી|બિલ|price",
+    "viral": r"વાયરલ|વીડિયો|સોશિયલ|ઇન્સ્ટાગ્રામ|viral",
+}
 
 
 def _kinds(story, mood: str) -> set[str]:
@@ -222,6 +239,14 @@ def _kinds(story, mood: str) -> set[str]:
         kinds.add("compare")
     if len([p for p in story.points if p]) >= 3:
         kinds.add("steps")
+    for kind, words in TOPIC_WORDS.items():
+        if re.search(words, text, re.I):
+            kinds.add(kind)
+    if any(re.search(r"તારીખ|date", f["label"], re.I) or re.search(r"\d{1,2}\s*(?:જાન્યુ|ફેબ્રુ|માર્ચ|એપ્રિલ|મે|જૂન|જુલાઈ|ઓગસ્ટ|સપ્ટે|ઓક્ટો|નવે|ડિસે)",
+                                                                  f["value"]) for f in story.facts):
+        kinds.add("date")
+    if story.category == "trending":
+        kinds.add("viral")
     return kinds
 
 
@@ -260,8 +285,9 @@ def viral_page(story, font: str, image_url: str | None, date: str, handle: str, 
     story.style["template"] = template
     if template != "police":
         from src.viral_layouts import LAYOUTS
+        from src.viral_extra import EXTRA_LAYOUTS
         from src.viral_more import MORE_LAYOUTS
-        page = {**LAYOUTS, **MORE_LAYOUTS}.get(template)
+        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS}.get(template)
         if page:
             return page(story, font, image_url, date, handle, _place_tag(story, places or []), ASKS)
     tag_text, looks = MOOD_LOOK.get(mood, MOOD_LOOK["info"])
@@ -338,4 +364,5 @@ VIRAL_STEPS = [
 ]
 from src.viral_layouts import MORE_STEPS  # noqa: E402  (the other layouts' elements)
 from src.viral_more import MORE_STEPS2  # noqa: E402
-VIRAL_STEPS = VIRAL_STEPS + MORE_STEPS2 + MORE_STEPS
+from src.viral_extra import EXTRA_STEPS  # noqa: E402
+VIRAL_STEPS = VIRAL_STEPS + EXTRA_STEPS + MORE_STEPS2 + MORE_STEPS

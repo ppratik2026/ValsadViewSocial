@@ -49,7 +49,8 @@ card:
   # layouts of the viral design (each like a popular Gujarati news poster); the story picks one that fits and
   # the layouts of the last few posts are skipped, so the grid keeps changing. Remove any you don't want.
   viral_templates: [police, storm, bignews, tips, card, tv, paper, quote, timeline, versus, alert, notice, stats,
-                    polaroid, magazine, chat, diagonal]
+                    polaroid, magazine, chat, diagonal, ticket, map, calendar, receipt, scoreboard, comic, neon,
+                    lockscreen, chalkboard, filmstrip]
   picture: "photo"                # photo = free stock photo: Pexels (free PEXELS_API_KEY), else an openly licensed
                                   # photo from Openverse (no key, credit shown on the poster), else a realistic AI
                                   # picture, else a drawn scene; never a real person's photo (for the viral design);
