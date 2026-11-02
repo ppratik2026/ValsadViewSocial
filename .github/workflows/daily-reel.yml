@@ -17,7 +17,7 @@ on:
       design:
         description: "Poster design"
         type: choice
-        options: [auto, bulletin, mag, hero, split, paper]
+        options: [auto, viral, brand, bulletin, mag, hero, split, paper]
         default: auto
       publish:
         description: "Post to Instagram (untick to only make the video)"
