@@ -1,0 +1,133 @@
+name: Valsad View reel
+
+# Fully automatic: news -> poster (AI poster from the Gemini-style prompt, else the template design) -> reel -> post.
+# Regular posting (every 2 hours) is done by scheduler.yml (GitHub's own schedule dropped runs); this one is for manual runs.
+on:
+  workflow_dispatch:
+    inputs:
+      category:
+        description: "News category"
+        type: choice
+        options:
+          - any
+          - government
+          - crime
+          - good_news
+        default: any
+      design:
+        description: "Poster design"
+        type: choice
+        options: [auto, bulletin, mag, hero, split, paper]
+        default: auto
+      publish:
+        description: "Post to Instagram (untick to only make the video)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  models: read      # free GitHub Models for the "free" provider
+
+concurrency:
+  group: reel
+  cancel-in-progress: false
+
+jobs:
+  reel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install system packages
+        # a stuck Ubuntu mirror once hung this step for over half an hour: each try is time-limited
+        timeout-minutes: 12
+        run: |
+          for try in 1 2 3; do
+            sudo timeout 150 apt-get update -o Acquire::Retries=3 &&
+              sudo timeout 300 apt-get install -y --no-install-recommends -o Acquire::Retries=3 ffmpeg fonts-noto-core fonts-noto-color-emoji && break
+            echo "apt try $try failed, retrying"; sleep 15
+          done
+          command -v ffmpeg >/dev/null   # the reel cannot be made without it
+
+      - name: Install Python packages
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Make (and post) the reel
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
+          CARD_DESIGN: ${{ inputs.design }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            # the backup trigger of the hour: skip if a reel went out in the last 35 minutes
+            git fetch -q origin "${{ github.ref_name }}"
+            if git show "origin/${{ github.ref_name }}:data/history.json" | python -c "
+          import json, sys
+          from datetime import datetime, timezone
+          posts = json.load(sys.stdin)
+          last = datetime.fromisoformat(posts[-1]['date']) if posts else None
+          sys.exit(0 if last and (datetime.now(timezone.utc) - last).total_seconds() < 35 * 60 else 1)"; then
+              echo "Already posted in the last 35 minutes, skipping this trigger."
+              exit 0
+            fi
+          fi
+          ARGS=""
+          if [ -n "${{ inputs.category }}" ] && [ "${{ inputs.category }}" != "any" ]; then ARGS="$ARGS --category ${{ inputs.category }}"; fi
+          if [ "${{ inputs.publish }}" = "false" ]; then
+            ARGS="$ARGS --no-publish"
+            # test runs: skip the stories already shown in earlier previews
+            git fetch -q origin previews 2>/dev/null && git log origin/previews --format=%s | sed 's/^Preview run [0-9]*: //' > preview_titles.txt || true
+            [ -s preview_titles.txt ] && ARGS="$ARGS --skip-titles preview_titles.txt"
+          fi
+          python main.py run $ARGS
+
+      - name: Save the video
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reel-${{ github.run_number }}
+          path: |
+            output/
+            !output/**/intro/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Remember posted stories
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/history.json || true
+          # the branch may have moved on while the reel was made: rebase so the history is never lost
+          git diff --cached --quiet || (git commit -m "Update posted history" && \
+            (git push || (git pull --rebase -q origin "${{ github.ref_name }}" && git push)))
+
+      - name: Save the poster preview (test runs only)
+        # test runs (publish unticked) also save card.png to the "previews" branch, easy to open in the GitHub app
+        if: success() && github.event_name == 'workflow_dispatch' && !inputs.publish
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          card=$(ls output/*/card.png | head -1)
+          title=$(python -c "import json,glob; print(json.load(open(sorted(glob.glob('output/*/story.json'))[0]))['headline'])")
+          git fetch origin previews:previews 2>/dev/null || true
+          git worktree add -f /tmp/prev previews 2>/dev/null || (git worktree add --detach /tmp/prev && cd /tmp/prev && git checkout --orphan previews && git rm -rfq .)
+          cp "$card" "/tmp/prev/run-${{ github.run_number }}.png"
+          cp "$(dirname "$card")/caption.txt" "/tmp/prev/run-${{ github.run_number }}.txt" 2>/dev/null || true
+          cd /tmp/prev
+          git add . && git commit -qm "Preview run ${{ github.run_number }}: $title" && git push -q origin previews
+          echo "Preview: https://github.com/${{ github.repository }}/blob/previews/run-${{ github.run_number }}.png"
