@@ -189,8 +189,36 @@ def _chips(story) -> str:
                    f'<b>{esc(f["value"])}</b></div></div>' for f in facts)
 
 
+def choose_template(story, mood: str) -> str:
+    """Which of the reference posters this story looks best as: the first that fits most of the time, now and then
+    another fitting one (the page's own numbers then show which layouts get more views). VIRAL_TEMPLATE forces one."""
+    forced = os.environ.get("VIRAL_TEMPLATE", "")
+    if forced:
+        return forced
+    text = f"{story.headline} {story.summary}"
+    fitting = []
+    if WEATHER.search(text):
+        fitting.append("storm")
+    if mood == "breaking" or story.category == "crime":
+        fitting.append("police")
+    if mood == "money" or len([p for p in story.points if p]) >= 3:
+        fitting.append("tips")
+    if any(re.search(r"\d", f["value"]) and len(f["value"]) <= 9 for f in story.facts):
+        fitting.append("bignews")
+    fitting += [t for t in ("card", "police") if t not in fitting]
+    if random.random() < 0.6:
+        return fitting[0]
+    from src.analytics import weighted_choice
+    return weighted_choice(fitting, "template")
+
+
 def viral_page(story, font: str, image_url: str | None, date: str, handle: str, mood: str,
                places: list[str] | None = None) -> str:
+    template = choose_template(story, mood)
+    story.style["template"] = template
+    if template != "police":
+        from src.viral_layouts import LAYOUTS
+        return LAYOUTS[template](story, font, image_url, date, handle, _place_tag(story, places or []), ASKS)
     tag_text, looks = MOOD_LOOK.get(mood, MOOD_LOOK["info"])
     weather = bool(WEATHER.search(f"{story.headline} {story.summary}"))
     if weather:
@@ -263,3 +291,5 @@ VIRAL_STEPS = [
     [".v-ask", "riseUp", 2.3, 0.45, 0],
     [".foot, .v-top", "fadeIn", 2.6, 0.3, 0],
 ]
+from src.viral_layouts import MORE_STEPS  # noqa: E402  (the other layouts' elements)
+VIRAL_STEPS = VIRAL_STEPS + MORE_STEPS

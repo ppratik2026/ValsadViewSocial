@@ -120,7 +120,13 @@ Har run ka folder `output/<date-time>/` mein banta hai, usmein yeh files hoti ha
 - **"🚨 બ્રેકિંગ ન્યૂઝ | વાપી - વલસાડ"** patti: news mein jo shaher hai wo apne aap aata hai (`content.places`)
 - laal brush patti par moti headline, har doosri line peeli, sabse zaroori shabd/number bada
 - tarikh/rakam ki chips, ✅ points ka box, neeche peeli patti par sawal + "કોમેન્ટ કરીને જરૂર જણાવો"
-- 5 rang (crime: laal-kaala, mausam: storm blue, info: purple, paisa: navy, khushkhabar: green) aur 2 layout (picture upar / picture poore poster ke peeche). Kaunsa chal raha hai, `data/report.md` mein dikhta hai aur wahi zyada aata hai.
+- **5 layout**, har ek aapke bheje ek poster jaisa; news ke hisaab se apne aap chuna jaata hai (`src/viral.py`, `src/viral_layouts.py`):
+  - `police`: crime / breaking (photo, "બ્રેકિંગ ન્યૂઝ | વાપી - વલસાડ", hazard patti, neon points box)
+  - `storm`: mausam / vavazodu (poore poster par photo, 📍 shaher, badi headline, tarikh patti, info box)
+  - `bignews`: niyam / numbers ("BIG NEWS", safed headline card, glass box, gol speed-sign jaise number)
+  - `tips`: paisa / "aa vato jaano" (4 rang ki headline, ❌ galat-maanyata box, numbered tips)
+  - `card`: baaki sab (headline photo par, safed card mein rangeen icon gol, sawal + comment bubble)
+- police layout mein 5 rang (crime: laal-kaala, mausam: storm blue, info: purple, paisa: navy, khushkhabar: green) aur 2 picture layout. Kaunsa chal raha hai, `data/report.md` mein dikhta hai aur wahi zyada aata hai.
 
 Purane designs (`brand`, `bulletin`, `mag`, ...) bhi hain: `config.yaml` → `card.designs` mein naam likho.
 
