@@ -475,7 +475,7 @@ def render_card(story: NewsStory, cfg: dict, out_path: Path, background: Path | 
     elif design == "viral":
         from src.viral import FIT as VIRAL_FIT, viral_page
         page_html = viral_page(story, font, image_url, date, cfg["card"]["handle"], mood,
-                               cfg["content"].get("places", []))
+                               cfg["content"].get("places", []), cfg["card"].get("viral_templates"))
         fit_script = VIRAL_FIT
     elif design == "bulletin":
         from src.bulletin import FIT, bulletin_page

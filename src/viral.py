@@ -189,36 +189,81 @@ def _chips(story) -> str:
                    f'<b>{esc(f["value"])}</b></div></div>' for f in facts)
 
 
-def choose_template(story, mood: str) -> str:
-    """Which of the reference posters this story looks best as: the first that fits most of the time, now and then
-    another fitting one (the page's own numbers then show which layouts get more views). VIRAL_TEMPLATE forces one."""
+# which layouts fit which kind of story (the first ones fit best); every story can also use the general ones
+TEMPLATE_RULES = [
+    ("weather", ["storm", "alert", "magazine"]),
+    ("crime", ["police", "tv", "diagonal", "alert"]),
+    ("politics", ["quote", "tv", "paper"]),
+    ("government", ["notice", "timeline", "card", "paper"]),
+    ("money", ["tips", "stats", "versus"]),
+    ("numbers", ["bignews", "stats"]),
+    ("compare", ["versus"]),
+    ("good_news", ["polaroid", "magazine", "card"]),
+    ("trending", ["chat", "magazine", "tv", "diagonal"]),
+    ("steps", ["timeline", "tips"]),
+]
+GENERAL = ["card", "diagonal", "paper", "chat", "polaroid"]
+ALL_TEMPLATES = ["police", "storm", "bignews", "tips", "card", "tv", "paper", "quote", "timeline", "versus", "alert",
+                 "notice", "stats", "polaroid", "magazine", "chat", "diagonal"]
+
+
+def _kinds(story, mood: str) -> set[str]:
+    text = f"{story.headline} {story.summary}"
+    kinds = {story.category}
+    if WEATHER.search(text):
+        kinds.add("weather")
+    if mood == "breaking":
+        kinds.add("crime" if story.category == "crime" else "trending")
+    if mood == "money" or re.search(r"₹|ભાવ|પેટ્રોલ|ડીઝલ", text):
+        kinds.add("money")
+    if any(re.search(r"\d", f["value"]) and len(f["value"]) <= 9 for f in story.facts):
+        kinds.add("numbers")
+    if (story.compare or {}).get("before") or len(story.facts) >= 2:
+        kinds.add("compare")
+    if len([p for p in story.points if p]) >= 3:
+        kinds.add("steps")
+    return kinds
+
+
+def choose_template(story, mood: str, allowed: list[str] | None = None) -> str:
+    """Which layout this story gets: one that fits the story, not one of the last few posts' layouts (so the
+    profile grid keeps changing), favouring the layouts whose reels did better. VIRAL_TEMPLATE forces one."""
     forced = os.environ.get("VIRAL_TEMPLATE", "")
     if forced:
         return forced
-    text = f"{story.headline} {story.summary}"
+    allowed = [t for t in (allowed or ALL_TEMPLATES) if t in ALL_TEMPLATES] or ALL_TEMPLATES
+    kinds = _kinds(story, mood)
     fitting = []
-    if WEATHER.search(text):
-        fitting.append("storm")
-    if mood == "breaking" or story.category == "crime":
-        fitting.append("police")
-    if mood == "money" or len([p for p in story.points if p]) >= 3:
-        fitting.append("tips")
-    if any(re.search(r"\d", f["value"]) and len(f["value"]) <= 9 for f in story.facts):
-        fitting.append("bignews")
-    fitting += [t for t in ("card", "police") if t not in fitting]
-    if random.random() < 0.6:
-        return fitting[0]
+    for kind, names in TEMPLATE_RULES:
+        if kind in kinds:
+            fitting += [n for n in names if n not in fitting]
+    if not _from_compare(story):
+        fitting = [t for t in fitting if t != "versus"]
+    fitting = [t for t in fitting if t in allowed] + [t for t in GENERAL if t in allowed and t not in fitting]
+    from src.history import load_history
+    recent = [(p.get("style") or {}).get("template") for p in load_history()[-4:]]
+    fresh = [t for t in fitting if t not in recent] or fitting
+    if random.random() < 0.5:
+        return fresh[0]
     from src.analytics import weighted_choice
-    return weighted_choice(fitting, "template")
+    return weighted_choice(fresh[:6], "template")
+
+
+def _from_compare(story) -> bool:
+    from src.viral_more import versus_parts
+    return versus_parts(story) is not None
 
 
 def viral_page(story, font: str, image_url: str | None, date: str, handle: str, mood: str,
-               places: list[str] | None = None) -> str:
-    template = choose_template(story, mood)
+               places: list[str] | None = None, allowed: list[str] | None = None) -> str:
+    template = choose_template(story, mood, allowed)
     story.style["template"] = template
     if template != "police":
         from src.viral_layouts import LAYOUTS
-        return LAYOUTS[template](story, font, image_url, date, handle, _place_tag(story, places or []), ASKS)
+        from src.viral_more import MORE_LAYOUTS
+        page = {**LAYOUTS, **MORE_LAYOUTS}.get(template)
+        if page:
+            return page(story, font, image_url, date, handle, _place_tag(story, places or []), ASKS)
     tag_text, looks = MOOD_LOOK.get(mood, MOOD_LOOK["info"])
     weather = bool(WEATHER.search(f"{story.headline} {story.summary}"))
     if weather:
@@ -292,4 +337,5 @@ VIRAL_STEPS = [
     [".foot, .v-top", "fadeIn", 2.6, 0.3, 0],
 ]
 from src.viral_layouts import MORE_STEPS  # noqa: E402  (the other layouts' elements)
-VIRAL_STEPS = VIRAL_STEPS + MORE_STEPS
+from src.viral_more import MORE_STEPS2  # noqa: E402
+VIRAL_STEPS = VIRAL_STEPS + MORE_STEPS2 + MORE_STEPS

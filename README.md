@@ -126,6 +126,8 @@ Har run ka folder `output/<date-time>/` mein banta hai, usmein yeh files hoti ha
   - `bignews`: niyam / numbers ("BIG NEWS", safed headline card, glass box, gol speed-sign jaise number)
   - `tips`: paisa / "aa vato jaano" (4 rang ki headline, ❌ galat-maanyata box, numbered tips)
   - `card`: baaki sab (headline photo par, safed card mein rangeen icon gol, sawal + comment bubble)
+- **12 aur layout** (`src/viral_more.py`), sabka look alag: `tv` (LIVE TV screen + ticker), `paper` (akhbaar ka pehla panna), `quote` (neta/adhikari ka bayan, bade quote nishan, chehra nahi), `timeline` (step by step), `versus` (pehle vs hav), `alert` (peela-kaala chetavni poster), `notice` (jaherat / sarkari suchna), `stats` (numbers dashboard), `polaroid` (pin board + sticky notes), `magazine` (magazine cover), `chat` (WhatsApp jaisi chat), `diagonal` (tirchhi photo + laal patti).
+- Har post ke liye news ke hisaab se fit hone wala layout chuna jaata hai, aur pichhli 4 post wale layout chhod diye jaate hain, taaki profile grid har baar alag dikhe. Koi layout nahi chahiye to `config.yaml` → `card.viral_templates` se hata do.
 - police layout mein 5 rang (crime: laal-kaala, mausam: storm blue, info: purple, paisa: navy, khushkhabar: green) aur 2 picture layout. Kaunsa chal raha hai, `data/report.md` mein dikhta hai aur wahi zyada aata hai.
 
 Purane designs (`brand`, `bulletin`, `mag`, ...) bhi hain: `config.yaml` → `card.designs` mein naam likho.
