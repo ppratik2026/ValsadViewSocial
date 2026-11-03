@@ -144,6 +144,19 @@ Purane designs (`brand`, `bulletin`, `mag`, ...) bhi hain: `config.yaml` → `ca
 - Har try `output/<folder>/poster_try1.png`, `poster_try2.png` mein save hota hai, taaki aap dekh sako.
 - `card.style: "template"` karoge to hamesha fixed template design banega.
 
+### Bana-banaya poster → animated reel
+
+Koi bhi poster image (Gemini app se bana, Canva, ya kahin aur se) seedha animated reel bana sakte ho:
+
+```bash
+python tools/poster_to_reel.py poster.jpg reel.mp4 --style auto --music assets/music/"Iron Rise.mp3"
+```
+
+Tool poster ke hisso (headline, photo, points, neeche ki patti) ko khud pehchanta hai aur camera unpar chalata hai.
+4 style: `scan` (headline se shuru, neeche padhta jaata hai), `punch` (har hisse par jhatke se zoom + flash),
+`zigzag` (tirchha left-right), `focus` (ek hissa roshan, baaki dhundhla). Har reel flash se shuru hoti hai aur
+aakhir mein poora poster dikhati hai.
+
 ## 6. Settings (`config.yaml`)
 
 - `content.categories`: kaun si news chahiye (crime / good_news / government)
