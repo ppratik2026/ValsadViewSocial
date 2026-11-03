@@ -223,6 +223,12 @@ TEMPLATE_RULES = [
     ("event", ["spotlight"]),
     ("viral", ["graffiti", "retrotv", "laptop"]),
     ("good_news", ["spotlight", "openbook"]),
+    ("crime", ["hero3d", "cinema"]),
+    ("weather", ["hero3d", "glass3d"]),
+    ("trending", ["poppop", "glass3d", "hero3d"]),
+    ("money", ["poppop", "glass3d"]),
+    ("government", ["glass3d", "cinema"]),
+    ("good_news", ["cinema", "hero3d"]),
 ]
 GENERAL = ["card", "diagonal", "paper", "chat", "polaroid", "lockscreen", "comic", "neon", "map", "billboard", "collage",
            "radio", "notebook", "letter", "retrotv", "laptop", "graffiti", "openbook"]
@@ -230,7 +236,7 @@ ALL_TEMPLATES = ["police", "storm", "bignews", "tips", "card", "tv", "paper", "q
                  "notice", "stats", "polaroid", "magazine", "chat", "diagonal", "ticket", "map", "calendar", "receipt",
                  "scoreboard", "comic", "neon", "lockscreen", "chalkboard", "filmstrip", "notebook", "billboard", "letter",
                  "crimetape", "collage", "radio", "countdown", "percent", "folder", "roadsign", "crackglass", "spotlight",
-                 "retrotv", "detective", "weatherapp", "graffiti", "telegram", "flapboard", "laptop", "openbook"]
+                 "retrotv", "detective", "weatherapp", "graffiti", "telegram", "flapboard", "laptop", "openbook", "hero3d", "glass3d", "poppop", "cinema"]
 TOPIC_WORDS = {
     "travel": r"ટ્રેન|રેલ|બસ|એસટી|ફ્લાઇટ|વિમાન|હાઇવે|train|bus|flight|railway",
     "sports": r"ક્રિકેટ|મેચ|સ્પર્ધા|મેડલ|ખેલ|ટુર્નામેન્ટ|ગોલ્ડ|ચેમ્પિયન|cricket|match",
@@ -313,7 +319,8 @@ def viral_page(story, font: str, image_url: str | None, date: str, handle: str, 
         from src.viral_more import MORE_LAYOUTS
         from src.viral_new import NEW_LAYOUTS
         from src.viral_plus import PLUS_LAYOUTS
-        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS, **PLUS_LAYOUTS, **NEW_LAYOUTS}.get(template)
+        from src.viral_pro import PRO_LAYOUTS
+        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS, **PLUS_LAYOUTS, **NEW_LAYOUTS, **PRO_LAYOUTS}.get(template)
         if page:
             return page(story, font, image_url, date, handle, _place_tag(story, places or []), ASKS)
     tag_text, looks = MOOD_LOOK.get(mood, MOOD_LOOK["info"])

@@ -82,6 +82,7 @@ MOTION_CSS = """
 @keyframes curtainOpenR { from { transform: scaleX(3.5); transform-origin: right; } to { transform: scaleX(1); transform-origin: right; } }
 @keyframes shatterIn { 0% { transform: var(--t0, translate(0)) scale(1.4) rotate(-6deg); opacity: 0; } 50% { opacity: 1; }
   70% { transform: var(--t0, translate(0)) scale(.96) rotate(1deg); } 100% { transform: var(--t0, translate(0)); } }
+@keyframes spinRays { from { transform: rotate(0deg); } to { transform: rotate(40deg); } }
 @keyframes underline { 0% { box-shadow: inset 0 -6px 0 rgba(255,214,10,0); } 30%, 80% { box-shadow: inset 0 -10px 0 rgba(255,214,10,.9); }
   100% { box-shadow: inset 0 -6px 0 rgba(255,214,10,0); } }
 """
@@ -305,6 +306,30 @@ M.update({
         "intro": [[".book", "flipY", 0.0, 0.7, 0], [".ribbon", "growY", 0.6, 0.5, 0], [".right .hl div", "inkIn", 0.8, 0.5, 0.2],
                   [".right p", "typeIn", 1.5, 0.45, 0.25]],
         "spot": "highlight"},
+})
+
+M.update({
+    "hero3d": {
+        "intro": [[".ribbon", "dropIn", 0.0, 0.4, 0], [".hl div", "slapIn", 0.2, 0.4, 0.15], [".fl", "popIn", 0.8, 0.35, 0.15],
+                  [".sub", "riseFar", 1.0, 0.4, 0], [".cards p", "slideFarR", 1.3, 0.35, 0.15]],
+        "live": [[".rays", "spinRays {end}s linear 0s both"], [".fl", "float 2.2s ease-in-out {start}s infinite"],
+                 [".spark", "blink 1.3s steps(1) 0s infinite"], [".bgpic", "kbZoom {end}s linear 0s both"]],
+        "spot": "glow"},
+    "glass3d": {
+        "intro": [[".photo", "settle", 0.0, 0.6, 0], [".tag", "slideFarL", 0.3, 0.4, 0], [".front", "riseFar", 0.5, 0.5, 0],
+                  [".gc", "flipX", 1.1, 0.4, 0.15]],
+        "live": [[".orb", "float 3s ease-in-out 0s infinite"], [".photo", "kbPan {end}s ease-in-out 0s both"]],
+        "spot": "glow"},
+    "poppop": {
+        "intro": [[".photo", "slapIn", 0.0, 0.4, 0], [".stamp", "slapIn", 0.4, 0.3, 0], [".hl div", "slideFarR", 0.5, 0.3, 0.12],
+                  [".bul p", "slapIn", 1.2, 0.3, 0.15]],
+        "live": [["#main", "shakeHard .35s linear .45s 1"], [".stamp", "wobble 1.2s ease-in-out {start}s infinite"]],
+        "spot": "tick"},
+    "cinema": {
+        "intro": [[".pre", "inkIn", 0.0, 0.8, 0], [".hl div", "inkIn", 0.6, 0.8, 0.3], [".tagline", "fadeIn", 1.5, 0.5, 0],
+                  [".stars", "typeIn", 1.8, 0.6, 0], [".credits p", "fadeIn", 2.0, 0.4, 0.2]],
+        "live": [[".bgpic", "kbZoom {end}s ease-out 0s both"]],
+        "spot": None},
 })
 
 SPOT_ANIM = {
