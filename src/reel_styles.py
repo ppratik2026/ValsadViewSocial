@@ -72,6 +72,16 @@ MOTION_CSS = """
 @keyframes ledBlink { 0%, 100% { text-shadow: 0 0 14px rgba(255,176,0,.8); } 50% { text-shadow: 0 0 30px rgba(255,176,0,1), 0 0 60px rgba(255,120,0,.6); } }
 @keyframes highlightSweep { from { background: linear-gradient(90deg, rgba(255,214,10,.55) 0%, transparent 0%); }
   to { background: linear-gradient(90deg, rgba(255,214,10,.55) 100%, transparent 100%); } }
+@keyframes tvOn { 0% { transform: var(--t0, translate(0)) scale(1, .01); filter: brightness(4); } 40% { transform: var(--t0, translate(0)) scale(1, .01); filter: brightness(4); }
+  70% { transform: var(--t0, translate(0)) scale(1, 1.05); filter: brightness(1.6); } 100% { transform: var(--t0, translate(0)); filter: none; } }
+@keyframes drawLine { from { stroke-dashoffset: 2600; } to { stroke-dashoffset: 0; } }
+@keyframes rainFall { from { background-position: 0 0; } to { background-position: -40px 360px; } }
+@keyframes sprayIn { from { filter: blur(14px); opacity: 0; transform: var(--t0, translate(0)) scale(1.15); } to { filter: none; opacity: 1; transform: var(--t0, translate(0)); } }
+@keyframes beamSway { 0%, 100% { transform: translateX(-50%) rotate(-3deg); } 50% { transform: translateX(-50%) rotate(3deg); } }
+@keyframes curtainOpenL { from { transform: scaleX(3.5); transform-origin: left; } to { transform: scaleX(1); transform-origin: left; } }
+@keyframes curtainOpenR { from { transform: scaleX(3.5); transform-origin: right; } to { transform: scaleX(1); transform-origin: right; } }
+@keyframes shatterIn { 0% { transform: var(--t0, translate(0)) scale(1.4) rotate(-6deg); opacity: 0; } 50% { opacity: 1; }
+  70% { transform: var(--t0, translate(0)) scale(.96) rotate(1deg); } 100% { transform: var(--t0, translate(0)); } }
 @keyframes underline { 0% { box-shadow: inset 0 -6px 0 rgba(255,214,10,0); } 30%, 80% { box-shadow: inset 0 -10px 0 rgba(255,214,10,.9); }
   100% { box-shadow: inset 0 -6px 0 rgba(255,214,10,0); } }
 """
@@ -251,6 +261,51 @@ M = {
         "live": [[".road", "perfs 1s linear 0s infinite"]],
         "spot": "tick"},
 }
+
+M.update({
+    "crackglass": {
+        "intro": [[".glass", "fadeIn", 0.0, 0.15, 0], [".shard", "shatterIn", 0.2, 0.5, 0], [".frag p", "slideFarR", 0.9, 0.3, 0.15]],
+        "live": [["#main", "shakeHard .4s linear .15s 1"], [".bgpic", "kbZoom {end}s linear 0s both"]],
+        "spot": "glow"},
+    "spotlight": {
+        "intro": [[".curtain.l", "curtainOpenL", 0.0, 0.9, 0], [".curtain.r", "curtainOpenR", 0.0, 0.9, 0], [".star", "inkIn", 0.7, 0.5, 0],
+                  [".hl div", "inkIn", 0.9, 0.5, 0.2], [".cards p", "riseFar", 1.5, 0.4, 0.2]],
+        "live": [[".beam", "beamSway 3s ease-in-out 0s infinite"]],
+        "spot": None},
+    "retrotv": {
+        "intro": [[".screen", "tvOn", 0.0, 0.8, 0], [".ch", "flickerOn", 0.6, 0.5, 0], [".hl div", "slideFarL", 0.8, 0.35, 0.12],
+                  [".pts p", "typeIn", 1.4, 0.4, 0.25]],
+        "live": [[".knobs i", "wobble 2s ease-in-out {start}s infinite"]],
+        "spot": "underline"},
+    "detective": {
+        "intro": [[".photo", "settle", 0.0, 0.6, 0], [".clip2", "slapIn", 0.4, 0.35, 0], [".notes p", "slapIn", 1.0, 0.3, 0.2]],
+        "live": [[".strings path", "drawLine 2.4s ease-out 1.2s both"]],
+        "spot": "highlight"},
+    "weatherapp": {
+        "intro": [[".loc", "dropIn", 0.0, 0.4, 0], [".big", "spinY", 0.2, 0.6, 0], [".card", "riseFar", 0.7, 0.45, 0], [".day", "flipX", 1.1, 0.35, 0.15]],
+        "live": [[".rain", "rainFall .7s linear 0s infinite"], [".big .ic", "float 2s ease-in-out 0s infinite"]],
+        "spot": "glow"},
+    "graffiti": {
+        "intro": [[".tag", "sprayIn", 0.0, 0.5, 0], [".hl div", "sprayIn", 0.3, 0.55, 0.25], [".drips", "growY", 1.1, 0.6, 0],
+                  [".paste p", "slapIn", 1.4, 0.3, 0.15]],
+        "spot": "tick"},
+    "telegram": {
+        "intro": [[".head", "typeIn", 0.0, 0.5, 0], [".meta div", "typeIn", 0.4, 0.3, 0.15], [".hl div", "typeIn", 1.0, 0.5, 0.25],
+                  [".body p", "typeIn", 1.8, 0.5, 0.3]],
+        "live": [[".head span", "pulse 1.2s ease-in-out {start}s infinite"]],
+        "spot": "highlight"},
+    "flapboard": {
+        "intro": [[".board .hl div", "flipX", 0.1, 0.35, 0.18], [".status", "flickerOn", 0.8, 0.5, 0], [".rw", "flipX", 1.2, 0.3, 0.15]],
+        "live": [[".status", "blink 1s steps(1) {start}s infinite"]],
+        "spot": "glow"},
+    "laptop": {
+        "intro": [[".lid", "unfold", 0.0, 0.6, 0], [".bar span", "typeIn", 0.5, 0.5, 0], [".page .hl div", "typeIn", 0.9, 0.4, 0.15]],
+        "spot": "underline"},
+    "openbook": {
+        "intro": [[".book", "flipY", 0.0, 0.7, 0], [".ribbon", "growY", 0.6, 0.5, 0], [".right .hl div", "inkIn", 0.8, 0.5, 0.2],
+                  [".right p", "typeIn", 1.5, 0.45, 0.25]],
+        "spot": "highlight"},
+})
 
 SPOT_ANIM = {
     "glow": "spot {step}s ease-in-out {at}s",

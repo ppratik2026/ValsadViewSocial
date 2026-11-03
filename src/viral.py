@@ -216,13 +216,21 @@ TEMPLATE_RULES = [
     ("travel", ["roadsign", "billboard"]),
     ("government", ["letter", "folder"]),
     ("education", ["notebook"]),
+    ("crime", ["detective", "crackglass"]),
+    ("weather", ["weatherapp"]),
+    ("travel", ["flapboard"]),
+    ("government", ["telegram", "openbook"]),
+    ("event", ["spotlight"]),
+    ("viral", ["graffiti", "retrotv", "laptop"]),
+    ("good_news", ["spotlight", "openbook"]),
 ]
 GENERAL = ["card", "diagonal", "paper", "chat", "polaroid", "lockscreen", "comic", "neon", "map", "billboard", "collage",
-           "radio", "notebook", "letter"]
+           "radio", "notebook", "letter", "retrotv", "laptop", "graffiti", "openbook"]
 ALL_TEMPLATES = ["police", "storm", "bignews", "tips", "card", "tv", "paper", "quote", "timeline", "versus", "alert",
                  "notice", "stats", "polaroid", "magazine", "chat", "diagonal", "ticket", "map", "calendar", "receipt",
                  "scoreboard", "comic", "neon", "lockscreen", "chalkboard", "filmstrip", "notebook", "billboard", "letter",
-                 "crimetape", "collage", "radio", "countdown", "percent", "folder", "roadsign"]
+                 "crimetape", "collage", "radio", "countdown", "percent", "folder", "roadsign", "crackglass", "spotlight",
+                 "retrotv", "detective", "weatherapp", "graffiti", "telegram", "flapboard", "laptop", "openbook"]
 TOPIC_WORDS = {
     "travel": r"ટ્રેન|રેલ|બસ|એસટી|ફ્લાઇટ|વિમાન|હાઇવે|train|bus|flight|railway",
     "sports": r"ક્રિકેટ|મેચ|સ્પર્ધા|મેડલ|ખેલ|ટુર્નામેન્ટ|ગોલ્ડ|ચેમ્પિયન|cricket|match",
@@ -303,8 +311,9 @@ def viral_page(story, font: str, image_url: str | None, date: str, handle: str, 
         from src.viral_layouts import LAYOUTS
         from src.viral_extra import EXTRA_LAYOUTS
         from src.viral_more import MORE_LAYOUTS
+        from src.viral_new import NEW_LAYOUTS
         from src.viral_plus import PLUS_LAYOUTS
-        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS, **PLUS_LAYOUTS}.get(template)
+        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS, **PLUS_LAYOUTS, **NEW_LAYOUTS}.get(template)
         if page:
             return page(story, font, image_url, date, handle, _place_tag(story, places or []), ASKS)
     tag_text, looks = MOOD_LOOK.get(mood, MOOD_LOOK["info"])
