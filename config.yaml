@@ -3,6 +3,13 @@
 #   gemini: Gemini + Google Search + full AI posters. Needs a Gemini key with billing.
 provider: "free"
 
+# How posts are made:
+#   gemini_app: like the reference posters. Every 2 hours (prepare-post.yml) a GitHub issue opens with today's news
+#               and a ready Gemini prompt; make the poster in the free Gemini app and upload it as a comment on the
+#               issue; it becomes an animated reel (src/poster_reel.py) and is posted (publish-from-issue.yml).
+#   auto:       fully automatic posters from the code templates (scheduler.yml).
+flow: "gemini_app"
+
 # What the reels are about.
 content:
   region: "Valsad district and nearby (Valsad, Vapi, Daman, Silvassa, Ahwa-Dang, Navsari) in South Gujarat"
@@ -71,6 +78,7 @@ video:
   fps: 30
   intro_animation: true           # first seconds: banner drops, headline punches in, stamp slams, points pop
   intro_seconds: 3.4
+  poster_motion: true             # Gemini posters: the camera reads the poster band by band (scan/punch/zigzag/focus)
   full_motion: true               # viral design: the poster keeps moving for the whole reel (picture pans, points
                                   # light up one by one, LIVE/siren blinks, ticker scrolls, "?" bounces at the end)
   music_volume: 0.9               # music from assets/music/*.mp3 (random pick each run)

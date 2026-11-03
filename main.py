@@ -329,7 +329,12 @@ def cmd_from_issue(args, cfg):
     mood, n_points = style_from(body)
     seconds = reel_seconds(mood, n_points)
     print(f"Mood: {mood or '-'} -> {seconds}s")
-    video = build_video(poster, cfg["video"], work_dir / "reel.mp4", pick_music(mood), seconds=seconds)
+    if cfg["video"].get("poster_motion", True):
+        # the camera reads the Gemini poster band by band (scan / punch / zigzag / focus), see src/poster_reel.py
+        from src.poster_reel import render as poster_reel
+        video = poster_reel(poster, work_dir / "reel.mp4", "auto", pick_music(mood), max(seconds, 12))
+    else:
+        video = build_video(poster, cfg["video"], work_dir / "reel.mp4", pick_music(mood), seconds=seconds)
     print(f"Reel: {video.relative_to(ROOT)}")
     if args.no_publish:
         return
@@ -491,6 +496,10 @@ def cmd_scheduler(args, cfg):
             print("   The run took over 25 minutes and was stopped; trying again later.", flush=True)
             return False
 
+    if cfg.get("flow") == "gemini_app":
+        print("flow is gemini_app: the posts are prepared as issues (prepare-post.yml) and posted when the Gemini "
+              "poster is uploaded, so the automatic scheduler does nothing.")
+        return
     max_extra = cfg.get("schedule", {}).get("max_breaking_per_day", 6)
     every = max(1, int(cfg.get("schedule", {}).get("every_hours", 1)))
 

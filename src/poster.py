@@ -93,11 +93,46 @@ with a ribbon banner above. Fact cards shaped like badges with 3D icons, a white
 bright call-to-action ribbon at the bottom.""",
 }
 
+# the five posters the page owner picked as the look of @valsadview
+CONCEPTS.update({
+    "policedrive": """PHOTO-REALISTIC BREAKING POSTER: the top 40% is a realistic night photo collage of the scene (police
+jeeps with red-blue lights, barricades, officers seen from behind; for other stories the real-looking scene of the story),
+with a glowing 3D siren in the top-right corner (never a real police or government emblem or logo). Below it a dark glossy bar with a
+red siren icon box "બ્રેકિંગ ન્યૂઝ" on the left and the PLACE in huge yellow letters. Yellow-black hazard stripes above
+and below a bright red/orange burst band carrying the headline in heavy white 3D letters with dark outline. Then a dark
+navy box with a glowing neon pink/blue border holding the points as yellow bullets in white text. Bottom: a red
+"BREAKING NEWS" bar with a white sub-line, and two 3D red siren lights in the bottom corners.""",
+    "cyclonemap": """DRAMATIC WEATHER / ALERT POSTER: the whole canvas is a dramatic realistic scene (satellite swirl, stormy
+sea waves, palm trees, lightning; for other stories the story's dramatic scene). Top-right a small 3D map of Gujarat
+with the PLACE highlighted in red and a white pin label. Centre: a giant stacked headline - first line white with thick
+dark outline, then huge glossy yellow 3D letters on rough red brush-stroke strips. Under it a red brush strip with a 3D
+calendar icon and the date in big yellow letters. Bottom-left a dark rounded box with a 3D weather/alert icon and the
+key line, the most important name or word in yellow.""",
+    "neonbig": """BIG NEWS NEON CARD: deep purple night background with sparkles and glowing 3D speedometers/gears or the
+story's 3D objects. Top: a glossy purple pill "BIG NEWS" (BIG in yellow) with a gold 3D quote-mark coin. Under it a huge
+white glass card with a glowing purple-pink neon edge holding the headline in dark purple heavy letters. Then a frosted
+glass panel with the facts as centred lines, the numbers in bright yellow. Bottom half: a glossy 3D illustration of the
+story with round road-sign style 3D badges showing the key numbers.""",
+    "mythcheck": """MYTH vs FACT EXPLAINER: top quarter is a bright realistic photo of the place/object of the story.
+Over it the headline in stacked rough brush strips of different colours (red with yellow text, white with black text,
+blue with white text, yellow with black text). Middle: on the left a dark red box with a big red ✖ 3D icon and the wrong
+belief / problem in white with key words in yellow; on the right a realistic close-up of the object. Then a blue band
+with a big green ✔ 3D icon and "આ વાતો જરૂર ચેક કરો" style heading. Bottom: numbered tip cards (red number circles, 3D
+icons) with the values in big bold numbers inside pastel boxes.""",
+    "alertcompare": """ALERT INFO CARD: dark navy-to-blue background. Top-left a big white 3D symbol of the story, the
+first headline line in white, the key word in huge red letters on a bright yellow brush strip with a ⚠ 3D icon, then a
+red brush band with yellow text. On the right a large realistic 3D render of the story's object with a red circle and
+arrow pointing at the important detail. A dark pill label with the topic. Then a big white rounded card with three rows,
+each with a glossy coloured circle 3D icon (red, green, blue) and the fact text, key words coloured. Bottom: a comparison
+or illustration strip, a blue "?" speech bubble with the question on a yellow brush strip, and a red brush tag
+"કોમેન્ટ કરીને જરૂર જણાવો".""",
+})
+
 MOOD_CONCEPTS = {
-    "breaking": ["breakingtv", "cinematic", "infographic"],
-    "money": ["bignumber", "infographic", "cinematic"],
-    "info": ["infographic", "newspaper", "bignumber"],
-    "happy": ["celebration", "newspaper", "infographic"],
+    "breaking": ["policedrive", "cyclonemap", "breakingtv"],
+    "money": ["mythcheck", "neonbig", "bignumber"],
+    "info": ["alertcompare", "neonbig", "cyclonemap"],
+    "happy": ["alertcompare", "celebration", "neonbig"],
 }
 
 CREATIVE_RULES = """Make it a STUNNING, highly creative, premium poster - the kind that stops people scrolling on Instagram,
@@ -115,6 +150,16 @@ def _extras(story: NewsStory) -> str:
     if getattr(story, "stamp", ""):
         out += f'\n- A tilted rubber-stamp / sticker on the picture: "{story.stamp}"'
     return out
+
+
+def _place(story: NewsStory) -> str:
+    """'વાપી - વલસાડ' from the page's places named in the story, else 'વલસાડ'."""
+    try:
+        from src.config import load_config
+        from src.viral import _place_tag
+        return _place_tag(story, load_config()["content"].get("places", [])) or "વલસાડ"
+    except Exception:
+        return "વલસાડ"
 
 
 def _poster_prompt(story: NewsStory, handle: str, extra_fix: str = "") -> str:
@@ -156,6 +201,7 @@ What the 3D illustration shows: {story.image_prompt}
 
 Write ALL of this text on the poster exactly as given (Gujarati script, same spelling, same numbers, nothing extra):
 - Top banner: "{story.kicker}"
+- Place (the PLACE in the layout concept): "{_place(story)}"
 - Headline (biggest text, coloured as the layout concept says): "{story.headline}"
 - Sub-headline strip: "{story.subheadline}"{_extras(story)}
 - Key facts in highlighted boxes:
