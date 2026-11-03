@@ -60,11 +60,23 @@ def render(cfg: dict, stories_file: Path) -> None:
         print(f"\n=== {n}. {template}: {story.headline}")
         keywords = stock_keywords(story)
         background = None
+        if os.environ.get("SHOWCASE_PICTURE") == "ai" and data.get("image_prompt"):
+            if n > 1:   # the keyless free AI allows one picture every ~45 seconds
+                import time
+                time.sleep(46)
+            # a rich AI picture of the story (free Pollinations), like the reference posters' pictures, no text
+            background = generate_free_ai_image(
+                data["image_prompt"] + ", dramatic cinematic 3D news poster illustration, hyper detailed, vivid colours, "
+                "volumetric light", work / "ai.jpg", "photo")
         try:
+            if background:
+                raise StopIteration
             background = fetch_stock_background(keywords, work / "photo.jpg")
+        except StopIteration:
+            pass
         except Exception as e:
             print(f"   Pexels failed: {e}")
-        if not background:
+        if not background and os.environ.get("SHOWCASE_PICTURE") != "ai":
             found = fetch_openverse_photo(keywords, work / "openverse.jpg")
             if found:
                 background, story.photo_credit = found

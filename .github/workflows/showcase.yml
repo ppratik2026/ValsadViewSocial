@@ -54,6 +54,7 @@ jobs:
         env:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
+          SHOWCASE_PICTURE: ai
         run: |
           if [ "${{ steps.mode.outputs.mode }}" = "collect" ]; then python -u tools/showcase.py collect
           else python -u tools/showcase.py render showcase/stories.json; fi
