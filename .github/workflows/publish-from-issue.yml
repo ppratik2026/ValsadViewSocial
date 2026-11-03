@@ -31,7 +31,7 @@ jobs:
 
       - run: |
           sudo apt-get update && sudo apt-get install -y ffmpeg
-          pip install requests PyYAML python-dotenv
+          pip install requests PyYAML python-dotenv Pillow
 
       - name: Make the reel and post it
         env:

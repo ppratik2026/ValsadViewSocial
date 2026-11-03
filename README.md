@@ -115,12 +115,47 @@ Har run ka folder `output/<date-time>/` mein banta hai, usmein yeh files hoti ha
 
 ## 5. Poster design
 
+**Default: `viral` design** (`src/viral.py`), popular Gujarati news pages ke posters jaisa:
+- upar badi **free stock photo**: pehle Pexels (free `PEXELS_API_KEY` secret, [pexels.com/api](https://www.pexels.com/api/)), na ho to Openverse ki free-license photo (bina key, photo ka credit poster par likha aata hai), na mile to free AI picture, aur wo bhi na mile to code se bana scene. Kisi neta ya asli insaan ki photo nahi.
+- **"🚨 બ્રેકિંગ ન્યૂઝ | વાપી - વલસાડ"** patti: news mein jo shaher hai wo apne aap aata hai (`content.places`)
+- laal brush patti par moti headline, har doosri line peeli, sabse zaroori shabd/number bada
+- tarikh/rakam ki chips, ✅ points ka box, neeche peeli patti par sawal + "કોમેન્ટ કરીને જરૂર જણાવો"
+- **5 layout**, har ek aapke bheje ek poster jaisa; news ke hisaab se apne aap chuna jaata hai (`src/viral.py`, `src/viral_layouts.py`):
+  - `police`: crime / breaking (photo, "બ્રેકિંગ ન્યૂઝ | વાપી - વલસાડ", hazard patti, neon points box)
+  - `storm`: mausam / vavazodu (poore poster par photo, 📍 shaher, badi headline, tarikh patti, info box)
+  - `bignews`: niyam / numbers ("BIG NEWS", safed headline card, glass box, gol speed-sign jaise number)
+  - `tips`: paisa / "aa vato jaano" (4 rang ki headline, ❌ galat-maanyata box, numbered tips)
+  - `card`: baaki sab (headline photo par, safed card mein rangeen icon gol, sawal + comment bubble)
+- **12 aur layout** (`src/viral_more.py`), sabka look alag: `tv` (LIVE TV screen + ticker), `paper` (akhbaar ka pehla panna), `quote` (neta/adhikari ka bayan, bade quote nishan, chehra nahi), `timeline` (step by step), `versus` (pehle vs hav), `alert` (peela-kaala chetavni poster), `notice` (jaherat / sarkari suchna), `stats` (numbers dashboard), `polaroid` (pin board + sticky notes), `magazine` (magazine cover), `chat` (WhatsApp jaisi chat), `diagonal` (tirchhi photo + laal patti).
+- **10 aur unique layout** (`src/viral_extra.py`), har ek roz ki koi cheez jaisa: `ticket` (train/bus ticket + barcode), `map` (naksha + bada pin), `calendar` (fadne wala calendar, badi tarikh), `receipt` (dukaan ka bill, bhav ki list), `scoreboard` (stadium LED board), `comic` (comic page, "BOOM!"), `neon` (diwal par neon sign), `lockscreen` (phone lock screen + notifications), `chalkboard` (school ka black board), `filmstrip` (film reel + "PRESENTS").
+- **10 aur creative layout** (`src/viral_plus.py`): `notebook` (line wali copy + highlighter), `billboard` (rasta kinare hoarding), `letter` (lifafa + chitthi "પ્રિય વલસાડવાસીઓ,"), `crimetape` (POLICE LINE tape), `collage` (photo collage + phata kagaz), `radio` (podcast player + waveform), `countdown` ("8 દિવસ બાકી", sirf jab aage ki tarikh ho), `percent` (gol chart, sirf jab news mein % ho), `folder` (tapas file + "તપાસ ચાલુ" stamp), `roadsign` (hara highway board + km patthar).
+- **Poori reel animated** (`src/reel_motion.py`, `video.full_motion`): shuru mein patti, headline, points ek ek karke aate hain; uske baad bhi poster rukta nahi: photo dheere move karti hai, points baari-baari chamakte hain (padhne mein madad), highlight shabd chamakta hai, LIVE / siren / ON AIR blink karte hain, hazard patti aur police tape chalti hai, TV ticker chalta hai, radio waveform naachta hai, aur aakhri 2 second mein "?" uchhalta hai taaki log comment karein.
+- Har post ke liye news ke hisaab se fit hone wala layout chuna jaata hai, aur pichhli 4 post wale layout chhod diye jaate hain, taaki profile grid har baar alag dikhe. Koi layout nahi chahiye to `config.yaml` → `card.viral_templates` se hata do.
+- police layout mein 5 rang (crime: laal-kaala, mausam: storm blue, info: purple, paisa: navy, khushkhabar: green) aur 2 picture layout. Kaunsa chal raha hai, `data/report.md` mein dikhta hai aur wahi zyada aata hai.
+
+Purane designs (`brand`, `bulletin`, `mag`, ...) bhi hain: `config.yaml` → `card.designs` mein naam likho.
+
+### Purana Gemini poster tareeka
+
 `card.style: "ai_poster"` (default): **Gemini ka image model poora poster banata hai**, jaise viral Gujarati news pages ke posters hote hain. Usmein badi headline, 3D illustration, info boxes, aur schedule/list wali news ke liye rangeen table hoti hai. Har baar style alag hota hai.
 
 - Image models kabhi-kabhi Gujarati mein spelling ya number galat likh dete hain. Isliye har poster ko Gemini **dobara padh kar check karta hai**. Galti mile to poster dobara banta hai (`poster_attempts`, default 3).
 - Teeno baar fail hua to tool apna **template card** (`src/card.py`) use karta hai, taaki galat number wala poster kabhi post na ho.
 - Har try `output/<folder>/poster_try1.png`, `poster_try2.png` mein save hota hai, taaki aap dekh sako.
 - `card.style: "template"` karoge to hamesha fixed template design banega.
+
+### Bana-banaya poster → animated reel
+
+Koi bhi poster image (Gemini app se bana, Canva, ya kahin aur se) seedha animated reel bana sakte ho:
+
+```bash
+python tools/poster_to_reel.py poster.jpg reel.mp4 --style auto --music assets/music/"Iron Rise.mp3"
+```
+
+Tool poster ke hisso (headline, photo, points, neeche ki patti) ko khud pehchanta hai aur camera unpar chalata hai.
+4 style: `scan` (headline se shuru, neeche padhta jaata hai), `punch` (har hisse par jhatke se zoom + flash),
+`zigzag` (tirchha left-right), `focus` (ek hissa roshan, baaki dhundhla). Har reel flash se shuru hoti hai aur
+aakhir mein poora poster dikhati hai.
 
 ## 6. Settings (`config.yaml`)
 

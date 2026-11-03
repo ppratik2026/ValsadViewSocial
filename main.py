@@ -136,7 +136,32 @@ def cmd_run(args, cfg):
         design = choose_design(story, cfg)
         background = cutout = None
         story.stamp = "" if not cfg["card"].get("stamps", False) else story.stamp
-        if cfg["card"].get("picture", "cutout") == "cartoon":
+        if cfg["card"].get("picture", "cutout") == "photo":
+            # the viral design: a free stock photo (Pexels with the free key, else an openly licensed photo from
+            # Openverse), else a realistic AI picture, else a drawn scene; never a real person's photo
+            story.person = ""
+            if "viral" in cfg["card"].get("designs", []):
+                design = "viral"
+            from src.backgrounds import fetch_openverse_photo, fetch_stock_background, generate_free_ai_image
+            from src.scenes import BY_CATEGORY, draw_scene
+            from src.viral import stock_keywords
+            keywords = stock_keywords(story)
+            print(f"   Photo searches: {keywords}")
+            background = None
+            try:
+                background = fetch_stock_background(keywords, work_dir / "background.jpg")
+            except Exception as e:   # Pexels is optional
+                print(f"   Pexels failed: {e}")
+            if not background:
+                found = fetch_openverse_photo(keywords, work_dir / "openverse.jpg")
+                if found:
+                    background, story.photo_credit = found
+            if not background and story.image_prompt:
+                background = generate_free_ai_image(story.image_prompt, work_dir / "photo.jpg", "photo")
+            if not background:
+                background = draw_scene(story.scene or BY_CATEGORY.get(story.category, "city"), story.props,
+                                        work_dir / "scene-drawn.png")
+        elif cfg["card"].get("picture", "cutout") == "cartoon":
             # a flat 2D cartoon scene of the story (generic characters, never a real person's likeness)
             from src.backgrounds import generate_free_ai_image, generate_gemini_cartoon
             story.person = ""
@@ -304,7 +329,12 @@ def cmd_from_issue(args, cfg):
     mood, n_points = style_from(body)
     seconds = reel_seconds(mood, n_points)
     print(f"Mood: {mood or '-'} -> {seconds}s")
-    video = build_video(poster, cfg["video"], work_dir / "reel.mp4", pick_music(mood), seconds=seconds)
+    if cfg["video"].get("poster_motion", True):
+        # the camera reads the Gemini poster band by band (scan / punch / zigzag / focus), see src/poster_reel.py
+        from src.poster_reel import render as poster_reel
+        video = poster_reel(poster, work_dir / "reel.mp4", "auto", pick_music(mood), max(seconds, 12))
+    else:
+        video = build_video(poster, cfg["video"], work_dir / "reel.mp4", pick_music(mood), seconds=seconds)
     print(f"Reel: {video.relative_to(ROOT)}")
     if args.no_publish:
         return
@@ -466,6 +496,10 @@ def cmd_scheduler(args, cfg):
             print("   The run took over 25 minutes and was stopped; trying again later.", flush=True)
             return False
 
+    if cfg.get("flow") == "gemini_app":
+        print("flow is gemini_app: the posts are prepared as issues (prepare-post.yml) and posted when the Gemini "
+              "poster is uploaded, so the automatic scheduler does nothing.")
+        return
     max_extra = cfg.get("schedule", {}).get("max_breaking_per_day", 6)
     every = max(1, int(cfg.get("schedule", {}).get("every_hours", 1)))
 

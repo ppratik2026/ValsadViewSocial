@@ -1,0 +1,72 @@
+name: Showcase reels
+
+# Sample reels without the AI keys (nothing is posted):
+#   collect: today's real local news -> showcase/news.json on the "previews" branch
+#   render:  a reel per story in showcase/stories.json (text written from those articles) -> previews branch
+# Started by a push that changes showcase/request.txt ("collect") or showcase/stories.json ("render"), so it also
+# runs from a branch that is not merged yet; or by hand once it is on main.
+on:
+  push:
+    paths: ["showcase/request.txt", "showcase/stories.json"]
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [collect, render]
+        default: collect
+
+permissions:
+  contents: write
+
+jobs:
+  showcase:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Mode
+        id: mode
+        run: |
+          mode="${{ inputs.mode }}"
+          if [ -z "$mode" ]; then
+            if git diff --name-only HEAD~1 HEAD | grep -q "showcase/stories.json"; then mode=render; else mode=collect; fi
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install system packages
+        timeout-minutes: 12
+        run: |
+          for try in 1 2 3; do
+            sudo timeout 150 apt-get update -o Acquire::Retries=3 &&
+              sudo timeout 300 apt-get install -y --no-install-recommends -o Acquire::Retries=3 ffmpeg fonts-noto-core fonts-noto-color-emoji && break
+            sleep 15
+          done
+      - name: Install Python packages
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+      - name: Run
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
+        run: |
+          if [ "${{ steps.mode.outputs.mode }}" = "collect" ]; then python -u tools/showcase.py collect
+          else python -u tools/showcase.py render showcase/stories.json; fi
+      - name: Save to the previews branch
+        if: always()
+        run: |
+          [ -d showcase ] || exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          dir="showcase-${{ github.run_number }}"
+          git fetch origin previews:previews 2>/dev/null || true
+          git worktree add -f /tmp/prev previews
+          mkdir -p "/tmp/prev/$dir"
+          cp showcase/news.json "/tmp/prev/$dir/" 2>/dev/null || true
+          for d in showcase/*/; do [ -f "$d/reel.mp4" ] && cp "$d/reel.mp4" "/tmp/prev/$dir/$(basename "$d").mp4" && cp "$d/card.png" "/tmp/prev/$dir/$(basename "$d").png"; done
+          cd /tmp/prev && git add . && git commit -qm "Showcase ${{ github.run_number }} (${{ steps.mode.outputs.mode }})" && git push -q origin previews

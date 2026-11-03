@@ -3,7 +3,9 @@ name: Prepare post (Gemini prompt)
 # Semi-automatic flow, step 1: find news and open an issue with a ready Gemini prompt.
 # Make the poster in the Gemini app and upload it as a comment on that issue; "Post from issue" does the rest.
 on:
-  # manual only now; daily-reel.yml posts automatically
+  # every 2 hours from 10:00 to 22:00 IST (04:31 ... 16:31 UTC), for flow "gemini_app" in config.yaml
+  schedule:
+    - cron: "31 4-16/2 * * *"
   workflow_dispatch:
     inputs:
       category:
@@ -41,6 +43,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
         run: |
           ARGS=""
           if [ -n "${{ inputs.category }}" ] && [ "${{ inputs.category }}" != "any" ]; then ARGS="--category ${{ inputs.category }}"; fi

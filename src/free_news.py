@@ -66,11 +66,20 @@ def _local_queries(content: dict, wanted: list[str]) -> list[tuple[str, str | No
     return queries
 
 
+# Gujarati endings after a place name ("વલસાડમાં", "વાપીના" ...); anything else means another word ("ડાંગર" is paddy)
+PLACE_ENDINGS = r"(?:માં|ના|ની|નું|નો|નાં|થી|ને|નુ|વાસીઓ|વાસી|ના)?"
+
+
+def place_at(text: str, place: str) -> int:
+    """Where the place is named in the text as a word of its own (with a Gujarati case ending), else -1."""
+    m = re.search(rf"(?<![\u0A80-\u0AFFA-Za-z]){re.escape(place)}{PLACE_ENDINGS}(?![\u0A80-\u0AFFA-Za-z])", text, re.I)
+    return m.start() if m else -1
+
+
 def _in_region(content: dict, text: str) -> bool:
     """Does the story name one of the page's own places?"""
     names = list(content.get("places") or []) + list(content.get("places_extra") or [])
-    low = text.lower()
-    return any(n.lower() in low for n in names)
+    return any(place_at(text, n) >= 0 for n in names)
 
 CARD_RULES = """You write the text of one Gujarati Instagram news card for a Gujarati news page.
 Write natural, simple Gujarati (Gujarati script) the way popular Gujarati news pages do: punchy and clear,
@@ -355,12 +364,18 @@ def _shorten(text: str, limit: int) -> str:
 def _plain_card(item: FeedItem, category: str, article: str, hashtags_count: int) -> dict:
     """Card text taken straight from the news item, for when no AI is reachable (all free quotas used up), so
     the hour is still posted. Adds nothing new: the headline, the first sentences and the date of the story."""
-    head, rest = item.title, ""
+    title = item.title.replace(item.source, "").strip(" -|") if item.source else item.title
+    head, rest = title, ""
     for sep in (":", "|", " - "):
-        if sep in item.title:
-            head, rest = (part.strip() for part in item.title.split(sep, 1))
+        if sep in title:
+            head, rest = (part.strip() for part in title.split(sep, 1))
             break
+    if rest and len(head.split()) <= 2:   # "વલસાડ: સગીરાનું અપહરણ ..." -> the place is not the headline
+        head, rest = rest, ""
+    if item.source:   # Google News adds the paper's name to the text
+        article = article.replace(item.source, "")
     sentences = [x.strip() for x in re.split(r"(?<=[.।!?])\s+", article) if 20 < len(x.strip())]
+    sentences = [x for x in sentences if x.rstrip(" .") != title.rstrip(" .")] or sentences
     short = [x.rstrip(".") for x in sentences[1:] if len(x) <= 90][:3]   # facts for the three rows
     date = item.published.astimezone(IST)
     summary = _shorten(sentences[0] if sentences else rest, 200)
