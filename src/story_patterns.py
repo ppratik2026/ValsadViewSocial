@@ -67,14 +67,14 @@ KIT = """
   body { color: #fff; }
   #main { gap: 18px; }
   .w { display: inline-block; }
-  .pic { position: relative; flex: 1 1 auto; min-height: 380px; border-radius: 28px; background: #333 center/cover no-repeat;
+  .pic { position: relative; flex: 1 1 auto; min-height: 560px; border-radius: 28px; background: #333 center/cover no-repeat;
     border: 8px solid var(--frame); box-shadow: 0 16px 34px rgba(0,0,0,.45); }
   .pic .sym { bottom: 12px; }
   .pic .tag { position: absolute; left: -8px; top: 22px; display: flex; box-shadow: 0 8px 18px rgba(0,0,0,.5); }
   .pic .tag b { background: var(--c1); color: #fff; font-size: 34px; padding: 6px 18px 10px; }
   .pic .tag span { background: #111; color: var(--c2); font-size: 42px; font-weight: 800; padding: 2px 22px 8px; }
   .hl { gap: 8px; }
-  .hl div { font-size: var(--hl); font-weight: 800; line-height: 1.2; padding: 6px 30px 14px; }
+  .hl div { font-size: var(--hl); font-weight: 800; line-height: 1.3; padding: 16px 30px 14px; overflow: visible; }
   .sub { align-self: center; text-align: center; font-size: calc(var(--pt) * 1.12); font-weight: 800; padding: 8px 26px 12px; line-height: 1.3; }
   .facts { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
   .fact { display: flex; align-items: center; gap: 12px; border-radius: 24px; padding: 8px 22px 8px 10px; }
@@ -306,7 +306,7 @@ def _with_hero(page):
         html = page(story, font, image_url, date, handle, place, asks)
         if not image_url:
             return html
-        hero = (f'<div class="hero" style="position:absolute;inset:0;z-index:60;background:#000 url({image_url}) center/cover no-repeat">'
+        hero = (f'<div class="hero" style="position:absolute;inset:0;z-index:60;opacity:0;background:#000 url({image_url}) center/cover no-repeat">'
                 '</div>')
         return html.replace("<body>", "<body>" + hero, 1)
     return wrapped
@@ -338,7 +338,7 @@ PATTERN_MOTION = {
 }
 
 EXTRA_KEYFRAMES = """
-@keyframes heroOut { from { opacity: 1; transform: scale(1.06); } to { opacity: 0; transform: scale(1.2); } }
+@keyframes heroOut { 0% { opacity: 1; transform: scale(1.06); } 100% { opacity: 0; transform: scale(1.2); } }
 @keyframes growX { from { transform: var(--t0, translate(0)) scaleX(0); transform-origin: left; } to { transform: var(--t0, translate(0)) scaleX(1); transform-origin: left; } }
 @keyframes wordRise { from { transform: var(--t0, translate(0)) translateY(60px); filter: blur(10px); opacity: 0; }
   to { transform: var(--t0, translate(0)); filter: none; opacity: 1; } }
