@@ -1,6 +1,6 @@
 [
  {
-  "template": "crimetape",
+  "template": "police",
   "category": "crime",
   "mood": "breaking",
   "kicker": "દારૂની હેરાફેરી",
@@ -34,7 +34,7 @@
   "source_url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPRzhpdk9DbVRjTTlNemFXSjhoVTRNOGU1ZDhYcVZybkYtR2QzMmV2bi1VNnlNOXIyXzNuZjJMR3ZZOS01bmppeV9ZNlktVzFBR2U3bVM4c2hSNVZwZUlPTGJVV2ltb0o2YVVqYnVLMnMzZTBNRmN6UTRIRFd3TGp1ZTY5UjNzWmt1NE1iMXpfRTRMSXY5UFRCdUhjbFhqaWFHUkxEQ2lRbkcwMVhQQTJtTdIBtgFBVV95cUxOYWRlS21vVmgtR184RFdraHZhWEExcF9HX2h5QUxDTXFielVBRWdPelljYW1WRmxyRlc5Vk9WOTU2bUJJMVNnRUZKNHF1alRiX1kyX0VLdlRvdGZjZnBvVHgzOTZEOHRudmp4ckI3Qm5KS2YwZ2Rab3RWbm5DVnlTWkcyNmNHb1kwbmpHRktFU1puZVl2RmZRY09kSkRuZFNJVmJWZWJDYTVyNExqam5qbmJHRHBjUQ?oc=5"
  },
  {
-  "template": "ticket",
+  "template": "card",
   "category": "trending",
   "mood": "info",
   "kicker": "વાપી - વતન",
@@ -67,7 +67,7 @@
   "source_url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPdjlqTzdUbHBSMmJwcE02V1RkeDJsZ0tjSG1Wd0RoSVphaWtfbzB4amxqNVB5dTZpNFhuSmdSaXF1enVjakJFamNKbktnR1J4RkRQTlJ6WmpDTlJ4V3pOOEhMVDB5WDRkU2ZZR2hKeVNKT0tYbzZrWDdzUFR6SFdxU0p6UFcxX1VZcVdEcm5NTGtUZ0pfMWF1allhWE9qS3BiazhCZTd0dngzNEJscjRsQ0xSVmZuZVdwT3czdtIBwgFBVV95cUxNQkJBMzNrUmt6U2ViYXJRN0FRbXAwZmtHNWpEMDdGVjgzVk82aFpJR0ktY3JZN2NTV21iR3RQc0VHNUIxcFc4VDY0VThCSjEwS2N1eHk4SkVSMWFlV1hIR3pKc0FXQ25JTGxjZ2NTWTJWeDhDLVd2NWxDWUZuRGthSHc0dEFTYnNHeXByWmJLd1IzLTMyN0Nic1p2eklFNlBXN2l3NnVhSG9ueFdPUFNnbWhYSnlzaEJvbVZ2akVpdkNRQQ?oc=5"
  },
  {
-  "template": "calendar",
+  "template": "bignews",
   "category": "government",
   "mood": "info",
   "kicker": "જિલ્લા પંચાયત",
@@ -101,7 +101,7 @@
   "source_url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNM1JOVmpPVFdoUTVzLVNvVnFTQ2JBaDNGX2x3RGJpY3NkSndmLWV6NHRqc3BNNmN2S3ZobzUzTHRxQkdNVGFQMjZHVEVDTjMyY1YzcjBwUTNnYUFoaFdtX1U5dGNadGVqRlRXUUtIRmZiVm4zYUlTTVpISVV0V1I3bWU3a1lsS0VyVEdTb0ZvX3RJT3JDZk50M183N09Pelp4TEwzRGk3czFWUmtKbF9Ib3FrakpjZXFhZVNsU2tOZWoteWphWEY0QnZmNDhTa2QxS0lKLTFn0gHbAUFVX3lxTE5MTVF5S0pxTG1iWXVyLWl4ZUJqTHRweFRQZGxxWFNxZWFaNmlndzZPRkZSdUVyZXlCSzJSME1Oc2xKc3lTdHVGa2ZYYkcySjR5U0hoM0J4cEUxR1NlQWNkalc2ejFzTzk2TWZncmN6cEF4ZG1SR0RGb0phTVNSTjlUbnhCVHFSZGVFWWNEcUc5SzktQmRIcnlnRnpGWXFncFp6QlJuczFnOGxWalZNbVlFOEZEakFNbURWektxX3o5QWgtc0M4a2J0OUpkQk9GSERnWkFxY0NncFhDZw?oc=5"
  },
  {
-  "template": "percent",
+  "template": "bignews",
   "category": "trending",
   "mood": "money",
   "kicker": "ઓટોમોબાઇલમાં તેજી",
@@ -130,7 +130,7 @@
   "source_url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOajNZazhzNWYyZE81bFRaSmRQSmRFTXdPd2VKcHNZX1ZSRW5xSlF0WFJtY2FUWEdNVWVfb0RQQjhFSnEzeDM1RGNCRDQzWElIbE1RN1Fhand6bUNFU19RZ3puV1BPV0FLQnVCdWNfOUpJdjNNZDhzUm1zMVNQX1djb1B1YkFmN2NVcUJqOUVwMGRIYUV6S0FteVBIRmk5RVRQSWk2b0dKZXNIanJEU1lOQ080YVZEUmp0OHgzUWhqQXRWbVYybFZuWUo1T1pIaEo0ZXfSAdcBQVVfeXFMTlN6TnBIQTdCaTQyOTVzUUlpOVZUUzEzSFhlWDVoTEFmTEdRYmRCNE9lblZoQTNMOG93eFZVYVlkdGl5RjdqWDBSTG9pTFJRWWhGZEpIZnZMbDlmQTJpb0lYNno5UTNOWHJLTkhkVnhNWFJrM1pDUEczazBFQUk3SWtzX1F0NnUzTEllRDIxQjA0VGJrYTIyUFR6NG5aR2V0dDhaVmZBMkFGWnVyM2poU25HN21MSlFYbFpLcVRESXRVSERPTWdZYnZ6SnpTdkY4eEpFZ1Flc0E?oc=5"
  },
  {
-  "template": "stats",
+  "template": "tips",
   "category": "good_news",
   "mood": "happy",
   "kicker": "ખેડૂતોમાં આનંદ",
@@ -191,7 +191,7 @@
   "source_url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQYWdHUENxN0dsOE5uQnQwb05CaGJJQ2tRemQzQmJFZ05FVXR2dG4wTVV0czM4MHNFaGFJNUVVdUVWVUY4aDRpRVhVOVpLRXo1UE5SZ1M3N3NYcHY3ZW9NZkpleEFCY0Ywc083LXRFRkgtbl80ZDY5TkVqVXVObzk4b1ZyZ210dzRrYkhKcDVHd3Jacm9zTHJkYkJWT0lpV3d2RXVfYUpnQ3czYjlyM3BLV0ZESEIwalZhVHVQRnhVWXHSAcYBQVVfeXFMT1hhVTNqMzRvb0M2N0VzSlcxdGpfUHBCR0JUQi0waVNDWFJNa0d1UDRJSUsybWxJQ0JfTjliNVV3c3BzaGtOdDdmMWdBVFZQREJrcEZIYUEyVGhqM2NUc3pVUU1ZdDl4TmIyYkRDay13eXlTVWxxT0VqZ3dXVDVGY1c5SllaYU9pYmxiNXZnbXIwRTlyekVSZlRxYUhKLUtic1AtYkpEaWF5RzdBSDFaRmo5RGJLdHhoc09keUwtODdnNWVwRDBB?oc=5"
  },
  {
-  "template": "folder",
+  "template": "police",
   "category": "crime",
   "mood": "breaking",
   "kicker": "સાપુતારા બોર્ડર",
@@ -224,7 +224,7 @@
   "source_url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNUXQ1Nl9GVzd3TkJsZTRORHl6eWZQTlltUEY4azRoZjdBQjdZMGRLRHNpZ05oR3hpM2swdHZNc1lwWjlMdXc4VU45RDRtYVlMVnZQSUJDOG9JcllBa056RG1BU2EyMnU1ZmtEVFVabTF0QmlfX3oxbDJDd09NclpDWkwxZTlXMnJhSmhYbVlZY0s2U0VvN282azZNSnVrUTRIUWU4Vnp5ZlJZQ3U5TE9mZ3FhTmhqUWh5ZnZGONIBwgFBVV95cUxNRzBPWFY4MmJ2Sk1UUTZVamRWQmlNTUIyaDJqNmQ2VUJibnJsaGNZNGY0Y0ZoZ1dQWFMyZ3Q2RDRlNl9tOUFVZzBFNFZvSERMVWxWbnJlVFJZdnVpeUZIc2lic0NsYTZrQVFsb2RTZnJ0LTBLOTVmeGdVSE5KaFN2WlRraXVEQUoybnBIM1lMbFlRTVQ1X214Ymd0cHRTbEhwNDRIMWZzR2padXVYQURNZ3UxZHBkZGxKUlhhMlZfU3VHZw?oc=5"
  },
  {
-  "template": "polaroid",
+  "template": "card",
   "category": "good_news",
   "mood": "happy",
   "kicker": "રન ફોર યુનિટી",
@@ -253,7 +253,7 @@
   "source_url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNcndESnVjZDRiTDRvdUlSVVhYTG9qbjJCcVNRU05FM0pqelBBOWt6LWxvbDdNeUZzYUFfaTlaVGxLQkVMUzE0cGlLZGRlUG5MWXRJT0x5SFJhWWdycVB5MnlzdnNKOHlNLWNfS2pfYUp3UFVrTWtBaGtnc1ZMMjBnNmFtMU1RamVyWFkyTUd4VEF1NW45SDVpcHI2djhEYnZfQ1RXb09WTUQxdmxpdnJvYVBTZEVOOEl3Wm10U0JyTjdxSHdHaG1QRVlaRUlSVE5SOThnU9IB2gFBVV95cUxOTmdXa3h5bTFaVGR2QzlXX0V0bG9LZml1NUs1ZDRvczlVc1o0WXdoanNNRUxiVXhQakZtSWZLcVI4eHBQQ1RDUEc0VmRxZHVwaGVFdWZNa21uWmtPdVkzYUR4YnhQcThjT0Q3MExaLTh4TE1lWGhMV21YUXFZZWNEWFI0eElMZU9FRzRBU2FfQjc1WEcwLWdCZDNSdFo2OHozdzRxbVpjY25aR09IUG5Td1NjbG5melpGeFJkbVBxU050Q1JMR0k5dlZsOGtSV1ZRbWt4WGdWNTEwdw?oc=5"
  },
  {
-  "template": "lockscreen",
+  "template": "card",
   "category": "government",
   "mood": "happy",
   "kicker": "દિવાળી પહેલા ભેટ",
@@ -282,7 +282,7 @@
   "source_url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNMEdPQzJoc2N2XzdRUVBGU3Nudkg0cGZpQnNRbDJnWUJ0eWEtclFpMHJxRHZWZkVhLWVBVGU1MHBVOENNenlhczlGZUQ3VjhKRnFCN243VTl2YjJhRW1fU1hnWHh5QVM1SF8zenlWTkhIdUdHY2N2ZURLaWJyRlplY0tIM1RQQlU3Yi1LdU13MUVtV2FIbzFOY1ZaUEdWWTcxUkIzdzJaeUlfeVZyODRBN1R1bG1hVkwzNzhsLVFhTXVRZEczMW1UU1VDRWpKdlN5UzBfadIB2gFBVV95cUxQVS11a1NKdnQ5R0F3d2drdEw4RTFESXVFejh3WTBTT3BHLXFycnNoY2dTWkZEUFl0VW56NExOWFNmTmtEZUhod1ZxWEpQLUo2aXVkS05tNzJLVHRsMUJTcUtldjN5bVk2VUtOUGJRRTNUc21jSFdQX3hHRmZuZEIxS2NHN21YS1pyR3pXdDJIUWgxcUZWQ2pza2lPd1Q4aGNyZXRNNjdzdmxUeWFST2V1Wm84Y2V2cDBfOXBxTDJIMkJfclpJWWFhU0xZSllTT3ltWGJhS2tFanZXQQ?oc=5"
  },
  {
-  "template": "diagonal",
+  "template": "police",
   "category": "crime",
   "mood": "info",
   "kicker": "નવસારી",

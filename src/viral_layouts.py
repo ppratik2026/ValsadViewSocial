@@ -202,8 +202,11 @@ def bignews_page(story, font, image_url, date, handle, places_tag, asks):
     paras = [p for p in story.points[:3] if p not in story.headline] or ([story.summary] if story.summary else [])
     glass = "".join(f"<p>{highlight_numbers(p)}</p>" for p in paras)
     glass = f'<div class="glass">{glass}</div>' if glass else ""
-    badges = "".join(f'<div class="badge"><b>{esc(f["value"])}</b><small>{esc(f["label"])}</small></div>'
-                     for f in _num_facts(story))
+    def _badge(f):   # longer values ("3 નવેમ્બર") get smaller letters so they stay inside the ring
+        size = 54 if len(f["value"]) <= 4 else 40 if len(f["value"]) <= 6 else 30
+        label = f["label"] if len(f["label"]) <= 22 else f["label"][:20] + "…"
+        return f'<div class="badge"><b style="font-size:{size}px">{esc(f["value"])}</b><small>{esc(label)}</small></div>'
+    badges = "".join(_badge(f) for f in _num_facts(story))
     style = f' style="background-image:url({image_url})"' if image_url else ""
     sym = '<div class="sym">પ્રતિકાત્મક તસવીર</div>' if image_url else ""
     tag = esc(places_tag or story.kicker or "")
@@ -299,8 +302,8 @@ def tips_page(story, font, image_url, date, handle, places_tag, asks):
 CARD_CSS = """
   body { background: linear-gradient(180deg, #0a1433 0%%, #0a1433 51%%, #1b3a9a 100%%); }
   .toppic { position: absolute; left: 0; right: 0; top: 0; height: 980px; background: #142a6b center/cover no-repeat; }
-  .toppic::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(5,10,30,.85) 0%%,
-    rgba(5,10,30,.55) 55%%, rgba(5,10,30,.1) 100%%), linear-gradient(180deg, transparent 60%%, #0a1433 100%%); }
+  .toppic::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%%, #0a1433 98%%),
+    linear-gradient(90deg, rgba(5,10,30,.85) 0%%, rgba(5,10,30,.55) 55%%, rgba(5,10,30,.15) 100%%); }
   .toppic .sym { bottom: 120px; }
   .head { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
   .head .handle { position: static; align-self: flex-end; margin-bottom: 4px; }
