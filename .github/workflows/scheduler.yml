@@ -25,12 +25,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Which flow
+        id: flow
+        # flow "gemini_app" posts from GitHub issues (prepare-post.yml), so this scheduler has nothing to do and
+        # must not start the next run either (that would chain empty runs forever)
+        run: echo "flow=$(python3 -c "import yaml; print(yaml.safe_load(open('config.yaml')).get('flow', 'auto'))")" >> "$GITHUB_OUTPUT"
+
       - uses: actions/setup-python@v5
+        if: steps.flow.outputs.flow != 'gemini_app'
         with:
           python-version: "3.12"
           cache: pip
 
       - name: Install system packages
+        if: steps.flow.outputs.flow != 'gemini_app'
         # a stuck Ubuntu mirror once hung this step for over half an hour: each try is time-limited
         timeout-minutes: 12
         run: |
@@ -42,11 +50,13 @@ jobs:
           command -v ffmpeg >/dev/null   # the reel cannot be made without it
 
       - name: Install Python packages
+        if: steps.flow.outputs.flow != 'gemini_app'
         run: |
           pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
       - name: Post every 2 hours
+        if: steps.flow.outputs.flow != 'gemini_app'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -59,7 +69,7 @@ jobs:
         run: python -u main.py scheduler --hours 5.5
 
       - name: Start the next scheduler run
-        if: always() && !cancelled()
+        if: always() && !cancelled() && steps.flow.outputs.flow != 'gemini_app'
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run scheduler.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"
