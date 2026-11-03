@@ -29,7 +29,7 @@ jobs:
         id: flow
         # flow "gemini_app" posts from GitHub issues (prepare-post.yml), so this scheduler has nothing to do and
         # must not start the next run either (that would chain empty runs forever)
-        run: echo "flow=$(python3 -c "import yaml; print(yaml.safe_load(open('config.yaml')).get('flow', 'auto'))")" >> "$GITHUB_OUTPUT"
+        run: echo "flow=$(sed -n 's/^flow:[[:space:]]*"\{0,1\}\([a-z_]*\).*/\1/p' config.yaml | head -1)" >> "$GITHUB_OUTPUT"
 
       - uses: actions/setup-python@v5
         if: steps.flow.outputs.flow != 'gemini_app'
