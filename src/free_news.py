@@ -66,11 +66,20 @@ def _local_queries(content: dict, wanted: list[str]) -> list[tuple[str, str | No
     return queries
 
 
+# Gujarati endings after a place name ("વલસાડમાં", "વાપીના" ...); anything else means another word ("ડાંગર" is paddy)
+PLACE_ENDINGS = r"(?:માં|ના|ની|નું|નો|નાં|થી|ને|નુ|વાસીઓ|વાસી|ના)?"
+
+
+def place_at(text: str, place: str) -> int:
+    """Where the place is named in the text as a word of its own (with a Gujarati case ending), else -1."""
+    m = re.search(rf"(?<![\u0A80-\u0AFFA-Za-z]){re.escape(place)}{PLACE_ENDINGS}(?![\u0A80-\u0AFFA-Za-z])", text, re.I)
+    return m.start() if m else -1
+
+
 def _in_region(content: dict, text: str) -> bool:
     """Does the story name one of the page's own places?"""
     names = list(content.get("places") or []) + list(content.get("places_extra") or [])
-    low = text.lower()
-    return any(n.lower() in low for n in names)
+    return any(place_at(text, n) >= 0 for n in names)
 
 CARD_RULES = """You write the text of one Gujarati Instagram news card for a Gujarati news page.
 Write natural, simple Gujarati (Gujarati script) the way popular Gujarati news pages do: punchy and clear,

@@ -171,7 +171,8 @@ CSS = """
 def _place_tag(story, places: list[str]) -> str:
     """'વાપી - વલસાડ': the page's places named in the story (at most two), or '' if none."""
     text = " ".join([story.headline, story.subheadline, story.summary, *story.points])
-    found = sorted({p for p in places if p in text}, key=text.index)
+    from src.free_news import place_at
+    found = sorted({p for p in places if place_at(text, p) >= 0}, key=lambda p: place_at(text, p))
     return " - ".join(found[:2])
 
 
