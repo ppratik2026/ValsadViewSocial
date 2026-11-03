@@ -3,7 +3,11 @@ name: Showcase reels
 # Sample reels without the AI keys (nothing is posted):
 #   collect: today's real local news -> showcase/news.json on the "previews" branch
 #   render:  a reel per story in showcase/stories.json (text written from those articles) -> previews branch
+# Started by a push that changes showcase/request.txt ("collect") or showcase/stories.json ("render"), so it also
+# runs from a branch that is not merged yet; or by hand once it is on main.
 on:
+  push:
+    paths: ["showcase/request.txt", "showcase/stories.json"]
   workflow_dispatch:
     inputs:
       mode:
@@ -20,6 +24,16 @@ jobs:
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Mode
+        id: mode
+        run: |
+          mode="${{ inputs.mode }}"
+          if [ -z "$mode" ]; then
+            if git diff --name-only HEAD~1 HEAD | grep -q "showcase/stories.json"; then mode=render; else mode=collect; fi
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -41,7 +55,7 @@ jobs:
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           POLLINATIONS_API_KEY: ${{ secrets.POLLINATIONS_API_KEY }}
         run: |
-          if [ "${{ inputs.mode }}" = "collect" ]; then python -u tools/showcase.py collect
+          if [ "${{ steps.mode.outputs.mode }}" = "collect" ]; then python -u tools/showcase.py collect
           else python -u tools/showcase.py render showcase/stories.json; fi
       - name: Save to the previews branch
         if: always()
@@ -55,4 +69,4 @@ jobs:
           mkdir -p "/tmp/prev/$dir"
           cp showcase/news.json "/tmp/prev/$dir/" 2>/dev/null || true
           for d in showcase/*/; do [ -f "$d/reel.mp4" ] && cp "$d/reel.mp4" "/tmp/prev/$dir/$(basename "$d").mp4" && cp "$d/card.png" "/tmp/prev/$dir/$(basename "$d").png"; done
-          cd /tmp/prev && git add . && git commit -qm "Showcase ${{ github.run_number }} (${{ inputs.mode }})" && git push -q origin previews
+          cd /tmp/prev && git add . && git commit -qm "Showcase ${{ github.run_number }} (${{ steps.mode.outputs.mode }})" && git push -q origin previews
