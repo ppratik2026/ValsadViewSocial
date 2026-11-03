@@ -192,6 +192,19 @@ def _chips(story) -> str:
 
 # which layouts fit which kind of story (the first ones fit best); every story can also use the general ones
 TEMPLATE_RULES = [
+    # image-first story patterns (src/story_patterns.py), by the kind of news
+    ("crime", ["brk", "glitch"]),
+    ("weather", ["neon", "brk"]),
+    ("trending", ["neon", "glitch", "stack"]),
+    ("viral", ["glitch", "neon"]),
+    ("good_news", ["gold", "stack"]),
+    ("event", ["gold", "neon"]),
+    ("government", ["card2", "gold"]),
+    ("money", ["stack", "card2"]),
+    ("prices", ["stack"]),
+    ("numbers", ["stack", "card2"]),
+    ("politics", ["glitch", "card2"]),
+    ("education", ["card2"]),
     ("weather", ["storm", "alert", "magazine"]),
     ("crime", ["police", "tv", "diagonal", "alert"]),
     ("politics", ["quote", "tv", "paper"]),
@@ -236,7 +249,8 @@ ALL_TEMPLATES = ["police", "storm", "bignews", "tips", "card", "tv", "paper", "q
                  "notice", "stats", "polaroid", "magazine", "chat", "diagonal", "ticket", "map", "calendar", "receipt",
                  "scoreboard", "comic", "neon", "lockscreen", "chalkboard", "filmstrip", "notebook", "billboard", "letter",
                  "crimetape", "collage", "radio", "countdown", "percent", "folder", "roadsign", "crackglass", "spotlight",
-                 "retrotv", "detective", "weatherapp", "graffiti", "telegram", "flapboard", "laptop", "openbook", "hero3d", "glass3d", "poppop", "cinema", "typo", "fullbleed", "splitv", "ring", "cutout", "droste"]
+                 "retrotv", "detective", "weatherapp", "graffiti", "telegram", "flapboard", "laptop", "openbook", "hero3d", "glass3d", "poppop", "cinema", "typo", "fullbleed", "splitv", "ring", "cutout", "droste",
+                 "brk", "gold", "neon", "stack", "card2", "glitch"]
 TOPIC_WORDS = {
     "travel": r"ટ્રેન|રેલ|બસ|એસટી|ફ્લાઇટ|વિમાન|હાઇવે|train|bus|flight|railway",
     "sports": r"ક્રિકેટ|મેચ|સ્પર્ધા|મેડલ|ખેલ|ટુર્નામેન્ટ|ગોલ્ડ|ચેમ્પિયન|cricket|match",
@@ -286,6 +300,8 @@ def choose_template(story, mood: str, allowed: list[str] | None = None) -> str:
         return forced
     allowed = [t for t in (allowed or ALL_TEMPLATES) if t in ALL_TEMPLATES] or ALL_TEMPLATES
     kinds = _kinds(story, mood)
+    if set(allowed) <= set(PATTERN_BY_KIND_ALL):
+        return _pattern_for(story, kinds, allowed)
     fitting = []
     for kind, names in TEMPLATE_RULES:
         if kind in kinds:
@@ -302,6 +318,33 @@ def choose_template(story, mood: str, allowed: list[str] | None = None) -> str:
         return fresh[0]
     from src.analytics import weighted_choice
     return weighted_choice(fresh[:6], "template")
+
+
+# image-first story patterns: the most important kind of the news decides; the second choice is used when the
+# last post already had the first one, so two posts in a row never look the same
+PATTERN_PRIORITY = [
+    ("crime", ["brk", "glitch"]),
+    ("weather", ["neon", "brk"]),
+    ("money", ["stack", "card2"]),
+    ("prices", ["stack", "card2"]),
+    ("good_news", ["gold", "stack"]),
+    ("event", ["gold", "neon"]),
+    ("government", ["card2", "gold"]),
+    ("education", ["card2", "stack"]),
+    ("politics", ["glitch", "card2"]),
+    ("trending", ["neon", "glitch"]),
+    ("viral", ["glitch", "neon"]),
+]
+PATTERN_BY_KIND_ALL = ["brk", "gold", "neon", "stack", "card2", "glitch"]
+
+
+def _pattern_for(story, kinds: set, allowed: list[str]) -> str:
+    choice = next((names for kind, names in PATTERN_PRIORITY if kind in kinds), ["card2", "gold"])
+    choice = [t for t in choice if t in allowed] or allowed
+    from src.history import load_history
+    history = load_history()
+    last = (history[-1].get("style") or {}).get("template") if history else None
+    return choice[1] if len(choice) > 1 and choice[0] == last else choice[0]
 
 
 def _from_compare(story) -> bool:
@@ -321,7 +364,10 @@ def viral_page(story, font: str, image_url: str | None, date: str, handle: str, 
         from src.viral_plus import PLUS_LAYOUTS
         from src.viral_bold import BOLD_LAYOUTS
         from src.viral_pro import PRO_LAYOUTS
-        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS, **PLUS_LAYOUTS, **NEW_LAYOUTS, **PRO_LAYOUTS, **BOLD_LAYOUTS}.get(template)
+        from src.story_patterns import PATTERNS
+        story_patterns = {("card2" if k == "card" else k): v for k, v in PATTERNS.items()}
+        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS, **PLUS_LAYOUTS, **NEW_LAYOUTS, **PRO_LAYOUTS, **BOLD_LAYOUTS,
+                **story_patterns}.get(template)
         if page:
             return page(story, font, image_url, date, handle, _place_tag(story, places or []), ASKS)
     tag_text, looks = MOOD_LOOK.get(mood, MOOD_LOOK["info"])

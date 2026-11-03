@@ -354,6 +354,10 @@ M.update({
                "live": [[".f4", "kbZoom {end}s linear 0s both"], [".f1", "kbZoom {end}s linear 0s both"]], "spot": None},
 })
 
+from src.story_patterns import EXTRA_KEYFRAMES, PATTERN_MOTION  # noqa: E402
+M.update({("card2" if k == "card" else k): v for k, v in PATTERN_MOTION.items()})
+MOTION_CSS += EXTRA_KEYFRAMES
+
 SPOT_ANIM = {
     "glow": "spot {step}s ease-in-out {at}s",
     "underline": "underline {step}s ease-in-out {at}s",

@@ -55,7 +55,9 @@ card:
                clipboard, tvs, balloons, station, detective, stamps]
   # layouts of the viral design (each like a popular Gujarati news poster); the story picks one that fits and
   # the layouts of the last few posts are skipped, so the grid keeps changing. Remove any you don't want.
-  viral_templates: [police, storm, bignews, tips, card]
+  # image-first story reels: the picture alone first, then the headline word by word, then the rest of the text;
+  # the pattern follows the kind of news (crime -> brk/glitch, good news -> gold, government -> card2, money -> stack ...)
+  viral_templates: [brk, gold, neon, stack, card2, glitch]
   # more layouts that can be turned on by adding them above: tv, paper, quote, timeline, versus, alert, notice,
   # stats, polaroid, magazine, chat, diagonal, ticket, map, calendar, receipt, scoreboard, comic, neon, lockscreen,
   # chalkboard, filmstrip, notebook, billboard, letter, crimetape, collage, radio, countdown, percent, folder, roadsign
