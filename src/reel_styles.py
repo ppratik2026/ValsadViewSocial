@@ -83,6 +83,7 @@ MOTION_CSS = """
 @keyframes shatterIn { 0% { transform: var(--t0, translate(0)) scale(1.4) rotate(-6deg); opacity: 0; } 50% { opacity: 1; }
   70% { transform: var(--t0, translate(0)) scale(.96) rotate(1deg); } 100% { transform: var(--t0, translate(0)); } }
 @keyframes spinRays { from { transform: rotate(0deg); } to { transform: rotate(40deg); } }
+@keyframes ringTurn { from { transform: rotate(0deg); } to { transform: rotate(60deg); } }
 @keyframes underline { 0% { box-shadow: inset 0 -6px 0 rgba(255,214,10,0); } 30%, 80% { box-shadow: inset 0 -10px 0 rgba(255,214,10,.9); }
   100% { box-shadow: inset 0 -6px 0 rgba(255,214,10,0); } }
 """
@@ -330,6 +331,27 @@ M.update({
                   [".stars", "typeIn", 1.8, 0.6, 0], [".credits p", "fadeIn", 2.0, 0.4, 0.2]],
         "live": [[".bgpic", "kbZoom {end}s ease-out 0s both"]],
         "spot": None},
+})
+
+M.update({
+    "typo": {"intro": [[".kick", "typeIn", 0.0, 0.3, 0], [".wall span", "slapIn", 0.1, 0.25, 0.12], [".rule", "typeIn", 1.4, 0.4, 0],
+                       [".dot", "popIn", 1.6, 0.4, 0], [".lower p", "typeIn", 1.8, 0.4, 0.25], [".sticker", "slapIn", 2.4, 0.3, 0]],
+             "spot": None},
+    "fullbleed": {"intro": [[".pill", "slideFarL", 0.3, 0.3, 0], [".hl div", "inkIn", 0.5, 0.6, 0.2], [".one", "fadeIn", 1.4, 0.5, 0],
+                            [".meta", "fadeIn", 1.7, 0.4, 0], [".sticker", "slapIn", 2.2, 0.3, 0]],
+                  "live": [[".bgpic", "kbZoom {end}s ease-out 0s both"]], "spot": None},
+    "splitv": {"intro": [[".bar", "growY", 0.0, 0.5, 0], [".stack span", "slideFarR", 0.2, 0.3, 0.1], [".rule", "typeIn", 1.3, 0.3, 0],
+                         [".pt2 p", "typeIn", 1.5, 0.4, 0.25], [".sticker", "slapIn", 2.2, 0.3, 0]],
+               "live": [[".strip", "kbPan {end}s ease-in-out 0s both"]], "spot": None},
+    "ring": {"intro": [[".disc", "popIn", 0.0, 0.5, 0], [".ringsvg", "spinY", 0.3, 0.8, 0], [".kick", "dropIn", 0.2, 0.4, 0],
+                       [".under p", "fadeIn", 1.3, 0.4, 0.2], [".sticker", "slapIn", 2.0, 0.3, 0]],
+             "live": [[".ringsvg", "ringTurn {end}s linear 0s both"]], "spot": None},
+    "cutout": {"intro": [[".snap", "dropBounce", 0.0, 0.7, 0], [".collage span", "slapIn", 0.5, 0.25, 0.13], [".torn p", "slapIn", 1.9, 0.25, 0.15],
+                         [".sticker", "slapIn", 2.4, 0.3, 0]],
+               "spot": None},
+    "droste": {"intro": [[".f2", "settle", 0.0, 0.5, 0], [".f3", "settle", 0.2, 0.5, 0], [".f4", "settle", 0.4, 0.5, 0],
+                         [".core .hl div", "slideFarL", 0.8, 0.35, 0.15], [".one", "fadeIn", 1.5, 0.4, 0], [".sticker", "slapIn", 2.0, 0.3, 0]],
+               "live": [[".f4", "kbZoom {end}s linear 0s both"], [".f1", "kbZoom {end}s linear 0s both"]], "spot": None},
 })
 
 SPOT_ANIM = {
