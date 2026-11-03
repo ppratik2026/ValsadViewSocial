@@ -318,6 +318,7 @@ COUNT_CSS = """
     justify-content: center; background: radial-gradient(circle, #fff 0 60%, transparent 61%),
       repeating-conic-gradient(#ffd60a 0 4deg, transparent 4deg 10deg); box-shadow: 0 0 80px rgba(255,214,10,.6); }
   .ring b { font: 900 260px/0.9 'Arial Black', Arial, sans-serif; color: #d00000; }
+  .cnt { counter-reset: n var(--n); } .cnt::after { content: counter(n); }
   .ring span { font-size: 64px; font-weight: 800; color: #370617; }
   .till { align-self: center; background: #370617; color: #ffd60a; font-size: 44px; font-weight: 800; padding: 8px 34px 12px; border-radius: 40px; }
   .hl div { color: #fff; text-shadow: 0 6px 0 rgba(0,0,0,.35); }
@@ -336,7 +337,7 @@ def countdown_page(story, font, image_url, date, handle, place, asks):
     pts = "".join(f"<p>⏳ {highlight_numbers(p)}</p>" for p in _pts(story, 2))
     body = f"""<div class="handle">{esc(handle)}</div>
   <div id="main">
-    <div class="ring"><b>{n}</b><span>દિવસ બાકી</span></div>
+    <div class="ring">{f'<b class="cnt" style="--n:{n}"></b>' if isinstance(n, int) else f"<b>{n}</b>"}<span>દિવસ બાકી</span></div>
     {f'<div class="till">📅 {esc(when)} સુધી</div>' if when else ""}
     <div class="hl">{_hl(story)}</div>
     <div class="photo"{_bg(image_url)}>{SYM if image_url else ""}</div>
@@ -370,6 +371,7 @@ PERCENT_CSS = """
     background: radial-gradient(circle, #fff 0 56%, transparent 57%), conic-gradient(#4361ee 0 var(--p), #f72585 var(--p) 100%); }
   .donut b { font: 900 120px/1 'Arial Black', Arial, sans-serif; color: #4361ee; }
   .donut b small { font-size: 60px; }
+  .pcnt { counter-reset: n var(--n); display: flex; align-items: baseline; } .pcnt::before { content: counter(n); }
   .legend p { font-size: calc(var(--pt) * 1.05); font-weight: 800; line-height: 1.3; }
   .legend p i { display: inline-block; width: 30px; height: 30px; border-radius: 8px; background: #4361ee; margin-right: 12px; vertical-align: -4px; }
   .legend p + p i { background: #f72585; }
@@ -386,7 +388,8 @@ def percent_page(story, font, image_url, date, handle, place, asks):
     value, label = found if found else (0, "")
     shown = f"{value:g}"
     pts = "".join(f"<p>{highlight_numbers(p)}</p>" for p in _pts(story, 3) if f"{shown}%" not in p.replace(" ", ""))
-    chart = (f'<div class="chart"><div class="donut" style="--p:{value}%"><b>{shown}<small>%</small></b></div>'
+    num = f'<b class="pcnt" style="--n:{int(value)}"><small>%</small></b>' if value == int(value) else f"<b>{shown}<small>%</small></b>"
+    chart = (f'<div class="chart"><div class="donut" style="--p:{value}%">{num}</div>'
              f'<div class="legend"><p><i></i>{esc(label)}</p></div></div>') if found else ""
     body = f"""<div class="handle">{esc(handle)}</div>
   <div id="main">

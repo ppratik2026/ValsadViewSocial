@@ -47,10 +47,6 @@ LIVE_JS = """([start, end, sel]) => {
   const total = Math.max(end - start, 1);
   all(sel.zoom).forEach(el => add(el, `kbZoom ${end}s linear 0s both`));
   all(sel.pan).forEach(el => add(el, `kbPan ${end}s ease-in-out 0s both`));
-  // reading guide: the rows light up one by one across the time after the intro
-  const rows = all(sel.spot).filter(el => el.offsetParent !== null);
-  const step = rows.length ? Math.min(1.6, (total - 1.2) / rows.length) : 0;
-  rows.forEach((el, i) => add(el, `spot ${Math.max(step, .6)}s ease-in-out ${start + i * step}s`));
   all('.hl .hi').forEach(el => add(el, `glowHi 1.4s ease-in-out ${start}s infinite`));
   all('.live i, .onair, .v-tag .t1 .ic, .pin .ic, .sign .ic').forEach(el => add(el, `blink 1s steps(1) ${start * 0}s infinite`));
   all('.hazard').forEach(el => add(el, `march 1.2s linear 0s infinite`));

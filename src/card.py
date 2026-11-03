@@ -324,15 +324,23 @@ BRAND_STEPS = [
 
 
 def _capture_intro(page, frames_dir: Path, seconds: float, fps: int, steps: list | None = None,
-                   flash: bool = True, live_until: float | None = None) -> None:
+                   flash: bool = True, live_until: float | None = None, template: str | None = None) -> None:
     """Screenshot the intro animation frame by frame (deterministic, no screen recording). With live_until, the
-    poster keeps moving after the intro (src/reel_motion.py) and the frames cover the whole reel."""
+    poster keeps moving after the intro (src/reel_motion.py) and the frames cover the whole reel; with template,
+    the viral layout's own animation is used (src/reel_styles.py), so every layout moves differently."""
     frames_dir.mkdir(parents=True, exist_ok=True)
     page.add_style_tag(content=ANIM_CSS.removeprefix("<style>").removesuffix("</style>"))
+    if template:
+        from src.reel_styles import MOTION_CSS, motion
+        page.add_style_tag(content=MOTION_CSS)
+        steps = motion(template)["intro"] + (steps or [])
     page.evaluate(ANIM_JS, [steps or ANIM_STEPS, flash])
     if live_until and live_until > seconds:
         from src.reel_motion import add_live_motion
         add_live_motion(page, min(seconds, 3.0), live_until)
+        if template:
+            from src.reel_styles import add_style_motion
+            add_style_motion(page, template, min(seconds, 2.6), live_until)
         seconds = live_until
     for n in range(int(seconds * fps)):
         page.evaluate("t => document.getAnimations().forEach(a => a.currentTime = t)", n * 1000 / fps)
@@ -533,7 +541,7 @@ def render_card(story: NewsStory, cfg: dict, out_path: Path, background: Path | 
                 # the whole reel moves (picture, reading guide, blinking ...), not only its first seconds
                 live = reel_seconds(mood, len(story.points)) if vcfg.get("full_motion", True) else None
                 _capture_intro(page, intro_dir, vcfg.get("intro_seconds", 3.4), vcfg["fps"], VIRAL_STEPS, flash=False,
-                               live_until=live)
+                               live_until=live, template=story.style.get("template"))
             else:
                 _capture_intro(page, intro_dir, vcfg.get("intro_seconds", 3.4), vcfg["fps"])
         browser.close()
