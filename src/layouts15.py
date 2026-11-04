@@ -1,20 +1,20 @@
-"""Fifteen posters with fifteen different structures (not just other colours): where the picture sits, how the
-headline is set, how the facts and points are laid out all change from one layout to the next.
+"""Fifteen posters with fifteen different structures (not just other colours), and no frame round any picture: its
+edges fade out. Where the picture sits, how the headline is set, how the facts and points are laid out all change.
 
   diagonal  picture cut on a slant, red block below, left-aligned headline
   tv        news channel screen: LIVE logo, BREAKING tab, white headline bar, blue sub bar, ticker
   paper     newspaper front page: masthead, black headline, photo with caption, two columns
   bignum    one giant number filled with the picture, headline above, chips below
-  polaroid  instant photo taped on a board, lined-paper note, sticky note with the number
-  circle    round picture with glowing rings, centred text, 2x2 point tiles
-  magazine  magazine cover: masthead over the picture, cover lines on the left, round price sticker
-  sidebar   coloured side band with the place written upwards, picture and numbered points on the right
+  glass     blurred picture as the page, a frosted glass card with the sharp picture fading into it
+  place     the place name in giant letters behind and in front of the picture
+  magazine  magazine cover: masthead over the picture, headline and cover lines at the bottom, round price sticker
+  topline   headline first on a light page, picture in the middle, three icon cards
   quote     a big quotation: giant quote mark, headline as the quote, sub as the attribution
   steps     light page, picture on top, points on a numbered timeline
   bento     a grid of rounded tiles: picture, number, place and date, headline, points
-  hazard    yellow warning page with black-yellow stripes, warning sign, picture as a wide band
-  film      film strip with sprocket holes around the picture, movie-title headline, points as credits
-  dossier   case file: folder, typed sheet, clipped photo, red stamp, form fields
+  ribbon    the headline on a folded ribbon banner, points as chat bubbles
+  film      sprocket holes over a soft-edged picture, movie-title headline, points as credits
+  infographic  stat cards with bars over a blurred picture
   tape      picture crossed by two "police line" tapes, headline below
 
 All of them keep the src/viral.FIT contract (#main, .hl div lines, --hl, --pt, --ask, --top, --min-top).
@@ -77,10 +77,8 @@ COMMON = """
 # 1 ---------------------------------------------------------------------------------------- diagonal
 DIAGONAL = """
   body { background: #a30015; }
-  .pic { position: absolute; left: 0; right: 0; top: 0; height: 1120px; background: center/cover no-repeat;
-    clip-path: polygon(0 0, 100% 0, 100% 78%, 0 100%); z-index: 1; }
-  .edge { position: absolute; left: 0; right: 0; top: 0; height: 1140px; background: #ffd60a; z-index: 0;
-    clip-path: polygon(0 80%, 100% 78%, 100% 80%, 0 102%); }
+  .pic { position: absolute; left: 0; right: 0; top: 0; height: 1180px; background: center/cover no-repeat; z-index: 1;
+    -webkit-mask-image: linear-gradient(172deg, #000 55%, transparent 88%); }
   .place { position: absolute; top: 40px; left: 0; z-index: 3; background: #ffd60a; color: #111; font-size: 40px; font-weight: 800;
     padding: 8px 30px 12px 40px; border-radius: 0 40px 40px 0; }
   .sym { right: 20px; top: 40px; }
@@ -98,7 +96,7 @@ DIAGONAL = """
 
 
 def diagonal(story, font, image_url, date, handle, place, asks):
-    body = f"""<div class="edge"></div><div class="pic" style="{_pic(image_url)}"></div>
+    body = f"""<div class="pic" style="{_pic(image_url)}"></div>
   <div class="place">📍 {esc(place or story.kicker)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
   <div id="main">{_hl(story)}{_sub(story)}<div class="pts">{_pts_html(story, 3)}</div><div class="grow"></div>
   {_askx(story, asks, "👉")}<div class="handle2"><span>{esc(handle)}</span><span>{esc(date)} • {esc(story.source_name)}</span></div></div>"""
@@ -151,7 +149,8 @@ PAPER = """
     padding: 8px 4px 10px; font-size: 26px; font-weight: 700; }
   .hl div { color: #111; font-size: calc(var(--hl) * .86); padding: 0; }
   .hl .hi { color: #b5001b; }
-  .photo { height: 560px; background: center/cover no-repeat; flex-shrink: 0; position: relative; filter: saturate(1.1); }
+  .photo { height: 600px; margin: 0 -44px; background: center/cover no-repeat; flex-shrink: 0; position: relative; filter: saturate(1.1);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 82%, transparent 100%); }
   .photo .sym { right: 12px; bottom: 12px; }
   .cap { font-size: calc(var(--pt) * .9); font-style: italic; color: #333; border-bottom: 1.5px solid #151515; padding-bottom: 10px; line-height: 1.3; }
   .sub { font-size: calc(var(--hl) * .4); font-weight: 800; color: #b5001b; line-height: 1.3; }
@@ -207,80 +206,6 @@ def bignum(story, font, image_url, date, handle, place, asks):
     return _wrap(BIGNUM, font, body, 60, 30)
 
 
-# 5 ---------------------------------------------------------------------------------------- polaroid
-POLAROID = """
-  body { background: #2f6f73; background-image: radial-gradient(rgba(255,255,255,.08) 2px, transparent 2px); background-size: 26px 26px; }
-  .pola { position: absolute; left: 110px; top: 70px; width: 860px; background: #fff; padding: 30px 30px 100px; transform: rotate(-3deg);
-    box-shadow: 0 30px 50px rgba(0,0,0,.45); z-index: 2; }
-  .pola .ph { height: 640px; background: center/cover no-repeat; position: relative; }
-  .pola .ph .sym { right: 10px; top: 10px; }
-  .pola .cap { position: absolute; bottom: 24px; left: 0; right: 0; text-align: center; font-size: 46px; font-weight: 700; color: #1d3557; }
-  .tape { position: absolute; width: 230px; height: 64px; background: rgba(255,230,140,.85); z-index: 3; }
-  .t1 { left: 70px; top: 60px; transform: rotate(-35deg); } .t2 { right: 70px; top: 50px; transform: rotate(30deg); }
-  .sticky { position: absolute; right: 50px; top: 760px; z-index: 4; width: 280px; background: #ffd60a; color: #111; padding: 20px 20px 26px;
-    transform: rotate(6deg); box-shadow: 0 16px 24px rgba(0,0,0,.35); text-align: center; }
-  .sticky b { display: block; font-size: 64px; line-height: 1.1; } .sticky small { font-size: 26px; font-weight: 700; }
-  #main { left: 50px; right: 50px; gap: 14px; background: #fffdf5; padding: 34px 40px 30px; transform: rotate(1deg);
-    background-image: repeating-linear-gradient(180deg, transparent 0 62px, #c9dcef 62px 64px); box-shadow: 0 24px 40px rgba(0,0,0,.35);
-    bottom: 40px; border-left: 6px solid #e63946; }
-  .hl { align-items: flex-start; }
-  .hl div { text-align: left; color: #1b1b1b; font-size: calc(var(--hl) * .78); padding: 0; }
-  .hl .hi { color: #e63946; }
-  .sub { font-size: calc(var(--hl) * .38); color: #1d4ed8; font-weight: 700; line-height: 1.3; }
-  .pt { display: flex; gap: 14px; color: #222; font-size: var(--pt); font-weight: 600; line-height: 1.32; }
-  .pt::before { content: "✔"; color: #2a9d8f; font-weight: 900; }
-  .grow { flex: 1; }
-  .askx { color: #e63946; }
-  .foot2 { font-size: 24px; color: #555; }
-"""
-
-
-def polaroid(story, font, image_url, date, handle, place, asks):
-    f = _num(story)
-    sticky = f'<div class="sticky"><b>{esc(f["value"])}</b><small>{esc(f["label"])}</small></div>' if f else ""
-    body = f"""<div class="pola"><div class="ph" style="{_pic(image_url)}"><div class="sym">પ્રતિકાત્મક તસવીર</div></div>
-  <div class="cap">📍 {esc(place or story.kicker)}</div></div><div class="tape t1"></div><div class="tape t2"></div>{sticky}
-  <div id="main">{_hl(story)}{_sub(story)}{_pts_html(story, 3, icons=False)}<div class="grow"></div>{_askx(story, asks, "✍️")}
-  <div class="foot2">{esc(handle)} • {esc(date)} • {esc(story.source_name)}</div></div>"""
-    return _wrap(POLAROID, font, body, 1000, 900)
-
-
-# 6 ------------------------------------------------------------------------------------------ circle
-CIRCLE = """
-  body { background: radial-gradient(circle at 50% 22%, #2b2d8f 0%, #10113a 55%, #070720 100%); }
-  .rings { position: absolute; left: 50%; top: 380px; width: 1000px; height: 1000px; margin: -500px 0 0 -500px; border-radius: 50%;
-    background: repeating-radial-gradient(circle, transparent 0 60px, rgba(255,255,255,.06) 60px 62px); }
-  .disc { position: absolute; left: 50%; top: 380px; width: 620px; height: 620px; margin: -310px 0 0 -310px; border-radius: 50%;
-    background: center/cover no-repeat; box-shadow: 0 0 0 14px #ff9f1c, 0 0 0 30px rgba(255,159,28,.25), 0 0 120px rgba(255,159,28,.6); z-index: 2; }
-  .badge { position: absolute; left: 50%; top: 610px; transform: translateX(150px) rotate(8deg); z-index: 3; background: #ff9f1c; color: #10113a;
-    width: 230px; height: 230px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center; border: 8px solid #fff; }
-  .badge b { font-size: 50px; line-height: 1.05; } .badge small { font-size: 22px; font-weight: 800; padding: 0 16px; line-height: 1.1; }
-  .handle { top: 30px; left: 30px; }
-  .sym { right: 30px; top: 30px; }
-  #main { left: 50px; right: 50px; gap: 20px; align-items: center; }
-  .place { font-size: 36px; font-weight: 800; color: #ff9f1c; letter-spacing: 1px; }
-  .hl div { color: #fff; font-size: calc(var(--hl) * .8); }
-  .hl .hi { color: #ff9f1c; }
-  .sub { text-align: center; font-size: calc(var(--hl) * .38); color: #a5b4fc; font-weight: 700; line-height: 1.3; }
-  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 100%; }
-  .tile { background: rgba(255,255,255,.08); border-radius: 26px; padding: 18px 20px; display: flex; gap: 14px; align-items: center;
-    color: #fff; font-size: calc(var(--pt) * .85); font-weight: 600; line-height: 1.28; border-top: 4px solid #ff9f1c; }
-  .tile .ic { width: 64px; height: 64px; flex-shrink: 0; }
-  .grow { flex: 1; }
-  .askx { color: #10113a; background: #fff; padding: 14px 30px 18px; border-radius: 22px; }
-"""
-
-
-def circle(story, font, image_url, date, handle, place, asks):
-    f = _num(story)
-    badge = f'<div class="badge"><b>{esc(f["value"])}</b><small>{esc(f["label"])}</small></div>' if f else ""
-    tiles = "".join(f'<div class="tile">{icon_img(p)}<span>{highlight_numbers(p)}</span></div>' for p in _pts(story, 4))
-    body = f"""<div class="rings"></div><div class="disc" style="{_pic(image_url)}"></div>{badge}
-  <div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
-  <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}<div class="tiles">{tiles}</div>
-  <div class="grow"></div>{_askx(story, asks, "🤔")}</div>"""
-    return _wrap(CIRCLE, font, body, 760, 700)
 
 
 # 7 ---------------------------------------------------------------------------------------- magazine
@@ -300,7 +225,7 @@ MAGAZINE = """
   .sticker b { font-size: 64px; line-height: 1; } .sticker small { font-size: 24px; color: #111; font-weight: 800; padding: 6px 20px 0; line-height: 1.1; }
   .sym { left: 40px; top: 300px; }
   #main { left: 40px; right: 120px; gap: 16px; }
-  .lines { display: flex; flex-direction: column; gap: 12px; margin-bottom: 14px; }
+  .lines { display: flex; flex-direction: column; gap: 10px; margin: 6px 0 8px; }
   .line { color: #fff; font-size: calc(var(--pt) * .9); font-weight: 700; line-height: 1.25; border-left: 6px solid #ffd60a; padding-left: 16px; max-width: 640px; }
   .place { color: #ffd60a; font-size: 34px; font-weight: 800; letter-spacing: 2px; }
   .hl { align-items: flex-start; }
@@ -318,42 +243,10 @@ def magazine(story, font, image_url, date, handle, place, asks):
     lines = "".join(f'<div class="line">{highlight_numbers(p)}</div>' for p in _pts(story, 3))
     body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="mast">VALSAD</div><div class="tag">VIEW • {esc(handle)}</div>
   <div class="issue">{esc(date)}</div>{sticker}
-  <div id="main"><div class="lines">{lines}</div><div class="place">{esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}
+  <div id="main"><div class="place">{esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}<div class="lines">{lines}</div>
   {_askx(story, asks, "તમારો મત")}</div>"""
-    return _wrap(MAGAZINE, font, body, 980, 760)
+    return _wrap(MAGAZINE, font, body, 1000, 760)
 
-
-# 8 ----------------------------------------------------------------------------------------- sidebar
-SIDEBAR = """
-  body { background: #fff; color: #111; }
-  .band { position: absolute; left: 0; top: 0; bottom: 0; width: 200px; background: #e63946; z-index: 1; }
-  .band .v { position: absolute; left: 50%; bottom: 60px; transform: translateX(-50%) rotate(180deg); writing-mode: vertical-rl;
-    font-size: 150px; font-weight: 800; color: #fff; line-height: 1; white-space: nowrap; }
-  .band .d { position: absolute; top: 40px; left: 0; right: 0; text-align: center; color: #fff; font-size: 26px; font-weight: 800; line-height: 1.2; }
-  .pic { position: absolute; left: 200px; right: 0; top: 0; height: 820px; background: center/cover no-repeat; }
-  .sym { right: 20px; top: 20px; }
-  .handle { position: absolute; left: 230px; top: 760px; z-index: 3; background: #111; color: #fff; font-size: 28px; font-weight: 800;
-    padding: 8px 24px 12px; }
-  #main { left: 240px; right: 40px; gap: 18px; }
-  .hl { align-items: flex-start; }
-  .hl div { text-align: left; color: #111; font-size: calc(var(--hl) * .8); padding: 0; }
-  .hl .hi { color: #e63946; }
-  .sub { font-size: calc(var(--hl) * .37); color: #1d3557; font-weight: 700; line-height: 1.3; }
-  .np { display: flex; gap: 18px; align-items: flex-start; font-size: var(--pt); font-weight: 600; line-height: 1.3; color: #222; }
-  .np b { font: 900 calc(var(--pt) * 1.5)/1 'Arial Black', Arial, sans-serif; color: #e63946; flex-shrink: 0; min-width: 1.6em; }
-  .grow { flex: 1; }
-  .askx { background: #1d3557; color: #fff; padding: 16px 26px 20px; }
-  .foot2 { font-size: 22px; color: #666; }
-"""
-
-
-def sidebar(story, font, image_url, date, handle, place, asks):
-    pts = "".join(f'<div class="np"><b>{i:02d}</b><span>{highlight_numbers(p)}</span></div>' for i, p in enumerate(_pts(story, 3), 1))
-    body = f"""<div class="band"><div class="d">{esc(date)}</div><div class="v">{esc((place or story.kicker).split(" - ")[0])}</div></div>
-  <div class="pic" style="{_pic(image_url)}"><div class="sym">પ્રતિકાત્મક તસવીર</div></div><div class="handle">{esc(handle)}</div>
-  <div id="main">{_hl(story)}{_sub(story)}{pts}<div class="grow"></div>{_askx(story, asks, "❓")}
-  <div class="foot2">સ્રોત: {esc(story.source_name)}</div></div>"""
-    return _wrap(SIDEBAR, font, body, 870, 840)
 
 
 # 9 ------------------------------------------------------------------------------------------- quote
@@ -425,7 +318,8 @@ BENTO = """
   #main { left: 30px; right: 30px; top: 30px; bottom: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
     grid-template-rows: 700px auto auto auto 1fr auto; }
   #main > * { border-radius: 34px; }
-  .t-pic { grid-column: 1 / 3; background: center/cover no-repeat; position: relative; }
+  .t-pic { grid-column: 1 / 3; background: center/cover no-repeat; position: relative; margin: -30px -30px 0; border-radius: 0 !important;
+    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%); }
   .t-pic .sym { right: 18px; top: 18px; }
   .t-pic .handle { left: 18px; top: 18px; }
   .t-num { background: #ffd60a; color: #111; padding: 22px 26px; display: flex; flex-direction: column; justify-content: center; }
@@ -454,51 +348,20 @@ def bento(story, font, image_url, date, handle, place, asks):
     return _wrap(BENTO, font, body, 30, 30)
 
 
-# 12 ----------------------------------------------------------------------------------------- hazard
-HAZARD = """
-  body { background: #ffd60a; color: #111; }
-  .stripe { position: absolute; left: 0; right: 0; height: 60px; background: repeating-linear-gradient(-45deg, #111 0 40px, #ffd60a 40px 80px); z-index: 3; }
-  .s1 { top: 0; } .s2 { bottom: 0; }
-  .warn { position: absolute; top: 90px; left: 50px; z-index: 3; display: flex; align-items: center; gap: 20px; }
-  .tri { width: 0; height: 0; border-left: 80px solid transparent; border-right: 80px solid transparent; border-bottom: 140px solid #111; position: relative; }
-  .tri::after { content: "!"; position: absolute; left: -20px; top: 30px; color: #ffd60a; font: 900 96px/1 Arial; width: 40px; text-align: center; }
-  .warn b { font: 900 64px/1 'Arial Black', Arial; } .warn small { display: block; font-size: 34px; font-weight: 800; margin-top: 8px; }
-  .handle { top: 100px; right: 40px; left: auto; background: #111; border-color: #111; }
-  #main { left: 50px; right: 50px; gap: 18px; bottom: 90px; }
-  .hl div { color: #111; font-size: calc(var(--hl) * .82); }
-  .hl .hi { color: #c1121f; }
-  .band { margin: 0 -50px; height: 520px; background: center/cover no-repeat; position: relative; flex-shrink: 0; }
-  .band .sym { right: 20px; bottom: 20px; }
-  .sub { background: #111; color: #ffd60a; margin: -18px -50px 0; padding: 16px 50px 20px; font-size: calc(var(--hl) * .37); font-weight: 700;
-    line-height: 1.3; text-align: center; }
-  .pt { display: flex; gap: 14px; align-items: center; font-size: var(--pt); font-weight: 700; line-height: 1.3; }
-  .pt::before { content: "⚠"; font-size: 1.1em; }
-  .grow { flex: 1; }
-  .askx { border: 5px solid #111; padding: 14px 24px 18px; background: #fff; }
-"""
-
-
-def hazard(story, font, image_url, date, handle, place, asks):
-    body = f"""<div class="stripe s1"></div><div class="stripe s2"></div>
-  <div class="warn"><div class="tri"></div><div><b>ALERT</b><small>📍 {esc(place or story.kicker)}</small></div></div>
-  <div class="handle">{esc(handle)}</div>
-  <div id="main">{_hl(story)}<div class="band" style="{_pic(image_url)}"><div class="sym">પ્રતિકાત્મક તસવીર</div></div>{_sub(story)}
-  {_pts_html(story, 3, icons=False)}<div class="grow"></div>{_askx(story, asks, "📢")}</div>"""
-    return _wrap(HAZARD, font, body, 290, 270)
-
 
 # 13 ------------------------------------------------------------------------------------------- film
 FILM = """
   body { background: radial-gradient(ellipse at 50% 60%, #2a1a0a 0%, #050505 70%); }
   .spot { position: absolute; left: 50%; top: 860px; width: 1300px; height: 1100px; margin-left: -650px;
     background: radial-gradient(ellipse at 50% 0%, rgba(255,214,140,.25), transparent 60%); }
-  .strip { position: absolute; left: -20px; right: -20px; top: 150px; height: 680px; background: #111; transform: rotate(-3deg); z-index: 2;
-    padding: 70px 0; box-shadow: 0 30px 60px rgba(0,0,0,.6); }
+  .strip { position: absolute; left: -20px; right: -20px; top: 130px; height: 760px; transform: rotate(-3deg); z-index: 2; padding: 0; }
   .strip::before, .strip::after { content: ""; position: absolute; left: 0; right: 0; height: 40px;
     background: repeating-linear-gradient(90deg, transparent 0 22px, #eee 22px 56px, transparent 56px 78px); background-size: 78px 28px;
     background-repeat: repeat-x; background-position: 0 6px; }
   .strip::before { top: 12px; } .strip::after { bottom: 12px; }
-  .frame { height: 100%; background: center/cover no-repeat; margin: 0 50px; position: relative; }
+  .frame { height: 100%; background: center/cover no-repeat; position: relative;
+    -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 50%, #000 60%, transparent 100%); }
+  .strip::before, .strip::after { opacity: .5; z-index: 3; }
   .frame .sym { right: 14px; top: 14px; }
   .handle { top: 40px; left: 40px; }
   .scene { position: absolute; top: 50px; right: 40px; color: #f5d08a; font: 700 28px/1 'Courier New', monospace; z-index: 3; }
@@ -524,44 +387,6 @@ def film(story, font, image_url, date, handle, place, asks):
   <div class="grow"></div>{_askx(story, asks, "🎬")}<div class="foot2">સ્રોત: {esc(story.source_name)}</div></div>"""
     return _wrap(FILM, font, body, 920, 880)
 
-
-# 14 ---------------------------------------------------------------------------------------- dossier
-DOSSIER = """
-  body { background: #b08a57; background-image: linear-gradient(135deg, rgba(255,255,255,.08) 25%, transparent 25%); background-size: 8px 8px; }
-  .tabf { position: absolute; top: 40px; left: 60px; background: #c9a46c; color: #4a3417; font-size: 34px; font-weight: 800; padding: 14px 40px 30px;
-    border-radius: 18px 18px 0 0; }
-  .sheet { position: absolute; left: 40px; right: 40px; top: 110px; bottom: 40px; background: #fbf7ee; box-shadow: 0 20px 40px rgba(0,0,0,.35); }
-  .clip { position: absolute; right: 70px; top: 150px; width: 470px; height: 380px; background: center/cover no-repeat; transform: rotate(4deg);
-    box-shadow: 0 14px 26px rgba(0,0,0,.35); z-index: 3; }
-  .clip::before { content: ""; position: absolute; left: 40px; top: -30px; width: 40px; height: 110px; border: 7px solid #8d99ae; border-radius: 20px; }
-  .clip .sym { right: 8px; bottom: 8px; font-size: 18px; }
-  .stamp { position: absolute; left: 90px; top: 430px; z-index: 4; border: 8px solid #c1121f; color: #c1121f; font: 900 58px/1 'Arial Black', Arial;
-    padding: 12px 26px; transform: rotate(-12deg); opacity: .85; letter-spacing: 3px; }
-  .fields { position: absolute; left: 90px; top: 170px; width: 420px; z-index: 3; display: flex; flex-direction: column; gap: 22px; }
-  .fld small { display: block; font: 700 22px/1 'Courier New', monospace; color: #6b5a3e; }
-  .fld b { display: block; font-size: 40px; line-height: 1.2; color: #1a1a1a; border-bottom: 2px solid #1a1a1a; padding-bottom: 4px; }
-  #main { left: 90px; right: 90px; gap: 22px; bottom: 80px; justify-content: center; }
-  .hl { align-items: flex-start; }
-  .hl div { text-align: left; color: #1a1a1a; font-size: calc(var(--hl) * .76); padding: 0; }
-  .hl .hi { color: #c1121f; }
-  .sub { font-size: calc(var(--hl) * .38); font-weight: 700; line-height: 1.35; color: #1d3557; }
-  .pt { display: flex; gap: 14px; font-size: calc(var(--pt) * .92); color: #222; line-height: 1.35; font-weight: 600; }
-  .pt::before { content: "▸"; color: #c1121f; }
-  .grow { flex: 1; }
-  .askx { border-top: 3px solid #1a1a1a; padding-top: 16px; color: #1a1a1a; }
-  .handle { top: 40px; right: 60px; left: auto; }
-"""
-
-
-def dossier(story, font, image_url, date, handle, place, asks):
-    fl = [("સ્થળ", place or story.kicker), ("તારીખ", date)] + [(f["label"], f["value"]) for f in story.facts[:1]]
-    fields = "".join(f'<div class="fld"><small>{esc(a)}</small><b>{esc(b)}</b></div>' for a, b in fl if b)
-    stamp = {"breaking": "BREAKING", "happy": "GOOD NEWS"}.get(story.mood, "IMPORTANT")
-    body = f"""<div class="tabf">કેસ ફાઇલ</div><div class="sheet"></div><div class="handle">{esc(handle)}</div>
-  <div class="clip" style="{_pic(image_url)}"><div class="sym">પ્રતિકાત્મક તસવીર</div></div><div class="fields">{fields}</div>
-  <div class="stamp">{stamp}</div>
-  <div id="main">{_hl(story)}{_sub(story)}{_pts_html(story, 4, icons=False)}{_askx(story, asks, "✏️")}</div>"""
-    return _wrap(DOSSIER, font, body, 720, 640)
 
 
 # 15 ------------------------------------------------------------------------------------------- tape
@@ -598,6 +423,180 @@ def tape(story, font, image_url, date, handle, place, asks):
     return _wrap(TAPE, font, body, 1000, 900)
 
 
+# 5 ------------------------------------------------------------------------------------------- glass
+GLASS = """
+  body { background: #0b1020; }
+  .blur { position: absolute; inset: -60px; background: center/cover no-repeat; filter: blur(36px) saturate(1.5) brightness(.75); }
+  .handle { top: 30px; left: 30px; }
+  #main { left: 60px; right: 60px; top: var(--top); bottom: 60px; gap: 18px; padding: 0 36px 34px; border-radius: 48px;
+    background: rgba(255,255,255,.14); backdrop-filter: blur(24px); border: 2px solid rgba(255,255,255,.35);
+    box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+  .ph { margin: 0 -36px; height: 640px; background: center/cover no-repeat; position: relative; border-radius: 48px 48px 0 0; flex-shrink: 0;
+    -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent 100%); }
+  .ph .sym { right: 20px; top: 20px; }
+  .place { align-self: center; margin-top: -40px; font-size: 32px; font-weight: 800; color: #fff; background: rgba(0,0,0,.35);
+    padding: 6px 24px 10px; border-radius: 30px; backdrop-filter: blur(8px); }
+  .hl div { color: #fff; font-size: calc(var(--hl) * .72); text-shadow: 0 4px 18px rgba(0,0,0,.4); }
+  .hl .hi { color: #ffe066; }
+  .sub { text-align: center; font-size: calc(var(--hl) * .34); color: #c8f7ff; font-weight: 700; line-height: 1.3; }
+  .pt { display: flex; gap: 14px; align-items: center; color: #fff; font-size: calc(var(--pt) * .85); font-weight: 600; line-height: 1.3; }
+  .pt .ic { width: 50px; height: 50px; }
+  .grow { flex: 1; }
+  .askx { justify-content: center; color: #0b1020; background: #fff; padding: 14px 26px 18px; border-radius: 30px; font-size: calc(var(--ask) * .85); }
+  .foot2 { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-size: 22px; color: rgba(255,255,255,.8); }
+"""
+
+
+def glass(story, font, image_url, date, handle, place, asks):
+    body = f"""<div class="blur" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div>
+  <div id="main"><div class="ph" style="{_pic(image_url)}"><div class="sym">પ્રતિકાત્મક તસવીર</div></div>
+  <div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}{_pts_html(story, 3)}<div class="grow"></div>
+  {_askx(story, asks, "💬")}</div><div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div>"""
+    return _wrap(GLASS, font, body, 110, 90)
+
+
+# 6 -------------------------------------------------------------------------------------------- place
+PLACE = """
+  body { background: #101418; }
+  .giant { position: absolute; top: 40px; left: -20px; right: -20px; text-align: center; z-index: 1; font-size: 330px; font-weight: 800;
+    line-height: 1; color: transparent; -webkit-text-stroke: 4px rgba(255,255,255,.35); white-space: nowrap; letter-spacing: -4px; }
+  .pic { position: absolute; left: 0; right: 0; top: 240px; height: 900px; background: center/cover no-repeat; z-index: 2;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 22%, #000 62%, transparent 100%); }
+  .giant2 { position: absolute; top: 40px; left: -20px; right: -20px; text-align: center; z-index: 3; font-size: 330px; font-weight: 800;
+    line-height: 1; color: #ff7b00; white-space: nowrap; letter-spacing: -4px; -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent 72%); }
+  .handle { top: 30px; left: 30px; z-index: 6; }
+  .sym { right: 30px; top: 30px; }
+  #main { left: 50px; right: 50px; gap: 18px; }
+  .hl div { color: #fff; font-size: calc(var(--hl) * .82); }
+  .hl .hi { color: #ff7b00; }
+  .sub { text-align: center; font-size: calc(var(--hl) * .37); color: #ffd6a5; font-weight: 700; line-height: 1.3; }
+  .row { display: flex; gap: 14px; }
+  .cell { flex: 1; text-align: center; border-top: 4px solid #ff7b00; padding-top: 14px; color: #eee; font-size: calc(var(--pt) * .78);
+    font-weight: 600; line-height: 1.28; }
+  .cell .ic { display: block; margin: 0 auto 10px; width: 70px; height: 70px; }
+  .grow { flex: 1; }
+  .askx { justify-content: center; color: #fff; border: 3px solid #ff7b00; border-radius: 60px; padding: 14px 26px 18px; }
+  .foot2 { font-size: 22px; color: #888; text-align: center; }
+"""
+
+
+def place_big(story, font, image_url, date, handle, place, asks):
+    word = esc((place or story.kicker or "").split(" - ")[0].split(" • ")[0])
+    cells = "".join(f'<div class="cell">{icon_img(p)}{highlight_numbers(p)}</div>' for p in _pts(story, 3))
+    body = f"""<div class="giant">{word}</div><div class="pic" style="{_pic(image_url)}"></div><div class="giant2">{word}</div>
+  <div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+  <div id="main">{_hl(story)}{_sub(story)}<div class="row">{cells}</div><div class="grow"></div>{_askx(story, asks, "👇")}
+  <div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div></div>"""
+    return _wrap(PLACE, font, body, 1050, 960)
+
+
+# 8 ------------------------------------------------------------------------------------------ topline
+TOPLINE = """
+  body { background: #fff7e6; color: #1b1b1b; }
+  .handle { top: 30px; right: 30px; left: auto; }
+  #main { left: 50px; right: 50px; top: 30px; gap: 18px; }
+  .place { font-size: 34px; font-weight: 800; color: #d62828; }
+  .hl { align-items: flex-start; }
+  .hl div { text-align: left; color: #1b1b1b; font-size: calc(var(--hl) * .9); padding: 0; line-height: 1.15; }
+  .hl .hi { color: #d62828; }
+  .sub { font-size: calc(var(--hl) * .37); color: #00798c; font-weight: 700; line-height: 1.3; }
+  .ph { margin: 0 -50px; flex: 1 1 auto; min-height: 520px; background: center/cover no-repeat; position: relative;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 85%, transparent 100%); }
+  .ph .sym { right: 30px; top: 70px; }
+  .row { display: flex; gap: 16px; }
+  .cell { flex: 1; background: #fff; border-radius: 26px; padding: 18px 16px 20px; text-align: center; box-shadow: 0 10px 24px rgba(0,0,0,.08);
+    font-size: calc(var(--pt) * .75); font-weight: 600; line-height: 1.28; }
+  .cell .ic { display: block; margin: 0 auto 10px; width: 66px; height: 66px; }
+  .askx { justify-content: center; background: #d62828; color: #fff; padding: 16px 26px 20px; border-radius: 24px; }
+  .foot2 { font-size: 22px; color: #777; display: flex; justify-content: space-between; }
+"""
+
+
+def topline(story, font, image_url, date, handle, place, asks):
+    cells = "".join(f'<div class="cell">{icon_img(p)}{highlight_numbers(p)}</div>' for p in _pts(story, 3))
+    body = f"""<div class="handle">{esc(handle)}</div>
+  <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}
+  <div class="ph" style="{_pic(image_url)}"><div class="sym">પ્રતિકાત્મક તસવીર</div></div><div class="row">{cells}</div>
+  {_askx(story, asks, "🙋")}<div class="foot2"><span>{esc(date)}</span><span>સ્રોત: {esc(story.source_name)}</span></div></div>"""
+    return _wrap(TOPLINE, font, body, 30, 30)
+
+
+# 12 ----------------------------------------------------------------------------------------- ribbon
+RIBBON = """
+  body { background: #1a0633; }
+  .pic { position: absolute; inset: 0 0 640px 0; background: center/cover no-repeat;
+    -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent 100%); }
+  .handle { top: 30px; left: 30px; }
+  .sym { right: 30px; top: 30px; }
+  #main { left: 0; right: 0; gap: 22px; }
+  .place { align-self: center; color: #ffd166; font-size: 34px; font-weight: 800; }
+  .hl { position: relative; background: linear-gradient(180deg, #ef476f, #c9184a); margin: 0 70px; padding: 18px 20px 14px;
+    box-shadow: 0 16px 30px rgba(0,0,0,.4); }
+  .hl::before, .hl::after { content: ""; position: absolute; top: 34px; bottom: -34px; width: 110px; background: #a4133c; z-index: -1;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 30% 50%); }
+  .hl::before { left: -80px; } .hl::after { right: -80px; transform: scaleX(-1); }
+  .hl div { color: #fff; font-size: calc(var(--hl) * .72); }
+  .hl .hi { color: #ffd166; }
+  .sub { text-align: center; margin: 22px 60px 0; font-size: calc(var(--hl) * .36); color: #ffd166; font-weight: 700; line-height: 1.3; }
+  .bubbles { display: flex; flex-direction: column; gap: 16px; padding: 0 50px; }
+  .bb { position: relative; align-self: flex-start; max-width: 88%; background: #fff; color: #1a0633; border-radius: 30px; padding: 14px 26px 18px;
+    font-size: calc(var(--pt) * .88); font-weight: 600; line-height: 1.3; }
+  .bb:nth-child(even) { align-self: flex-end; background: #ffd166; }
+  .grow { flex: 1; }
+  .askx { justify-content: center; color: #fff; margin: 0 50px; border-bottom: 4px solid #ef476f; padding-bottom: 14px; }
+  .foot2 { font-size: 22px; color: #a99bc0; text-align: center; padding-bottom: 6px; }
+"""
+
+
+def ribbon(story, font, image_url, date, handle, place, asks):
+    bubbles = "".join(f'<div class="bb">{highlight_numbers(p)}</div>' for p in _pts(story, 3))
+    body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+  <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}<div class="bubbles">{bubbles}</div>
+  <div class="grow"></div>{_askx(story, asks, "💬")}<div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div></div>"""
+    return _wrap(RIBBON, font, body, 980, 860)
+
+
+# 14 ------------------------------------------------------------------------------------- infographic
+INFO = """
+  body { background: #04141f; }
+  .blur { position: absolute; inset: -60px; background: center/cover no-repeat; filter: blur(28px) brightness(.45) saturate(1.3); }
+  .pic { position: absolute; left: 0; right: 0; top: 0; height: 760px; background: center/cover no-repeat;
+    -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent 100%); }
+  .handle { top: 30px; left: 30px; }
+  .sym { right: 30px; top: 30px; }
+  #main { left: 50px; right: 50px; gap: 20px; }
+  .place { align-self: flex-start; color: #2ec4b6; font-size: 34px; font-weight: 800; }
+  .hl { align-items: flex-start; }
+  .hl div { text-align: left; color: #fff; font-size: calc(var(--hl) * .8); padding: 0; }
+  .hl .hi { color: #2ec4b6; }
+  .sub { font-size: calc(var(--hl) * .36); color: #ffbf69; font-weight: 700; line-height: 1.3; }
+  .stats { display: flex; gap: 18px; }
+  .stat { flex: 1; background: rgba(255,255,255,.08); border: 2px solid rgba(46,196,182,.5); border-radius: 26px; padding: 18px 22px; }
+  .stat b { display: block; font: 900 64px/1.05 'Arial Black', Arial, sans-serif; color: #2ec4b6; white-space: nowrap; }
+  .stat small { display: block; font-size: 24px; font-weight: 700; color: #cde; margin-top: 6px; line-height: 1.2; }
+  .bar { height: 14px; border-radius: 10px; background: rgba(255,255,255,.12); overflow: hidden; margin-top: 12px; }
+  .bar i { display: block; height: 100%; background: linear-gradient(90deg, #2ec4b6, #ffbf69); }
+  .pt { display: flex; gap: 14px; align-items: center; color: #e6f1f5; font-size: calc(var(--pt) * .85); font-weight: 600; line-height: 1.3; }
+  .pt .ic { width: 50px; height: 50px; }
+  .grow { flex: 1; }
+  .askx { color: #04141f; background: #2ec4b6; padding: 14px 26px 18px; border-radius: 18px; }
+  .foot2 { font-size: 22px; color: #7a98a8; }
+"""
+
+
+def infographic(story, font, image_url, date, handle, place, asks):
+    facts = [f for f in story.facts if len(f["value"]) <= 10][:2]
+    widths = [82, 58]
+    stats = "".join(f'<div class="stat"><b>{esc(f["value"])}</b><small>{esc(f["label"])}</small><div class="bar"><i style="width:{w}%"></i></div></div>'
+                    for f, w in zip(facts, widths))
+    body = f"""<div class="blur" style="{_pic(image_url)}"></div><div class="pic" style="{_pic(image_url)}"></div>
+  <div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+  <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}
+  {f'<div class="stats">{stats}</div>' if stats else ""}{_pts_html(story, 3)}<div class="grow"></div>{_askx(story, asks, "📊")}
+  <div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div></div>"""
+    return _wrap(INFO, font, body, 700, 600)
+
+
 # registered as x<name> (several older layouts already use these names)
-LAYOUTS15 = {"x" + f.__name__: f for f in (diagonal, tv, paper, bignum, polaroid, circle, magazine, sidebar, quote, steps, bento,
-                                     hazard, film, dossier, tape)}
+LAYOUTS15 = {"x" + f.__name__: f for f in (diagonal, tv, paper, bignum, glass, place_big, magazine, topline, quote, steps,
+                                     bento, ribbon, film, infographic, tape)}
