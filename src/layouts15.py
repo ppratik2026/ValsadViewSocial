@@ -57,6 +57,11 @@ def _askx(story, asks, icon="💬") -> str:
     return f'<div class="askx"><span class="qi">{icon}</span><span class="qt">{_ask(story, asks)}</span></div>'
 
 
+def _credit(story) -> str:
+    """The photo's credit line (a CC BY photo must name its author), else "symbolic picture"."""
+    return esc(story.photo_credit) if getattr(story, "photo_credit", "") else "પ્રતિકાત્મક તસવીર"
+
+
 def _pic(url):
     return f"background-image:url({url})" if url else "background:linear-gradient(135deg,#334,#112)"
 
@@ -78,7 +83,7 @@ COMMON = """
   .askx .qi { flex-shrink: 0; }
   .num { font-weight: 800; }
   .sym { position: absolute; z-index: 7; background: rgba(0,0,0,.55); color: #fff; font-size: 22px; font-weight: 700;
-    padding: 4px 14px; border-radius: 12px; }
+    padding: 4px 14px; border-radius: 12px; max-width: 62%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 """
 
 
@@ -105,7 +110,7 @@ DIAGONAL = """
 
 def diagonal(story, font, image_url, date, handle, place, asks):
     body = f"""<div class="pic" style="{_pic(image_url)}"></div>
-  <div class="place">📍 {esc(place or story.kicker)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+  <div class="place">📍 {esc(place or story.kicker)}</div><div class="sym">{_credit(story)}</div>
   <div id="main">{_hl(story)}{_sub(story)}<div class="pts">{_pts_html(story, 3)}</div><div class="grow"></div>
   {_askx(story, asks, "👉")}<div class="handle2"><span>{esc(handle)}</span><span>{esc(date)} • {esc(story.source_name)}</span></div></div>"""
     return _wrap(DIAGONAL, font, body, 1000, 780)
@@ -140,7 +145,7 @@ TV = """
 
 def tv(story, font, image_url, date, handle, place, asks):
     body = f"""<div class="pic" style="{_pic(image_url)}"></div>
-  <div class="logo"><b>{esc(handle)}</b><span>● LIVE</span></div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+  <div class="logo"><b>{esc(handle)}</b><span>● LIVE</span></div><div class="sym">{_credit(story)}</div>
   <div id="main"><div class="tab">BREAKING NEWS <small>{esc(place or story.kicker)}</small></div>{_hl(story)}{_sub(story)}
   <div class="pts">{_pts_html(story, 3, icons=False)}</div><div class="grow"></div>
   <div class="ticker"><div class="when">{esc(date)}</div>{_askx(story, asks, "🗣️")}</div></div>"""
@@ -174,7 +179,7 @@ def paper(story, font, image_url, date, handle, place, asks):
     cols = "".join(f"<p>{highlight_numbers(p)}</p>" for p in _pts(story, 4))
     body = f"""<div id="main"><div class="mast">વલસાડ વ્યૂ</div>
   <div class="dateline"><span>{esc(date)}</span><span>📍 {esc(place or story.kicker)}</span><span>{esc(handle)}</span></div>
-  {_hl(story)}{_sub(story)}<div class="photo" style="{_pic(image_url)}"><div class="sym">પ્રતિકાત્મક તસવીર</div></div>
+  {_hl(story)}{_sub(story)}<div class="photo" style="{_pic(image_url)}"><div class="sym">{_credit(story)}</div></div>
   <div class="cap">સ્રોત: {esc(story.source_name)}</div><div class="cols">{cols}</div><div class="grow"></div>
   {_askx(story, asks, "વાચકોનો સવાલ")}</div>"""
     return _wrap(PAPER, font, body, 24, 24)
@@ -281,7 +286,7 @@ QUOTE = """
 
 def quote(story, font, image_url, date, handle, place, asks):
     body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div>
-  <div class="sym">પ્રતિકાત્મક તસવીર</div><div class="mark">“</div>
+  <div class="sym">{_credit(story)}</div><div class="mark">“</div>
   <div id="main"><div class="place">{esc(place or story.kicker)}</div>{_hl(story, 3)}{_sub(story)}<div class="line"></div>
   {_pts_html(story, 3, icons=False)}{_askx(story, asks, "🗨️")}<div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div></div>"""
     return _wrap(QUOTE, font, body, 640, 560)
@@ -314,7 +319,7 @@ STEPS = """
 
 def steps(story, font, image_url, date, handle, place, asks):
     sts = "".join(f'<div class="st"><i>{i}</i>{highlight_numbers(p)}</div>' for i, p in enumerate(_pts(story, 4), 1))
-    body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+    body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div><div class="sym">{_credit(story)}</div>
   <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}<div class="tl">{sts}</div>
   <div class="grow"></div>{_askx(story, asks, "💭")}<div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div></div>"""
     return _wrap(STEPS, font, body, 640, 560)
@@ -353,7 +358,7 @@ def bento(story, font, image_url, date, handle, place, asks):
     num = (f'<div class="tile t-num"><div class="lbl">{esc(f["label"])}</div><b>{esc(f["value"])}</b>{icon_img(f["label"] + " " + f["value"], "bigic")}</div>'
            if f else f'<div class="tile t-num"><div class="lbl">ખાસ</div><b>!</b></div>')
     where = esc((place or story.kicker).split(" - ")[0])
-    body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+    body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div><div class="sym">{_credit(story)}</div>
   <div id="main">{_hl(story)}{_sub(story)}<div class="grid">{num}
   <div class="tile t-place"><div class="lbl">{esc(date)}</div><b>📍 {where}</b>{icon_img("pin", "bigic")}</div>
   <div class="tile t-pts">{_pts_html(story, 3)}</div></div>{_askx(story, asks, "💬")}
@@ -392,7 +397,7 @@ FILM = """
 
 def film(story, font, image_url, date, handle, place, asks):
     credits = "".join(f"<p>{highlight_numbers(p)}</p>" for p in _pts(story, 3))
-    body = f"""<div class="spot"></div><div class="strip"><div class="frame" style="{_pic(image_url)}"><div class="sym">પ્રતિકાત્મક તસવીર</div></div></div>
+    body = f"""<div class="spot"></div><div class="strip"><div class="frame" style="{_pic(image_url)}"><div class="sym">{_credit(story)}</div></div></div>
   <div class="handle">{esc(handle)}</div><div class="scene">SCENE • {esc(date)}</div>
   <div id="main"><div class="place">{esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}<div class="credits">{credits}</div>
   <div class="grow"></div>{_askx(story, asks, "🎬")}<div class="foot2">સ્રોત: {esc(story.source_name)}</div></div>"""
@@ -428,7 +433,7 @@ def tape(story, font, image_url, date, handle, place, asks):
     word = {"breaking": "BREAKING", "happy": "GOOD NEWS"}.get(story.mood, "LATEST NEWS")
     t = (f" {word} • {handle} •" * 6)
     body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="tp tp1">{esc(t)}</div><div class="tp tp2">{esc(t)}</div>
-  <div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+  <div class="handle">{esc(handle)}</div><div class="sym">{_credit(story)}</div>
   <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}<div class="pts">{_pts_html(story, 3)}</div>
   {_askx(story, asks, "👇")}<div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div></div>"""
     return _wrap(TAPE, font, body, 1000, 900)
@@ -460,7 +465,7 @@ GLASS = """
 
 def glass(story, font, image_url, date, handle, place, asks):
     body = f"""<div class="blur" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div>
-  <div id="main"><div class="ph" style="{_pic(image_url)}"><div class="sym">પ્રતિકાત્મક તસવીર</div></div>
+  <div id="main"><div class="ph" style="{_pic(image_url)}"><div class="sym">{_credit(story)}</div></div>
   <div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}{_pts_html(story, 3)}<div class="grow"></div>
   {_askx(story, asks, "💬")}</div><div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div>"""
     return _wrap(GLASS, font, body, 110, 90)
@@ -495,7 +500,7 @@ def place_big(story, font, image_url, date, handle, place, asks):
     word = esc((place or story.kicker or "").split(" - ")[0].split(" • ")[0])
     cells = "".join(f'<div class="cell">{icon_img(p)}{highlight_numbers(p)}</div>' for p in _pts(story, 3))
     body = f"""<div class="giant">{word}</div><div class="pic" style="{_pic(image_url)}"></div><div class="giant2">{word}</div>
-  <div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+  <div class="handle">{esc(handle)}</div><div class="sym">{_credit(story)}</div>
   <div id="main">{_hl(story)}{_sub(story)}<div class="row">{cells}</div><div class="grow"></div>{_askx(story, asks, "👇")}
   <div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div></div>"""
     return _wrap(PLACE, font, body, 1050, 960)
@@ -527,7 +532,7 @@ def topline(story, font, image_url, date, handle, place, asks):
     cells = "".join(f'<div class="cell">{icon_img(p)}{highlight_numbers(p)}</div>' for p in _pts(story, 3))
     body = f"""<div class="handle">{esc(handle)}</div>
   <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}
-  <div class="ph" style="{_pic(image_url)}"><div class="sym">પ્રતિકાત્મક તસવીર</div></div><div class="row">{cells}</div>
+  <div class="ph" style="{_pic(image_url)}"><div class="sym">{_credit(story)}</div></div><div class="row">{cells}</div>
   {_askx(story, asks, "🙋")}<div class="foot2"><span>{esc(date)}</span><span>સ્રોત: {esc(story.source_name)}</span></div></div>"""
     return _wrap(TOPLINE, font, body, 30, 30)
 
@@ -561,7 +566,7 @@ RIBBON = """
 
 def ribbon(story, font, image_url, date, handle, place, asks):
     bubbles = "".join(f'<div class="bb">{highlight_numbers(p)}</div>' for p in _pts(story, 3))
-    body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+    body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div><div class="sym">{_credit(story)}</div>
   <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}<div class="bubbles">{bubbles}</div>
   <div class="grow"></div>{_askx(story, asks, "💬")}<div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div></div>"""
     return _wrap(RIBBON, font, body, 980, 860)
@@ -601,7 +606,7 @@ def infographic(story, font, image_url, date, handle, place, asks):
     stats = "".join(f'<div class="stat"><b>{esc(f["value"])}</b><small>{esc(f["label"])}</small><div class="bar"><i style="width:{w}%"></i></div></div>'
                     for f, w in zip(facts, widths))
     body = f"""<div class="blur" style="{_pic(image_url)}"></div><div class="pic" style="{_pic(image_url)}"></div>
-  <div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+  <div class="handle">{esc(handle)}</div><div class="sym">{_credit(story)}</div>
   <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}
   {f'<div class="stats">{stats}</div>' if stats else ""}{_pts_html(story, 3)}<div class="grow"></div>{_askx(story, asks, "📊")}
   <div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div></div>"""

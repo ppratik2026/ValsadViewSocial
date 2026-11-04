@@ -36,7 +36,7 @@ def collect(cfg: dict) -> None:
 
 
 def render(cfg: dict, stories_file: Path) -> None:
-    from src.backgrounds import fetch_openverse_photo, fetch_stock_background, generate_free_ai_image
+    from src.backgrounds import fetch_openverse_photo, fetch_stock_background, fetch_wikimedia_photo, generate_free_ai_image
     from src.card import render_card
     from src.designs import mood_of
     from src.music import pick_track
@@ -80,6 +80,10 @@ def render(cfg: dict, stories_file: Path) -> None:
             background = generate_free_ai_image(
                 data["image_prompt"] + ", dramatic cinematic 3D news poster illustration, hyper detailed, vivid colours, "
                 "volumetric light", work / "ai.jpg", "photo")
+        if not background:   # a free Wikimedia Commons photo first (the Wikipedia pictures)
+            found = fetch_wikimedia_photo(keywords, work / "wikimedia.jpg")
+            if found:
+                background, story.photo_credit = found
         try:
             if background:
                 raise StopIteration

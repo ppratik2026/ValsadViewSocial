@@ -137,19 +137,24 @@ def cmd_run(args, cfg):
         background = cutout = None
         story.stamp = "" if not cfg["card"].get("stamps", False) else story.stamp
         if cfg["card"].get("picture", "cutout") == "photo":
-            # the viral design: a free stock photo (Pexels with the free key, else an openly licensed photo from
-            # Openverse), else a realistic AI picture, else a drawn scene; never a real person's photo
+            # the viral design: a free photo (Wikimedia Commons, else Pexels with the free key, else an openly licensed
+            # photo from Openverse), else a realistic AI picture, else a drawn scene; never a real person's photo
             story.person = ""
             if "viral" in cfg["card"].get("designs", []):
                 design = "viral"
-            from src.backgrounds import fetch_openverse_photo, fetch_stock_background, generate_free_ai_image
+            from src.backgrounds import (fetch_openverse_photo, fetch_stock_background, fetch_wikimedia_photo,
+                                         generate_free_ai_image)
             from src.scenes import BY_CATEGORY, draw_scene
             from src.viral import stock_keywords
             keywords = stock_keywords(story)
             print(f"   Photo searches: {keywords}")
             background = None
+            # first choice: a free photo from Wikimedia Commons (the Wikipedia pictures), with its credit on the poster
+            found = fetch_wikimedia_photo(keywords, work_dir / "wikimedia.jpg")
+            if found:
+                background, story.photo_credit = found
             try:
-                background = fetch_stock_background(keywords, work_dir / "background.jpg")
+                background = background or fetch_stock_background(keywords, work_dir / "background.jpg")
             except Exception as e:   # Pexels is optional
                 print(f"   Pexels failed: {e}")
             if not background:

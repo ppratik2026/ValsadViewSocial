@@ -1,4 +1,5 @@
-"""Image for the news card: free AI illustration (Pollinations) or Gemini, then a Pexels photo, else none."""
+"""Image for the news card: a free Wikimedia Commons photo, a Pexels or Openverse photo, a free AI illustration
+(Pollinations) or Gemini, else none."""
 import os
 import random
 import re
@@ -113,6 +114,65 @@ def fetch_openverse_photo(keywords: list[str], out_path: Path) -> tuple[Path, st
             creator = (r.get("creator") or "").strip()[:40]
             print(f"Background: Openverse photo for {keyword!r} ({creator or 'unknown'}, {lic})")
             return out_path, f"ફોટો: {creator} / {lic}" if creator else f"ફોટો: {lic}"
+    return None
+
+
+COMMONS_API = "https://commons.wikimedia.org/w/api.php"
+COMMONS_UA = {"User-Agent": "ValsadViewReels/1.0 (https://github.com/ppratik2026/ValsadViewSocial)"}
+# free licences only (anyone may reuse, also commercially); CC BY / BY-SA need the author's name, which goes on the poster
+FREE_LICENCE = re.compile(r"^(cc0|public domain|pd|cc[- ]by(-sa)?( \d(\.\d)?)?)", re.I)
+
+
+def _plain(html: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", html or "")).strip()
+
+
+def fetch_wikimedia_photo(keywords: list[str], out_path: Path) -> tuple[Path, str] | None:
+    """A free photo from Wikimedia Commons (the pictures used on Wikipedia), no key needed: only public domain, CC0,
+    CC BY and CC BY-SA files; recent colour photos first. Returns the path and the credit line ("ફોટો: name / CC BY-SA
+    4.0, Wikimedia Commons"), or None."""
+    for keyword in keywords:
+        try:
+            resp = requests.get(COMMONS_API, headers=COMMONS_UA, timeout=30, params={
+                "action": "query", "format": "json", "generator": "search", "gsrnamespace": 6, "gsrlimit": 25,
+                "gsrsearch": f"{keyword} filetype:bitmap", "prop": "imageinfo",
+                "iiprop": "url|size|mime|extmetadata", "iiurlwidth": 1600})
+            pages = (resp.json().get("query") or {}).get("pages", {}).values() if resp.status_code == 200 else []
+        except requests.Timeout:
+            print("Wikimedia Commons is not answering, skipping it this time.")
+            return None
+        except (requests.RequestException, ValueError) as e:
+            print(f"Wikimedia search failed: {e}")
+            continue
+        found = []
+        for page in pages:
+            info = (page.get("imageinfo") or [{}])[0]
+            meta = info.get("extmetadata") or {}
+            lic = _plain((meta.get("LicenseShortName") or {}).get("value", ""))
+            if info.get("mime") not in ("image/jpeg", "image/png") or not FREE_LICENCE.match(lic):
+                continue
+            if (info.get("width") or 0) < 1000 or (info.get("height") or 0) < 650:
+                continue
+            text = (page.get("title", "") + " " + _plain((meta.get("Categories") or {}).get("value", ""))).lower()
+            if re.search(r"black and white|black-and-white|monochrome|sepia|historical|19\d\d|18\d\d|map|logo|diagram|drawing|coat of arms", text):
+                continue
+            year = re.search(r"(20\d\d)", (meta.get("DateTimeOriginal") or {}).get("value", "") or "")
+            score = (int(year.group(1)) if year else 2005) * 10 + min(info["width"] // 1000, 6)
+            found.append((score, info, lic, _plain((meta.get("Artist") or {}).get("value", ""))[:40]))
+        found.sort(key=lambda x: -x[0])
+        for _, info, lic, artist in found[:4]:
+            try:
+                with requests.get(info.get("thumburl") or info["url"], headers=COMMONS_UA, timeout=60) as dl:
+                    if dl.status_code != 200 or not dl.headers.get("content-type", "").startswith("image/"):
+                        continue
+                    out_path.write_bytes(dl.content)
+            except requests.RequestException:
+                continue
+            if re.match(r"(?i)pd|public domain|cc0", lic):
+                lic = "Public domain"
+            print(f"Background: Wikimedia Commons photo for {keyword!r} ({artist or 'unknown'}, {lic})")
+            credit = f"ફોટો: {artist} / {lic}" if artist else f"ફોટો: {lic}"
+            return out_path, credit + ", Wikimedia Commons"
     return None
 
 
