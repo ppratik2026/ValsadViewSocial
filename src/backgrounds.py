@@ -154,7 +154,7 @@ def fetch_wikimedia_photo(keywords: list[str], out_path: Path) -> tuple[Path, st
             if (info.get("width") or 0) < 1000 or (info.get("height") or 0) < 650:
                 continue
             text = (page.get("title", "") + " " + _plain((meta.get("Categories") or {}).get("value", ""))).lower()
-            if re.search(r"black and white|black-and-white|monochrome|sepia|historical|19\d\d|18\d\d|map|logo|diagram|drawing|coat of arms", text):
+            if re.search(r"black and white|black-and-white|monochrome|sepia|historical|19\d\d|18\d\d|map|logo|diagram|drawing|coat of arms|bird|heron|egret|insect|butterfly|animal|flower|museum", text):
                 continue
             year = re.search(r"(20\d\d)", (meta.get("DateTimeOriginal") or {}).get("value", "") or "")
             score = (int(year.group(1)) if year else 2005) * 10 + min(info["width"] // 1000, 6)
