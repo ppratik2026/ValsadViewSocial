@@ -123,6 +123,11 @@ COMMONS_UA = {"User-Agent": "ValsadViewReels/1.0 (https://github.com/ppratik2026
 FREE_LICENCE = re.compile(r"^(cc0|public domain|pd|cc[- ]by(-sa)?( \d(\.\d)?)?)", re.I)
 
 
+INDIA = re.compile(r"india|gujarat|valsad|vapi|daman|silvassa|navsari|surat|dang|bharuch|ahmedabad|vadodara|mumbai|"
+                   r"maharashtra|rajasthan|delhi|karnataka|kerala|tamil|bengal|pradesh|punjab|bihar|odisha|telangana|"
+                   r"bengaluru|bangalore|chennai|kolkata|hyderabad|pune|jaipur|lucknow|indore|nashik|goa")
+
+
 def _plain(html: str) -> str:
     return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", html or "")).strip()
 
@@ -153,7 +158,14 @@ def fetch_wikimedia_photo(keywords: list[str], out_path: Path) -> tuple[Path, st
                 continue
             if (info.get("width") or 0) < 1000 or (info.get("height") or 0) < 650:
                 continue
-            text = (page.get("title", "") + " " + _plain((meta.get("Categories") or {}).get("value", ""))).lower()
+            text = (page.get("title", "") + " " + _plain((meta.get("Categories") or {}).get("value", "")) + " "
+                    + _plain((meta.get("ImageDescription") or {}).get("value", ""))[:400]).lower()
+            # only pictures taken in India (a foreign street, party banner or sign would mislead on a Gujarat story)
+            if not INDIA.search(text):
+                continue
+            # no party flags, banners or symbols of any party
+            if re.search(r"\bparty\b|banner|poster|flag|symbol|graffiti|propaganda", text):
+                continue
             if re.search(r"black and white|black-and-white|monochrome|sepia|historical|19\d\d|18\d\d|map|logo|diagram|drawing|coat of arms|bird|heron|egret|insect|butterfly|animal|flower|museum", text):
                 continue
             # never a real person: no portraits, politicians, leaders, celebrities, rallies or speeches
