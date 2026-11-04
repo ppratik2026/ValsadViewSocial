@@ -8,7 +8,7 @@ edges fade out. Where the picture sits, how the headline is set, how the facts a
   glass     blurred picture as the page, a frosted glass card with the sharp picture fading into it
   place     the place name in giant letters behind and in front of the picture
   magazine  magazine cover: masthead over the picture, headline and cover lines at the bottom, round price sticker
-  topline   headline first on a light page, picture in the middle, three icon cards
+  topline   headline first on a deep teal page, picture in the middle, three icon cards
   quote     a big quotation: giant quote mark, headline as the quote, sub as the attribution
   steps     light page, picture on top, points on a numbered timeline
   bento     picture fading into a dark page, headline on it, then rounded tiles: number, place, points
@@ -503,23 +503,23 @@ def place_big(story, font, image_url, date, handle, place, asks):
 
 # 8 ------------------------------------------------------------------------------------------ topline
 TOPLINE = """
-  body { background: #fff7e6; color: #1b1b1b; }
+  body { background: linear-gradient(180deg, #003c46 0%, #00695c 100%); color: #fff; }
   .handle { top: 30px; right: 30px; left: auto; }
   #main { left: 50px; right: 50px; top: 30px; gap: 18px; }
-  .place { font-size: 34px; font-weight: 800; color: #d62828; }
+  .place { font-size: 34px; font-weight: 800; color: #ffd54f; }
   .hl { align-items: flex-start; }
-  .hl div { text-align: left; color: #1b1b1b; font-size: calc(var(--hl) * .9); padding: 0; line-height: 1.15; }
-  .hl .hi { color: #d62828; }
-  .sub { font-size: calc(var(--hl) * .37); color: #00798c; font-weight: 700; line-height: 1.3; }
+  .hl div { text-align: left; color: #fff; font-size: calc(var(--hl) * .9); padding: 0; line-height: 1.15; }
+  .hl .hi { color: #ffd54f; }
+  .sub { font-size: calc(var(--hl) * .37); color: #a7ffeb; font-weight: 700; line-height: 1.3; }
   .ph { margin: 0 -50px; flex: 1 1 auto; min-height: 520px; background: center/cover no-repeat; position: relative;
     -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 85%, transparent 100%); }
   .ph .sym { right: 30px; top: 70px; }
   .row { display: flex; gap: 16px; }
-  .cell { flex: 1; background: #fff; border-radius: 26px; padding: 18px 16px 20px; text-align: center; box-shadow: 0 10px 24px rgba(0,0,0,.08);
+  .cell { flex: 1; background: #fff; color: #00363d; border-radius: 26px; padding: 18px 16px 20px; text-align: center; box-shadow: 0 10px 24px rgba(0,0,0,.08);
     font-size: calc(var(--pt) * .75); font-weight: 600; line-height: 1.28; }
   .cell .ic { display: block; margin: 0 auto 10px; width: 66px; height: 66px; }
-  .askx { justify-content: center; background: #d62828; color: #fff; padding: 16px 26px 20px; border-radius: 24px; }
-  .foot2 { font-size: 22px; color: #777; display: flex; justify-content: space-between; }
+  .askx { justify-content: center; background: #ffd54f; color: #00363d; padding: 16px 26px 20px; border-radius: 24px; }
+  .foot2 { font-size: 22px; color: rgba(255,255,255,.7); display: flex; justify-content: space-between; }
 """
 
 
