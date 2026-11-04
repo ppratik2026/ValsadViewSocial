@@ -518,13 +518,20 @@ def cmd_scheduler(args, cfg):
     max_extra = cfg.get("schedule", {}).get("max_breaking_per_day", 6)
     every = max(1, int(cfg.get("schedule", {}).get("every_hours", 1)))
 
-    def post_hour(hour: int) -> bool:   # 10:00, 10 + every, ... up to midnight
+    fixed = sorted(int(h) for h in cfg.get("schedule", {}).get("hours", []) or [])
+
+    def post_hour(hour: int) -> bool:   # the fixed hours (schedule.hours), else 10:00, 10 + every, ... up to midnight
+        if fixed:
+            return hour in fixed
         return (hour >= 10 or hour == 0) and ((hour - 10) % 24) % every == 0
+
+    def active(hour: int) -> bool:
+        return fixed[0] <= hour <= fixed[-1] if fixed else (hour >= 10 or hour == 0)
 
     checked_hour = ""
     while True:
         now = datetime.now(IST)
-        if now.hour >= 10 or now.hour == 0:   # 10:00 ... 23:00 and midnight
+        if active(now.hour):   # the posting hours of the day
             sync()
             posts = posts_ist()
             if post_hour(now.hour) and not any(p.strftime("%Y%m%d%H") == now.strftime("%Y%m%d%H") for p in posts):
@@ -536,8 +543,8 @@ def cmd_scheduler(args, cfg):
                 checked_hour = now.strftime("%Y%m%d%H")   # one breaking news check an hour (saves the AI quota)
                 # between the regular posts: a really big breaking story goes out at once (a few a day at most)
                 today = sum(1 for p in posts if p.date() == now.date())
-                hours_so_far = sum(1 for h in range(10, now.hour + 1) if post_hour(h)) if now.hour >= 10 else 1
-                if today - hours_so_far < max_extra:
+                hours_so_far = sum(1 for h in range(0, now.hour + 1) if post_hour(h)) or 1
+                if max_extra > 0 and today - hours_so_far < max_extra:
                     print(f"\n=== {now:%d %b %H:%M} IST: breaking news check ===", flush=True)
                     if attempt(["run", "--breaking"]):
                         save(stats=False)

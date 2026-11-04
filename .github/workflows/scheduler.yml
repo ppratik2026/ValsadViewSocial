@@ -1,6 +1,6 @@
-name: Scheduler (every 2 hours)
+name: Scheduler (5 reels a day)
 
-# Posts a reel every 2 hours (config.yaml -> schedule.every_hours) from 10:00 to midnight IST. GitHub's own schedule drops runs when it is busy,
+# Posts the reels at the hours in config.yaml -> schedule.hours (IST; 9, 12, 15, 18, 21 = 5 a day). GitHub's own schedule drops runs when it is busy,
 # so this job stays up and posts on time itself; after ~5.5 hours (jobs stop at 6) it starts the next
 # scheduler run, so the chain never ends. The cron below only restarts the chain if it ever stops.
 # Free for public repositories. To pause posting: Actions -> Scheduler (every 2 hours) -> "..." -> Disable workflow.
@@ -55,7 +55,7 @@ jobs:
           pip install -r requirements.txt
           python -m playwright install --with-deps chromium
 
-      - name: Post every 2 hours
+      - name: Post at the scheduled hours
         if: steps.flow.outputs.flow != 'gemini_app'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

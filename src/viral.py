@@ -345,10 +345,20 @@ def _pattern_for(story, kinds: set, allowed: list[str]) -> str:
     history = load_history()
     if all(t.startswith("x") for t in allowed):   # the 15 layouts (src/layouts15.py): first fitting one not used lately
         from src.layouts15 import LAYOUT_DEFAULT, LAYOUT_PRIORITY
-        choice = next((names for kind, names in LAYOUT_PRIORITY if kind in kinds), LAYOUT_DEFAULT)
-        choice = [t for t in choice if t in allowed] or allowed
-        recent = [(p.get("style") or {}).get("template") for p in history[-3:]]
-        return next((t for t in choice if t not in recent), choice[0])
+        # every layout once before any comes back (15 layouts, 5 posts a day: a full round every 3 days);
+        # among the ones not used yet in this round, the best fit for the kind of news
+        used = []
+        for p in reversed(history):
+            t = (p.get("style") or {}).get("template")
+            if t in allowed and t not in used:
+                used.append(t)
+                if len(used) == len(allowed) - 1:
+                    break
+            elif t in used:
+                break   # a layout seen twice: the current round started after it
+        fresh = [t for t in allowed if t not in used] or allowed
+        fitting = next((names for kind, names in LAYOUT_PRIORITY if kind in kinds), LAYOUT_DEFAULT)
+        return next((t for t in fitting if t in fresh), next((t for t in LAYOUT_DEFAULT if t in fresh), fresh[0]))
     choice = next((names for kind, names in PATTERN_PRIORITY if kind in kinds), ["card2", "gold"])
     choice = [t for t in choice if t in allowed] or allowed
     last = (history[-1].get("style") or {}).get("template") if history else None
