@@ -250,7 +250,9 @@ ALL_TEMPLATES = ["police", "storm", "bignews", "tips", "card", "tv", "paper", "q
                  "scoreboard", "comic", "neon", "lockscreen", "chalkboard", "filmstrip", "notebook", "billboard", "letter",
                  "crimetape", "collage", "radio", "countdown", "percent", "folder", "roadsign", "crackglass", "spotlight",
                  "retrotv", "detective", "weatherapp", "graffiti", "telegram", "flapboard", "laptop", "openbook", "hero3d", "glass3d", "poppop", "cinema", "typo", "fullbleed", "splitv", "ring", "cutout", "droste",
-                 "brk", "gold", "neon", "stack", "card2", "glitch"]
+                 "brk", "gold", "neon", "stack", "card2", "glitch",
+                 "xdiagonal", "xtv", "xpaper", "xbignum", "xglass", "xplace_big", "xmagazine", "xtopline", "xquote", "xsteps",
+                 "xbento", "xribbon", "xfilm", "xinfographic", "xtape"]
 TOPIC_WORDS = {
     "travel": r"ટ્રેન|રેલ|બસ|એસટી|ફ્લાઇટ|વિમાન|હાઇવે|train|bus|flight|railway",
     "sports": r"ક્રિકેટ|મેચ|સ્પર્ધા|મેડલ|ખેલ|ટુર્નામેન્ટ|ગોલ્ડ|ચેમ્પિયન|cricket|match",
@@ -335,14 +337,20 @@ PATTERN_PRIORITY = [
     ("trending", ["neon", "glitch"]),
     ("viral", ["glitch", "neon"]),
 ]
-PATTERN_BY_KIND_ALL = ["brk", "gold", "neon", "stack", "card2", "glitch"]
+PATTERN_BY_KIND_ALL = ["brk", "gold", "neon", "stack", "card2", "glitch"] + [t for t in ALL_TEMPLATES if t.startswith("x")]
 
 
 def _pattern_for(story, kinds: set, allowed: list[str]) -> str:
-    choice = next((names for kind, names in PATTERN_PRIORITY if kind in kinds), ["card2", "gold"])
-    choice = [t for t in choice if t in allowed] or allowed
     from src.history import load_history
     history = load_history()
+    if all(t.startswith("x") for t in allowed):   # the 15 layouts (src/layouts15.py): first fitting one not used lately
+        from src.layouts15 import LAYOUT_DEFAULT, LAYOUT_PRIORITY
+        choice = next((names for kind, names in LAYOUT_PRIORITY if kind in kinds), LAYOUT_DEFAULT)
+        choice = [t for t in choice if t in allowed] or allowed
+        recent = [(p.get("style") or {}).get("template") for p in history[-3:]]
+        return next((t for t in choice if t not in recent), choice[0])
+    choice = next((names for kind, names in PATTERN_PRIORITY if kind in kinds), ["card2", "gold"])
+    choice = [t for t in choice if t in allowed] or allowed
     last = (history[-1].get("style") or {}).get("template") if history else None
     return choice[1] if len(choice) > 1 and choice[0] == last else choice[0]
 

@@ -23,15 +23,22 @@ import re
 
 from src.designs import esc, highlight_numbers
 from src.icons import icon_img
-from src.story_patterns import _base
-from src.viral_layouts import _ask, _hi, _lines
+from src.story_patterns import _base, _with_hero
+from src.viral_layouts import _ask, _lines
 from src.viral_layouts import _page
 from src.viral_more import _pts
 
 
 def _hl(story, n=None, cls="hl") -> str:
+    """Headline in 2 lines (3 when long); every word is its own span (.w) so the reel can bring the words in one by one,
+    the highlight words also get .hi."""
     n = n or (2 if len(story.headline) < 44 else 3)
-    return f'<div class="{cls}">' + "".join(f"<div>{_hi(l, story.highlight)}</div>" for l in _lines(story.headline, n)) + "</div>"
+    hi = set(story.highlight.split()) if story.highlight else set()
+    lines = []
+    for line in _lines(story.headline, n):
+        words = " ".join(f'<span class="w{" hi" if w in hi else ""}">{esc(w)}</span>' for w in line.split())
+        lines.append(f"<div>{words}</div>")
+    return f'<div class="{cls}">{"".join(lines)}</div>'
 
 
 def _sub(story, cls="sub") -> str:
@@ -64,6 +71,7 @@ def _wrap(css, font, body, top, min_top):
 
 
 COMMON = """
+  .w { display: inline-block; }
   .hl div { padding: 2px 6px 6px; }
   .hl .hi { font-size: 1em; }
   .askx { display: flex; align-items: center; gap: 16px; font-size: var(--ask); font-weight: 800; line-height: 1.25; }
@@ -600,6 +608,81 @@ def infographic(story, font, image_url, date, handle, place, asks):
     return _wrap(INFO, font, body, 700, 600)
 
 
-# registered as x<name> (several older layouts already use these names)
-LAYOUTS15 = {"x" + f.__name__: f for f in (diagonal, tv, paper, bignum, glass, place_big, magazine, topline, quote, steps,
-                                     bento, ribbon, film, infographic, tape)}
+# registered as x<name> (several older layouts already use these names); every one shows the picture alone first
+LAYOUTS15 = {"x" + f.__name__: _with_hero(f) for f in (diagonal, tv, paper, bignum, glass, place_big, magazine, topline, quote,
+                                                     steps, bento, ribbon, film, infographic, tape)}
+
+# ---------------------------------------------------------------------------------------------- motion
+# image first (S seconds), then the headline word by word, then the rest one element at a time, in each layout's own way
+# (steps in the src/card.ANIM_JS format: selector, animation, start, duration, stagger)
+S = 1.1
+_HERO = [".hero", "heroOut", S - 0.25, 0.55, 0]
+_ZOOM = [[".pic, .blur, .ph, .photo, .frame", "kbZoom {end}s linear 0s both"]]
+
+
+def _m(*steps, live=None):
+    return {"intro": [_HERO] + [list(x) for x in steps], "live": _ZOOM + (live or []), "spot": None}
+
+
+LAYOUT_MOTION = {
+    "xdiagonal": _m((".place", "slideFarL", S, .35, 0), (".hl .w", "slapIn", S + .3, .3, .11), (".sub", "slideFarL", S + 1.9, .4, 0),
+                    (".pt", "slideFarL", S + 2.4, .35, .3), (".askx", "riseUp", S + 3.6, .4, 0), (".handle2", "fadeIn", S + 3.9, .4, 0)),
+    "xtv": _m((".logo", "dropIn", S, .4, 0), (".tab", "slideFarL", S + .2, .35, 0), (".hl", "growX", S + .5, .4, 0),
+              (".hl .w", "fadeIn", S + .8, .2, .08), (".sub", "growX", S + 2.0, .4, 0), (".pt", "slideFarR", S + 2.5, .35, .3),
+              (".ticker", "riseUp", S + 3.6, .4, 0), live=[[".logo span", "blink 1s steps(1) {start}s infinite"]]),
+    "xpaper": _m((".mast", "dropIn", S, .45, 0), (".dateline", "growX", S + .3, .4, 0), (".hl .w", "inkIn", S + .6, .45, .1),
+                 (".sub", "fadeIn", S + 1.9, .4, 0), (".photo", "develop", S + 2.2, .8, 0), (".cap", "fadeIn", S + 2.6, .4, 0),
+                 (".cols p", "fadeIn", S + 2.9, .4, .3), (".askx", "popIn", S + 4.0, .35, 0)),
+    "xbignum": _m((".place", "popIn", S, .35, 0), (".hl .w", "wordRise", S + .3, .45, .1), (".big", "slam", S + 1.6, .6, 0),
+                  (".biglabel", "fadeIn", S + 2.1, .3, 0), (".sub", "fadeIn", S + 2.4, .4, 0), (".chip", "popIn", S + 2.8, .3, .25),
+                  (".askx", "riseUp", S + 3.8, .4, 0), (".foot2", "fadeIn", S + 4.1, .4, 0)),
+    "xglass": _m((".ph", "fadeIn", S - .1, .5, 0), (".place", "popIn", S + .3, .35, 0), (".hl .w", "wordRise", S + .5, .5, .1),
+                 (".sub", "fadeIn", S + 1.9, .4, 0), (".pt", "slideFarL", S + 2.3, .35, .3), (".askx", "popIn", S + 3.5, .35, 0),
+                 (".foot2", "fadeIn", S + 3.8, .4, 0)),
+    "xplace_big": _m((".giant", "fadeIn", S, .5, 0), (".giant2", "dropBounce", S + .1, .8, 0), (".hl .w", "dropIn", S + .8, .4, .1),
+                     (".sub", "fadeIn", S + 2.1, .4, 0), (".cell", "popIn", S + 2.5, .35, .3), (".askx", "riseUp", S + 3.6, .4, 0),
+                     (".foot2", "fadeIn", S + 3.9, .4, 0)),
+    "xmagazine": _m((".mast", "flipX", S, .6, 0), (".tag, .issue", "fadeIn", S + .4, .4, 0), (".sticker", "popIn", S + .7, .4, 0),
+                    (".place", "slideFarL", S + 1.0, .35, 0), (".hl .w", "slideFarL", S + 1.2, .4, .09), (".sub", "fadeIn", S + 2.4, .4, 0),
+                    (".line", "slideFarL", S + 2.8, .35, .3), (".askx", "fadeIn", S + 3.9, .4, 0),
+                    live=[[".sticker", "wobble 1.6s ease-in-out {start}s infinite"]]),
+    "xtopline": _m((".place", "fadeIn", S, .4, 0), (".hl .w", "wordRise", S + .2, .45, .1), (".sub", "fadeIn", S + 1.6, .4, 0),
+                   (".ph", "develop", S + 1.9, .7, 0), (".cell", "popIn", S + 2.5, .35, .3), (".askx", "riseUp", S + 3.6, .4, 0),
+                   (".foot2", "fadeIn", S + 3.9, .4, 0)),
+    "xquote": _m((".mark", "dropBounce", S, .8, 0), (".place", "fadeIn", S + .5, .4, 0), (".hl .w", "fadeIn", S + .7, .5, .14),
+                 (".sub", "slideFarL", S + 2.4, .4, 0), (".line", "growX", S + 2.8, .4, 0), (".pt", "fadeIn", S + 3.1, .4, .3),
+                 (".askx", "slideFarL", S + 4.1, .4, 0), (".foot2", "fadeIn", S + 4.4, .4, 0)),
+    "xsteps": _m((".place", "popIn", S, .35, 0), (".hl .w", "wordRise", S + .3, .45, .1), (".sub", "fadeIn", S + 1.7, .4, 0),
+                 (".st", "slideFarR", S + 2.1, .4, .35), (".askx", "riseUp", S + 3.7, .4, 0), (".foot2", "fadeIn", S + 4.0, .4, 0)),
+    "xbento": _m((".hl .w", "popIn", S + .1, .35, .09), (".sub", "fadeIn", S + 1.4, .4, 0), (".tile", "popIn", S + 1.8, .4, .3),
+                 (".askx", "riseUp", S + 3.2, .4, 0), (".foot2", "fadeIn", S + 3.5, .4, 0),
+                 live=[[".bigic", "float 2s ease-in-out {start}s infinite"]]),
+    "xribbon": _m((".place", "dropIn", S, .4, 0), (".hl", "unfold", S + .3, .5, 0), (".hl .w", "fadeIn", S + .7, .25, .08),
+                  (".sub", "fadeIn", S + 1.9, .4, 0), (".bb", "popIn", S + 2.3, .35, .45), (".askx", "riseUp", S + 3.8, .4, 0),
+                  (".foot2", "fadeIn", S + 4.1, .4, 0)),
+    "xfilm": _m((".scene", "typeIn", S, .5, 0), (".place", "flickerOn", S + .3, .6, 0), (".hl .w", "flickerOn", S + .6, .6, .12),
+                (".sub", "fadeIn", S + 2.2, .5, 0), (".credits p", "riseUp", S + 2.6, .45, .35), (".askx", "popIn", S + 3.9, .35, 0),
+                (".foot2", "fadeIn", S + 4.2, .4, 0)),
+    "xinfographic": _m((".place", "slideFarL", S, .35, 0), (".hl .w", "wordRise", S + .3, .45, .1), (".sub", "fadeIn", S + 1.7, .4, 0),
+                       (".stat", "popIn", S + 2.0, .35, .25), (".bar i", "growX", S + 2.4, .8, .25), (".pt", "slideFarL", S + 2.9, .35, .3),
+                       (".askx", "riseUp", S + 4.0, .4, 0), (".foot2", "fadeIn", S + 4.3, .4, 0)),
+    "xtape": _m((".tp1", "slideFarL", S, .4, 0), (".tp2", "slideFarR", S + .2, .4, 0), (".place", "fadeIn", S + .5, .3, 0),
+                (".hl .w", "slapIn", S + .7, .3, .1), (".sub", "fadeIn", S + 2.0, .4, 0), (".pt", "slideFarL", S + 2.4, .35, .3),
+                (".askx", "riseUp", S + 3.6, .4, 0), (".foot2", "fadeIn", S + 3.9, .4, 0)),
+}
+
+# which layouts fit which kind of news (src/viral._pattern_for picks the first one not used in the last posts)
+LAYOUT_PRIORITY = [
+    ("crime", ["xtape", "xtv", "xdiagonal", "xbento"]),
+    ("weather", ["xtv", "xglass", "xplace_big", "xfilm"]),
+    ("money", ["xbignum", "xinfographic", "xbento", "xpaper"]),
+    ("prices", ["xbignum", "xinfographic", "xbento", "xpaper"]),
+    ("good_news", ["xmagazine", "xribbon", "xglass", "xquote"]),
+    ("event", ["xfilm", "xribbon", "xmagazine", "xplace_big"]),
+    ("government", ["xsteps", "xtopline", "xpaper", "xinfographic"]),
+    ("education", ["xsteps", "xtopline", "xquote", "xglass"]),
+    ("politics", ["xquote", "xpaper", "xtv", "xdiagonal"]),
+    ("trending", ["xplace_big", "xglass", "xribbon", "xfilm"]),
+    ("viral", ["xribbon", "xtape", "xbignum", "xplace_big"]),
+]
+LAYOUT_DEFAULT = ["xtopline", "xbento", "xglass", "xplace_big"]

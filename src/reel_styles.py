@@ -357,6 +357,8 @@ M.update({
 from src.story_patterns import EXTRA_KEYFRAMES, PATTERN_MOTION  # noqa: E402
 M.update({("card2" if k == "card" else k): v for k, v in PATTERN_MOTION.items()})
 MOTION_CSS += EXTRA_KEYFRAMES
+from src.layouts15 import LAYOUT_MOTION  # noqa: E402
+M.update(LAYOUT_MOTION)
 
 SPOT_ANIM = {
     "glow": "spot {step}s ease-in-out {at}s",
