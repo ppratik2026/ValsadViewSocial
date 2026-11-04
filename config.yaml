@@ -8,7 +8,7 @@ provider: "free"
 #               and a ready Gemini prompt; make the poster in the free Gemini app and upload it as a comment on the
 #               issue; it becomes an animated reel (src/poster_reel.py) and is posted (publish-from-issue.yml).
 #   auto:       fully automatic posters from the code templates (scheduler.yml).
-flow: "gemini_app"
+flow: "auto"
 
 # What the reels are about.
 content:
