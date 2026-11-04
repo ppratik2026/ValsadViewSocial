@@ -365,9 +365,10 @@ def viral_page(story, font: str, image_url: str | None, date: str, handle: str, 
         from src.viral_bold import BOLD_LAYOUTS
         from src.viral_pro import PRO_LAYOUTS
         from src.story_patterns import PATTERNS
+        from src.layouts15 import LAYOUTS15
         story_patterns = {("card2" if k == "card" else k): v for k, v in PATTERNS.items()}
         page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS, **PLUS_LAYOUTS, **NEW_LAYOUTS, **PRO_LAYOUTS, **BOLD_LAYOUTS,
-                **story_patterns}.get(template)
+                **story_patterns, **LAYOUTS15}.get(template)
         if page:
             return page(story, font, image_url, date, handle, _place_tag(story, places or []), ASKS)
     tag_text, looks = MOOD_LOOK.get(mood, MOOD_LOOK["info"])
