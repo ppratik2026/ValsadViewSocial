@@ -31,7 +31,8 @@
   ],
   "image_prompt": "an Indian auto rickshaw stopped at a police checkpoint at night, police jeep with flashing lights, people seen from behind",
   "source_name": "Divya Bhaskar",
-  "source_url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPRzhpdk9DbVRjTTlNemFXSjhoVTRNOGU1ZDhYcVZybkYtR2QzMmV2bi1VNnlNOXIyXzNuZjJMR3ZZOS01bmppeV9ZNlktVzFBR2U3bVM4c2hSNVZwZUlPTGJVV2ltb0o2YVVqYnVLMnMzZTBNRmN6UTRIRFd3TGp1ZTY5UjNzWmt1NE1iMXpfRTRMSXY5UFRCdUhjbFhqaWFHUkxEQ2lRbkcwMVhQQTJtTdIBtgFBVV95cUxOYWRlS21vVmgtR184RFdraHZhWEExcF9HX2h5QUxDTXFielVBRWdPelljYW1WRmxyRlc5Vk9WOTU2bUJJMVNnRUZKNHF1alRiX1kyX0VLdlRvdGZjZnBvVHgzOTZEOHRudmp4ckI3Qm5KS2YwZ2Rab3RWbm5DVnlTWkcyNmNHb1kwbmpHRktFU1puZVl2RmZRY09kSkRuZFNJVmJWZWJDYTVyNExqam5qbmJHRHBjUQ?oc=5"
+  "source_url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPRzhpdk9DbVRjTTlNemFXSjhoVTRNOGU1ZDhYcVZybkYtR2QzMmV2bi1VNnlNOXIyXzNuZjJMR3ZZOS01bmppeV9ZNlktVzFBR2U3bVM4c2hSNVZwZUlPTGJVV2ltb0o2YVVqYnVLMnMzZTBNRmN6UTRIRFd3TGp1ZTY5UjNzWmt1NE1iMXpfRTRMSXY5UFRCdUhjbFhqaWFHUkxEQ2lRbkcwMVhQQTJtTdIBtgFBVV95cUxOYWRlS21vVmgtR184RFdraHZhWEExcF9HX2h5QUxDTXFielVBRWdPelljYW1WRmxyRlc5Vk9WOTU2bUJJMVNnRUZKNHF1alRiX1kyX0VLdlRvdGZjZnBvVHgzOTZEOHRudmp4ckI3Qm5KS2YwZ2Rab3RWbm5DVnlTWkcyNmNHb1kwbmpHRktFU1puZVl2RmZRY09kSkRuZFNJVmJWZWJDYTVyNExqam5qbmJHRHBjUQ?oc=5",
+  "cta": "તમારો અભિપ્રાય કોમેન્ટમાં જણાવો 👇"
  },
  {
   "template": "neon",
@@ -64,41 +65,8 @@
   ],
   "image_prompt": "crowded Indian railway station platform with passengers carrying bags waiting for a train, seen from behind",
   "source_name": "Divya Bhaskar",
-  "source_url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPdjlqTzdUbHBSMmJwcE02V1RkeDJsZ0tjSG1Wd0RoSVphaWtfbzB4amxqNVB5dTZpNFhuSmdSaXF1enVjakJFamNKbktnR1J4RkRQTlJ6WmpDTlJ4V3pOOEhMVDB5WDRkU2ZZR2hKeVNKT0tYbzZrWDdzUFR6SFdxU0p6UFcxX1VZcVdEcm5NTGtUZ0pfMWF1allhWE9qS3BiazhCZTd0dngzNEJscjRsQ0xSVmZuZVdwT3czdtIBwgFBVV95cUxNQkJBMzNrUmt6U2ViYXJRN0FRbXAwZmtHNWpEMDdGVjgzVk82aFpJR0ktY3JZN2NTV21iR3RQc0VHNUIxcFc4VDY0VThCSjEwS2N1eHk4SkVSMWFlV1hIR3pKc0FXQ25JTGxjZ2NTWTJWeDhDLVd2NWxDWUZuRGthSHc0dEFTYnNHeXByWmJLd1IzLTMyN0Nic1p2eklFNlBXN2l3NnVhSG9ueFdPUFNnbWhYSnlzaEJvbVZ2akVpdkNRQQ?oc=5"
- },
- {
-  "template": "card2",
-  "category": "government",
-  "mood": "info",
-  "kicker": "જિલ્લા પંચાયત",
-  "headline": "વલસાડ જિલ્લા પંચાયતના નવા ભવનનું લોકાર્પણ",
-  "highlight": "નવા ભવનનું",
-  "subheadline": "મુખ્યમંત્રીના હસ્તે 3 નવેમ્બરે લોકાર્પણ",
-  "facts": [
-   {
-    "label": "લોકાર્પણ",
-    "value": "3 નવેમ્બર"
-   },
-   {
-    "label": "ખર્ચ",
-    "value": "₹37.50 કરોડ"
-   }
-  ],
-  "points": [
-   "જિલ્લા પંચાયતનું નવું ભવન છ માળનું",
-   "રૂ.37.50 કરોડના ખર્ચે બનેલું",
-   "3 નવેમ્બરે મુખ્યમંત્રીના હસ્તે લોકાર્પણ",
-   "વાપી મિની સિવિલ હોસ્પિટલનું પણ લોકાર્પણ"
-  ],
-  "comment": "નવા ભવનથી લોકોના કામ ઝડપથી થશે? 👇",
-  "image_keywords": [
-   "modern government building india",
-   "office building inauguration",
-   "ribbon cutting ceremony"
-  ],
-  "image_prompt": "a new modern six storey government office building in an Indian town with flags, inauguration decorations",
-  "source_name": "Divya Bhaskar",
-  "source_url": "https://news.google.com/rss/articles/CBMi1gFBVV95cUxNM1JOVmpPVFdoUTVzLVNvVnFTQ2JBaDNGX2x3RGJpY3NkSndmLWV6NHRqc3BNNmN2S3ZobzUzTHRxQkdNVGFQMjZHVEVDTjMyY1YzcjBwUTNnYUFoaFdtX1U5dGNadGVqRlRXUUtIRmZiVm4zYUlTTVpISVV0V1I3bWU3a1lsS0VyVEdTb0ZvX3RJT3JDZk50M183N09Pelp4TEwzRGk3czFWUmtKbF9Ib3FrakpjZXFhZVNsU2tOZWoteWphWEY0QnZmNDhTa2QxS0lKLTFn0gHbAUFVX3lxTE5MTVF5S0pxTG1iWXVyLWl4ZUJqTHRweFRQZGxxWFNxZWFaNmlndzZPRkZSdUVyZXlCSzJSME1Oc2xKc3lTdHVGa2ZYYkcySjR5U0hoM0J4cEUxR1NlQWNkalc2ejFzTzk2TWZncmN6cEF4ZG1SR0RGb0phTVNSTjlUbnhCVHFSZGVFWWNEcUc5SzktQmRIcnlnRnpGWXFncFp6QlJuczFnOGxWalZNbVlFOEZEakFNbURWektxX3o5QWgtc0M4a2J0OUpkQk9GSERnWkFxY0NncFhDZw?oc=5"
+  "source_url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxPdjlqTzdUbHBSMmJwcE02V1RkeDJsZ0tjSG1Wd0RoSVphaWtfbzB4amxqNVB5dTZpNFhuSmdSaXF1enVjakJFamNKbktnR1J4RkRQTlJ6WmpDTlJ4V3pOOEhMVDB5WDRkU2ZZR2hKeVNKT0tYbzZrWDdzUFR6SFdxU0p6UFcxX1VZcVdEcm5NTGtUZ0pfMWF1allhWE9qS3BiazhCZTd0dngzNEJscjRsQ0xSVmZuZVdwT3czdtIBwgFBVV95cUxNQkJBMzNrUmt6U2ViYXJRN0FRbXAwZmtHNWpEMDdGVjgzVk82aFpJR0ktY3JZN2NTV21iR3RQc0VHNUIxcFc4VDY0VThCSjEwS2N1eHk4SkVSMWFlV1hIR3pKc0FXQ25JTGxjZ2NTWTJWeDhDLVd2NWxDWUZuRGthSHc0dEFTYnNHeXByWmJLd1IzLTMyN0Nic1p2eklFNlBXN2l3NnVhSG9ueFdPUFNnbWhYSnlzaEJvbVZ2akVpdkNRQQ?oc=5",
+  "cta": "તમારો અભિપ્રાય કોમેન્ટમાં જણાવો 👇"
  },
  {
   "template": "stack",
@@ -127,7 +95,8 @@
   ],
   "image_prompt": "a bright car showroom with new cars lined up, no logos, no people faces",
   "source_name": "Divya Bhaskar",
-  "source_url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOajNZazhzNWYyZE81bFRaSmRQSmRFTXdPd2VKcHNZX1ZSRW5xSlF0WFJtY2FUWEdNVWVfb0RQQjhFSnEzeDM1RGNCRDQzWElIbE1RN1Fhand6bUNFU19RZ3puV1BPV0FLQnVCdWNfOUpJdjNNZDhzUm1zMVNQX1djb1B1YkFmN2NVcUJqOUVwMGRIYUV6S0FteVBIRmk5RVRQSWk2b0dKZXNIanJEU1lOQ080YVZEUmp0OHgzUWhqQXRWbVYybFZuWUo1T1pIaEo0ZXfSAdcBQVVfeXFMTlN6TnBIQTdCaTQyOTVzUUlpOVZUUzEzSFhlWDVoTEFmTEdRYmRCNE9lblZoQTNMOG93eFZVYVlkdGl5RjdqWDBSTG9pTFJRWWhGZEpIZnZMbDlmQTJpb0lYNno5UTNOWHJLTkhkVnhNWFJrM1pDUEczazBFQUk3SWtzX1F0NnUzTEllRDIxQjA0VGJrYTIyUFR6NG5aR2V0dDhaVmZBMkFGWnVyM2poU25HN21MSlFYbFpLcVRESXRVSERPTWdZYnZ6SnpTdkY4eEpFZ1Flc0E?oc=5"
+  "source_url": "https://news.google.com/rss/articles/CBMi0gFBVV95cUxOajNZazhzNWYyZE81bFRaSmRQSmRFTXdPd2VKcHNZX1ZSRW5xSlF0WFJtY2FUWEdNVWVfb0RQQjhFSnEzeDM1RGNCRDQzWElIbE1RN1Fhand6bUNFU19RZ3puV1BPV0FLQnVCdWNfOUpJdjNNZDhzUm1zMVNQX1djb1B1YkFmN2NVcUJqOUVwMGRIYUV6S0FteVBIRmk5RVRQSWk2b0dKZXNIanJEU1lOQ080YVZEUmp0OHgzUWhqQXRWbVYybFZuWUo1T1pIaEo0ZXfSAdcBQVVfeXFMTlN6TnBIQTdCaTQyOTVzUUlpOVZUUzEzSFhlWDVoTEFmTEdRYmRCNE9lblZoQTNMOG93eFZVYVlkdGl5RjdqWDBSTG9pTFJRWWhGZEpIZnZMbDlmQTJpb0lYNno5UTNOWHJLTkhkVnhNWFJrM1pDUEczazBFQUk3SWtzX1F0NnUzTEllRDIxQjA0VGJrYTIyUFR6NG5aR2V0dDhaVmZBMkFGWnVyM2poU25HN21MSlFYbFpLcVRESXRVSERPTWdZYnZ6SnpTdkY4eEpFZ1Flc0E?oc=5",
+  "cta": "તમારો અભિપ્રાય કોમેન્ટમાં જણાવો 👇"
  },
  {
   "template": "gold",
@@ -160,97 +129,8 @@
   ],
   "image_prompt": "golden paddy field at harvest in South Gujarat with sacks of rice, farmers seen from far away",
   "source_name": "Divya Bhaskar",
-  "source_url": "https://news.google.com/rss/articles/CBMi-AFBVV95cUxPck0zU0RaUk1wdlY1S3didlFxUFN2NHoxYnhLbE9HNWVNOFhRSXh1V25XNDBHT2dYWWNYSmFYZTdLY21vMVh5bkh6dFYyV3hDRm1DT1NTTllITFRkcGV1XzZhYTlQQ3Y0TXBpWWExeFJQYXhHUzAzbURoSzhaeENVbUlkYkFYckxDWFdEdENJeXB5em1IenJMWHpXNjZaYTA0ZVNCM1ZBaERHaVh2ajVpV2tCLWZTRFFQN09ENkc1QlR4YVZHVWRfbWtlUE5yUWhfdDZudXNPcEZKejNtQkVaMkFfcXRNOVBaazZEUHN6V25IeGlZQk5HOdIB_gFBVV95cUxOR0FqS2dJRzRYVVBMSEh4VjFpcUY3OG4tOXBhWEhweElHZlo4d0RfendOY3RZdFhsN1dHM1M4aUhRbk5GX3RCR3dwdUE3cVlpNzdRbHlTeTQyQ3dteEJjQUx5LWRlQV8yVVZfVzE5VGhYWU1MeXZJMXVJelVpR3VONVBTVzEtbndCMTNzSk1JM2RjWjRKZTNPRGFfYkZtSVlBYXpyT1FZeVNXR2tGU01EWnpkX1BYX1h4VjhpYmt0STZnWGRReTVsN2YyUFFTbW1icVBzNElWMjBsQmdJWWM3YV9tTnFETHY0YW1RSm1vQzRtNGlDbV9fdG9DeTd4Zw?oc=5"
- },
- {
-  "template": "card2",
-  "category": "government",
-  "mood": "info",
-  "kicker": "SSR 2026",
-  "headline": "વલસાડમાં 4070 યુવા મતદારો નોંધાયા",
-  "highlight": "4070",
-  "subheadline": "",
-  "facts": [
-   {
-    "label": "યુવા મતદારો",
-    "value": "4070"
-   }
-  ],
-  "points": [
-   "SSR 2026 હેઠળ મતદાર નોંધણી",
-   "વલસાડમાં 4070 યુવા મતદારો નોંધાયા"
-  ],
-  "comment": "તમે તમારું નામ મતદાર યાદીમાં ચેક કર્યું? 👇",
-  "image_keywords": [
-   "voter id india election",
-   "indian election voting",
-   "ballot box india"
-  ],
-  "image_prompt": "young Indian voters standing in a queue at a polling booth, seen from behind, inked fingers",
-  "source_name": "Divya Bhaskar",
-  "source_url": "https://news.google.com/rss/articles/CBMiwAFBVV95cUxQYWdHUENxN0dsOE5uQnQwb05CaGJJQ2tRemQzQmJFZ05FVXR2dG4wTVV0czM4MHNFaGFJNUVVdUVWVUY4aDRpRVhVOVpLRXo1UE5SZ1M3N3NYcHY3ZW9NZkpleEFCY0Ywc083LXRFRkgtbl80ZDY5TkVqVXVObzk4b1ZyZ210dzRrYkhKcDVHd3Jacm9zTHJkYkJWT0lpV3d2RXVfYUpnQ3czYjlyM3BLV0ZESEIwalZhVHVQRnhVWXHSAcYBQVVfeXFMT1hhVTNqMzRvb0M2N0VzSlcxdGpfUHBCR0JUQi0waVNDWFJNa0d1UDRJSUsybWxJQ0JfTjliNVV3c3BzaGtOdDdmMWdBVFZQREJrcEZIYUEyVGhqM2NUc3pVUU1ZdDl4TmIyYkRDay13eXlTVWxxT0VqZ3dXVDVGY1c5SllaYU9pYmxiNXZnbXIwRTlyekVSZlRxYUhKLUtic1AtYkpEaWF5RzdBSDFaRmo5RGJLdHhoc09keUwtODdnNWVwRDBB?oc=5"
- },
- {
-  "template": "brk",
-  "category": "crime",
-  "mood": "breaking",
-  "kicker": "સાપુતારા બોર્ડર",
-  "headline": "હેલ્મેટનાં બોક્સની આડમાં વિદેશી દારૂની હેરાફેરી પકડાઈ",
-  "highlight": "હેલ્મેટનાં બોક્સની",
-  "subheadline": "",
-  "facts": [
-   {
-    "label": "દારૂ",
-    "value": "1,064+ લિટર"
-   },
-   {
-    "label": "આરોપી",
-    "value": "2"
-   }
-  ],
-  "points": [
-   "સાપુતારા બોર્ડર પર હેરાફેરી પકડાઈ",
-   "હેલ્મેટનાં બોક્સની આડમાં દારૂ લઈ જવાતો હતો",
-   "1,064 લિટરથી વધુ દારૂ સાથે બે આરોપી"
-  ],
-  "comment": "આવી હેરાફેરી વિશે તમે શું કહેશો? 👇",
-  "image_keywords": [
-   "police checkpoint highway",
-   "cardboard boxes truck",
-   "police inspection truck"
-  ],
-  "image_prompt": "a truck loaded with cardboard boxes checked by police at a hill border checkpost, officers seen from behind",
-  "source_name": "Divya Bhaskar",
-  "source_url": "https://news.google.com/rss/articles/CBMivAFBVV95cUxNUXQ1Nl9GVzd3TkJsZTRORHl6eWZQTlltUEY4azRoZjdBQjdZMGRLRHNpZ05oR3hpM2swdHZNc1lwWjlMdXc4VU45RDRtYVlMVnZQSUJDOG9JcllBa056RG1BU2EyMnU1ZmtEVFVabTF0QmlfX3oxbDJDd09NclpDWkwxZTlXMnJhSmhYbVlZY0s2U0VvN282azZNSnVrUTRIUWU4Vnp5ZlJZQ3U5TE9mZ3FhTmhqUWh5ZnZGONIBwgFBVV95cUxNRzBPWFY4MmJ2Sk1UUTZVamRWQmlNTUIyaDJqNmQ2VUJibnJsaGNZNGY0Y0ZoZ1dQWFMyZ3Q2RDRlNl9tOUFVZzBFNFZvSERMVWxWbnJlVFJZdnVpeUZIc2lic0NsYTZrQVFsb2RTZnJ0LTBLOTVmeGdVSE5KaFN2WlRraXVEQUoybnBIM1lMbFlRTVQ1X214Ymd0cHRTbEhwNDRIMWZzR2padXVYQURNZ3UxZHBkZGxKUlhhMlZfU3VHZw?oc=5"
- },
- {
-  "template": "gold",
-  "category": "good_news",
-  "mood": "happy",
-  "kicker": "રન ફોર યુનિટી",
-  "headline": "વલસાડમાં ‘રન ફોર યુનિટી’ યોજાઈ",
-  "highlight": "રન ફોર યુનિટી",
-  "subheadline": "સરદાર પટેલની 151મી જન્મજયંતિએ રેલી",
-  "facts": [
-   {
-    "label": "જન્મજયંતિ",
-    "value": "151મી"
-   }
-  ],
-  "points": [
-   "સરદાર પટેલની 151મી જન્મજયંતિ",
-   "મંત્રી કનુ દેસાઈએ લીલી ઝંડી આપી",
-   "રેલી શરૂ કરાવી"
-  ],
-  "comment": "તમે આ દોડમાં ભાગ લીધો હતો? 👇",
-  "image_keywords": [
-   "unity run india flags",
-   "marathon runners india",
-   "people running road event"
-  ],
-  "image_prompt": "many people running in a unity run on a city road with Indian flags, seen from behind",
-  "source_name": "Divya Bhaskar",
-  "source_url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNcndESnVjZDRiTDRvdUlSVVhYTG9qbjJCcVNRU05FM0pqelBBOWt6LWxvbDdNeUZzYUFfaTlaVGxLQkVMUzE0cGlLZGRlUG5MWXRJT0x5SFJhWWdycVB5MnlzdnNKOHlNLWNfS2pfYUp3UFVrTWtBaGtnc1ZMMjBnNmFtMU1RamVyWFkyTUd4VEF1NW45SDVpcHI2djhEYnZfQ1RXb09WTUQxdmxpdnJvYVBTZEVOOEl3Wm10U0JyTjdxSHdHaG1QRVlaRUlSVE5SOThnU9IB2gFBVV95cUxOTmdXa3h5bTFaVGR2QzlXX0V0bG9LZml1NUs1ZDRvczlVc1o0WXdoanNNRUxiVXhQakZtSWZLcVI4eHBQQ1RDUEc0VmRxZHVwaGVFdWZNa21uWmtPdVkzYUR4YnhQcThjT0Q3MExaLTh4TE1lWGhMV21YUXFZZWNEWFI0eElMZU9FRzRBU2FfQjc1WEcwLWdCZDNSdFo2OHozdzRxbVpjY25aR09IUG5Td1NjbG5melpGeFJkbVBxU050Q1JMR0k5dlZsOGtSV1ZRbWt4WGdWNTEwdw?oc=5"
+  "source_url": "https://news.google.com/rss/articles/CBMi-AFBVV95cUxPck0zU0RaUk1wdlY1S3didlFxUFN2NHoxYnhLbE9HNWVNOFhRSXh1V25XNDBHT2dYWWNYSmFYZTdLY21vMVh5bkh6dFYyV3hDRm1DT1NTTllITFRkcGV1XzZhYTlQQ3Y0TXBpWWExeFJQYXhHUzAzbURoSzhaeENVbUlkYkFYckxDWFdEdENJeXB5em1IenJMWHpXNjZaYTA0ZVNCM1ZBaERHaVh2ajVpV2tCLWZTRFFQN09ENkc1QlR4YVZHVWRfbWtlUE5yUWhfdDZudXNPcEZKejNtQkVaMkFfcXRNOVBaazZEUHN6V25IeGlZQk5HOdIB_gFBVV95cUxOR0FqS2dJRzRYVVBMSEh4VjFpcUY3OG4tOXBhWEhweElHZlo4d0RfendOY3RZdFhsN1dHM1M4aUhRbk5GX3RCR3dwdUE3cVlpNzdRbHlTeTQyQ3dteEJjQUx5LWRlQV8yVVZfVzE5VGhYWU1MeXZJMXVJelVpR3VONVBTVzEtbndCMTNzSk1JM2RjWjRKZTNPRGFfYkZtSVlBYXpyT1FZeVNXR2tGU01EWnpkX1BYX1h4VjhpYmt0STZnWGRReTVsN2YyUFFTbW1icVBzNElWMjBsQmdJWWM3YV9tTnFETHY0YW1RSm1vQzRtNGlDbV9fdG9DeTd4Zw?oc=5",
+  "cta": "તમારો અભિપ્રાય કોમેન્ટમાં જણાવો 👇"
  },
  {
   "template": "card2",
@@ -279,29 +159,7 @@
   ],
   "image_prompt": "a new small government hospital building beside a highway in Gujarat with an ambulance outside",
   "source_name": "Divya Bhaskar",
-  "source_url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNMEdPQzJoc2N2XzdRUVBGU3Nudkg0cGZpQnNRbDJnWUJ0eWEtclFpMHJxRHZWZkVhLWVBVGU1MHBVOENNenlhczlGZUQ3VjhKRnFCN243VTl2YjJhRW1fU1hnWHh5QVM1SF8zenlWTkhIdUdHY2N2ZURLaWJyRlplY0tIM1RQQlU3Yi1LdU13MUVtV2FIbzFOY1ZaUEdWWTcxUkIzdzJaeUlfeVZyODRBN1R1bG1hVkwzNzhsLVFhTXVRZEczMW1UU1VDRWpKdlN5UzBfadIB2gFBVV95cUxQVS11a1NKdnQ5R0F3d2drdEw4RTFESXVFejh3WTBTT3BHLXFycnNoY2dTWkZEUFl0VW56NExOWFNmTmtEZUhod1ZxWEpQLUo2aXVkS05tNzJLVHRsMUJTcUtldjN5bVk2VUtOUGJRRTNUc21jSFdQX3hHRmZuZEIxS2NHN21YS1pyR3pXdDJIUWgxcUZWQ2pza2lPd1Q4aGNyZXRNNjdzdmxUeWFST2V1Wm84Y2V2cDBfOXBxTDJIMkJfclpJWWFhU0xZSllTT3ltWGJhS2tFanZXQQ?oc=5"
- },
- {
-  "template": "brk",
-  "category": "crime",
-  "mood": "info",
-  "kicker": "નવસારી",
-  "headline": "દિવાળીની LED લાઈટો ચોરાઈ",
-  "highlight": "LED લાઈટો",
-  "subheadline": "અહિંસા દ્વાર અને લુન્સીકૂઈ પરથી",
-  "facts": [],
-  "points": [
-   "નવસારીના અહિંસા દ્વાર પરથી લાઈટો ચોરાઈ",
-   "લુન્સીકૂઈ પરથી પણ LED લાઈટો ગાયબ"
-  ],
-  "comment": "આવા તત્વો સામે શું પગલાં લેવા જોઈએ? 👇",
-  "image_keywords": [
-   "diwali led lights street",
-   "festival lights city night",
-   "string lights night"
-  ],
-  "image_prompt": "colourful Diwali LED string lights on a city gate at night in India, no people",
-  "source_name": "Divya Bhaskar",
-  "source_url": "https://news.google.com/rss/articles/CBMimgJBVV95cUxPRUlYcVQ3b3hiWEttRFhUeWhqRURELXNiUllTMTNMWDN6c2xJT2ZJNnhaZF9IR0Z5cHVJRGhEZGpBSG5wamJPRzE1Nk83aTBONFpLV1JOc3cwOUVXOHBxX3JmdEZ3TnNzUGlfeTh1VzBKUHdfN1doa3ZXUm1KdnpnRFk5YURTQ2h2czQ4NXBkYXBMS0lOQ2RnWElETWRoMzBsNDd3UHBTUG5ISmpObXFUeHV2UTVQU1ZweEFWU1p4dlltdVVOZkhpWEJ3OWtqcFNwUGFFY1BiaXVYdzhrQlpYb1pzMkdSVnBsN3Bvc0dtb0M4RGotWGpja1FSZGZSWnJ6VWFlTTVBRFQtdEZBX2JOc29XNjNVbjFkY3fSAZoCQVVfeXFMT0VJWHFUN294YlhLbURYVHloakVERC1zYlJZUzEzTFgzenNsSU9mSTZ4WmRfSEdGeXB1SURoRGRqQUhucGpiT0cxNTZPN2kwTjRaS1dSTnN3MDlFVzhwcV9yZnRGd05zc1BpX3k4dVcwSlB3XzdXaGt2V1JtSnZ6Z0RZOWFEU0NodnM0ODVwZGFwTEtJTkNkZ1hJRE1kaDMwbDQ3d1BwU1BuSEpqTm1xVHh1dlE1UFNWcHhBVlNaeHZZbXVVTmZIaVhCdzlranBTcFBhRWNQYml1WHc4a0JaWG9aczJHUlZwbDdwb3NHbW9DOERqLVhqY2tRUmRmUlpyelVhZU01QURULXRGQV9iTnNvVzYzVW4xZGN3?oc=5"
+  "source_url": "https://news.google.com/rss/articles/CBMi1AFBVV95cUxNMEdPQzJoc2N2XzdRUVBGU3Nudkg0cGZpQnNRbDJnWUJ0eWEtclFpMHJxRHZWZkVhLWVBVGU1MHBVOENNenlhczlGZUQ3VjhKRnFCN243VTl2YjJhRW1fU1hnWHh5QVM1SF8zenlWTkhIdUdHY2N2ZURLaWJyRlplY0tIM1RQQlU3Yi1LdU13MUVtV2FIbzFOY1ZaUEdWWTcxUkIzdzJaeUlfeVZyODRBN1R1bG1hVkwzNzhsLVFhTXVRZEczMW1UU1VDRWpKdlN5UzBfadIB2gFBVV95cUxQVS11a1NKdnQ5R0F3d2drdEw4RTFESXVFejh3WTBTT3BHLXFycnNoY2dTWkZEUFl0VW56NExOWFNmTmtEZUhod1ZxWEpQLUo2aXVkS05tNzJLVHRsMUJTcUtldjN5bVk2VUtOUGJRRTNUc21jSFdQX3hHRmZuZEIxS2NHN21YS1pyR3pXdDJIUWgxcUZWQ2pza2lPd1Q4aGNyZXRNNjdzdmxUeWFST2V1Wm84Y2V2cDBfOXBxTDJIMkJfclpJWWFhU0xZSllTT3ltWGJhS2tFanZXQQ?oc=5",
+  "cta": "તમારો અભિપ્રાય કોમેન્ટમાં જણાવો 👇"
  }
 ]

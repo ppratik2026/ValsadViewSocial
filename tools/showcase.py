@@ -58,6 +58,18 @@ def render(cfg: dict, stories_file: Path) -> None:
         shutil.rmtree(work, ignore_errors=True)
         work.mkdir(parents=True)
         print(f"\n=== {n}. {template}: {story.headline}")
+        if os.environ.get("SHOWCASE_GEMINI") and os.environ.get("GEMINI_API_KEY"):
+            # first choice: the whole poster from Gemini (like the reference posters), as an animated reel
+            from src.poster import make_poster
+            from src.poster_reel import render as poster_reel
+            story.cta = story.cta or "તમારો અભિપ્રાય કોમેન્ટમાં જણાવો 👇"
+            poster = make_poster(story, cfg, work / "card.png")
+            if poster:
+                mood = mood_of(story)
+                poster_reel(poster, work / "reel.mp4", "auto", pick_track(mood), 12, True, cfg["card"]["handle"])
+                print(f"   Gemini poster reel saved {work.relative_to(ROOT)}/reel.mp4")
+                continue
+            print("   No Gemini poster (see the errors above); making the story-pattern poster instead")
         keywords = stock_keywords(story)
         background = None
         if os.environ.get("SHOWCASE_PICTURE") == "ai" and data.get("image_prompt"):
