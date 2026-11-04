@@ -11,7 +11,7 @@ edges fade out. Where the picture sits, how the headline is set, how the facts a
   topline   headline first on a light page, picture in the middle, three icon cards
   quote     a big quotation: giant quote mark, headline as the quote, sub as the attribution
   steps     light page, picture on top, points on a numbered timeline
-  bento     a grid of rounded tiles: picture, number, place and date, headline, points
+  bento     picture fading into a dark page, headline on it, then rounded tiles: number, place, points
   ribbon    the headline on a folded ribbon banner, points as chat bubbles
   film      sprocket holes over a soft-edged picture, movie-title headline, points as credits
   infographic  stat cards with bars over a blurred picture
@@ -314,40 +314,43 @@ def steps(story, font, image_url, date, handle, place, asks):
 
 # 11 ------------------------------------------------------------------------------------------ bento
 BENTO = """
-  body { background: #0e0e10; }
-  #main { left: 30px; right: 30px; top: 30px; bottom: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
-    grid-template-rows: 700px auto auto auto 1fr auto; }
-  #main > * { border-radius: 34px; }
-  .t-pic { grid-column: 1 / 3; background: center/cover no-repeat; position: relative; margin: -30px -30px 0; border-radius: 0 !important;
-    -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%); }
-  .t-pic .sym { right: 18px; top: 18px; }
-  .t-pic .handle { left: 18px; top: 18px; }
-  .t-num { background: #ffd60a; color: #111; padding: 22px 26px; display: flex; flex-direction: column; justify-content: center; }
-  .t-num b { font: 900 86px/1 'Arial Black', Arial, sans-serif; } .t-num small { font-size: 26px; font-weight: 800; margin-top: 8px; }
-  .t-place { background: #3a86ff; color: #fff; padding: 22px 26px; display: flex; flex-direction: column; justify-content: center; }
-  .t-place b { font-size: 56px; line-height: 1.1; } .t-place small { font-size: 26px; font-weight: 700; opacity: .9; }
-  .hl { grid-column: 1 / 3; background: #fff; padding: 20px 20px 16px; }
-  .hl div { color: #111; font-size: calc(var(--hl) * .72); }
-  .hl .hi { color: #ff006e; }
-  .sub { grid-column: 1 / 3; background: #ff006e; color: #fff; padding: 16px 26px 20px; font-size: calc(var(--hl) * .34); font-weight: 700;
-    line-height: 1.3; text-align: center; }
-  .t-pts { grid-column: 1 / 3; background: #1c1c22; padding: 18px 26px; display: flex; flex-direction: column; gap: 8px; justify-content: center; }
-  .pt { display: flex; gap: 14px; align-items: center; color: #eee; font-size: calc(var(--pt) * .9); font-weight: 600; line-height: 1.3; }
-  .pt .ic { width: 52px; height: 52px; }
-  .askx { grid-column: 1 / 3; background: #8338ec; color: #fff; padding: 18px 28px 22px; }
+  body { background: #0e0e12; }
+  .pic { position: absolute; left: 0; right: 0; top: 0; height: 980px; background: center/cover no-repeat;
+    -webkit-mask-image: linear-gradient(180deg, #000 60%, transparent 100%); }
+  .handle { top: 30px; left: 30px; }
+  .sym { right: 30px; top: 30px; }
+  #main { left: 36px; right: 36px; gap: 16px; justify-content: flex-end; }
+  .hl { align-items: flex-start; }
+  .hl div { text-align: left; color: #fff; font-size: calc(var(--hl) * .8); padding: 0; text-shadow: 0 4px 20px rgba(0,0,0,.8); }
+  .hl .hi { color: #ffd60a; }
+  .sub { font-size: calc(var(--hl) * .36); color: #9ad1ff; font-weight: 700; line-height: 1.3; margin-bottom: 6px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .tile { border-radius: 32px; padding: 22px 24px; position: relative; overflow: hidden; }
+  .tile .lbl { font-size: 24px; font-weight: 800; letter-spacing: 1px; opacity: .8; }
+  .t-num { background: linear-gradient(135deg, #ffd60a, #ff9f1c); color: #1a1200; }
+  .t-num b { display: block; font: 900 74px/1.05 'Arial Black', Arial, sans-serif; margin-top: 6px; white-space: nowrap; }
+  .t-place { background: linear-gradient(135deg, #3a86ff, #4361ee); color: #fff; }
+  .t-place b { display: block; font-size: 52px; line-height: 1.15; margin-top: 6px; }
+  .tile .bigic { position: absolute; right: -14px; bottom: -14px; width: 120px; height: 120px; opacity: .35; }
+  .t-pts { grid-column: 1 / 3; background: #1b1b24; border: 2px solid #2b2b38; display: flex; flex-direction: column; gap: 10px; }
+  .pt { display: flex; gap: 16px; align-items: center; color: #eee; font-size: calc(var(--pt) * .88); font-weight: 600; line-height: 1.3; }
+  .pt .ic { width: 54px; height: 54px; flex-shrink: 0; background: #2b2b38; border-radius: 16px; padding: 6px; }
+  .askx { border-radius: 32px; background: linear-gradient(90deg, #8338ec, #ff006e); color: #fff; padding: 20px 28px 24px; }
+  .foot2 { font-size: 22px; color: #777; display: flex; justify-content: space-between; }
 """
 
 
 def bento(story, font, image_url, date, handle, place, asks):
     f = _num(story)
-    num = f'<div class="t-num"><b>{esc(f["value"])}</b><small>{esc(f["label"])}</small></div>' if f else '<div class="t-num"><b>!</b></div>'
-    body = f"""<div id="main"><div class="t-pic" style="{_pic(image_url)}"><div class="handle">{esc(handle)}</div>
-  <div class="sym">પ્રતિકાત્મક તસવીર</div></div>{num}
-  <div class="t-place"><b>📍 {esc((place or story.kicker).split(" - ")[0])}</b><small>{esc(date)}</small></div>
-  {_hl(story)}{_sub(story)}<div class="t-pts">{_pts_html(story, 3)}</div>{_askx(story, asks, "💬")}</div>"""
-    return _wrap(BENTO, font, body, 30, 30)
-
-
+    num = (f'<div class="tile t-num"><div class="lbl">{esc(f["label"])}</div><b>{esc(f["value"])}</b>{icon_img(f["label"] + " " + f["value"], "bigic")}</div>'
+           if f else f'<div class="tile t-num"><div class="lbl">ખાસ</div><b>!</b></div>')
+    where = esc((place or story.kicker).split(" - ")[0])
+    body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div><div class="sym">પ્રતિકાત્મક તસવીર</div>
+  <div id="main">{_hl(story)}{_sub(story)}<div class="grid">{num}
+  <div class="tile t-place"><div class="lbl">{esc(date)}</div><b>📍 {where}</b>{icon_img("pin", "bigic")}</div>
+  <div class="tile t-pts">{_pts_html(story, 3)}</div></div>{_askx(story, asks, "💬")}
+  <div class="foot2"><span>{esc(handle)}</span><span>સ્રોત: {esc(story.source_name)}</span></div></div>"""
+    return _wrap(BENTO, font, body, 820, 600)
 
 # 13 ------------------------------------------------------------------------------------------- film
 FILM = """
