@@ -36,8 +36,18 @@ def post_reel(cfg: dict, video: Path, caption: str, ig=None) -> dict:
     except Exception as e:   # hosting is best effort: the direct upload is still tried
         print(f"   Could not host the video: {e}")
         sources = []
-    return (ig or instagram(cfg)).publish_reel(video, caption, cfg["instagram"]["share_to_feed"],
-                                               sources=sources, thumb_offset_ms=int(at * 1000))
+    result = (ig or instagram(cfg)).publish_reel(video, caption, cfg["instagram"]["share_to_feed"],
+                                                 sources=sources, thumb_offset_ms=int(at * 1000))
+    # the same reel on the Facebook Page too (best effort: never undoes the Instagram post)
+    from src import facebook
+    if cfg.get("facebook", {}).get("enabled", True) and facebook.configured():
+        try:
+            fb = facebook.publish_reel(video, caption, cfg["instagram"]["api_version"])
+            result["facebook"] = fb
+            print(f"   Facebook reel: {fb.get('permalink') or fb['video_id']}")
+        except Exception as e:
+            print(f"   Facebook post failed (Instagram is fine): {e}")
+    return result
 
 
 def instagram(cfg: dict):
@@ -552,6 +562,17 @@ def cmd_stats(args, cfg):
 def cmd_check(args, cfg):
     me = instagram(cfg).me()
     print(f"Token OK: @{me['username']} ({me['account_type']}), user_id={me['user_id']}")
+    from src import facebook
+    if facebook.configured():
+        import requests
+        page_id, version = os.environ["FB_PAGE_ID"].strip(), cfg["instagram"]["api_version"]
+        token = facebook.page_token(page_id, os.environ.get("FB_PAGE_TOKEN", "").strip()
+                                    or os.environ["IG_ACCESS_TOKEN"].strip(), version)
+        page = facebook._check(requests.get(f"{facebook.GRAPH}/{version}/{page_id}",
+                                            params={"fields": "name", "access_token": token}, timeout=30))
+        print(f"Facebook Page OK: {page.get('name')} (id {page_id})")
+    else:
+        print("Facebook: not set up (add the FB_PAGE_ID secret to post there too)")
 
 
 def cmd_refresh(args, cfg):

@@ -145,6 +145,10 @@ schedule:
   every_hours: 2                  # one reel every 2 hours from 10:00 to midnight IST (10, 12, 14 ... 22, 0)
   max_breaking_per_day: 3         # extra posts for really big breaking news, between the regular posts
 
+facebook:
+  # the same reel also on the Facebook Page (needs the FB_PAGE_ID secret, and FB_PAGE_TOKEN or a system-user token)
+  enabled: true
+
 instagram:
   api_version: "v21.0"
   # up to 3 public Instagram accounts invited as collaborators on every reel, e.g. ["friendpage"]; the reel
