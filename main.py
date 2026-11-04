@@ -558,6 +558,9 @@ def cmd_refresh(args, cfg):
     from src.publisher import refresh_token
 
     data = refresh_token(require_env("IG_ACCESS_TOKEN"))
+    if data.get("never_expires"):
+        print("Facebook system-user token: it never expires, nothing to refresh.")
+        return
     days = int(data.get("expires_in", 0)) // 86400
     # Written to a git-ignored file instead of printed, so the token never lands in logs.
     out = ROOT / ".new_token"

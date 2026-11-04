@@ -25,6 +25,7 @@ jobs:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
+          case "$IG_ACCESS_TOKEN" in EAA*) echo "Facebook system-user token: it never expires, nothing to refresh."; exit 0;; esac
           if [ -z "$GH_TOKEN" ]; then
             echo "::error::Add a GH_PAT secret so the refreshed token can be saved. See README."
             exit 1
