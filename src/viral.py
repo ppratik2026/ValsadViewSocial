@@ -79,7 +79,7 @@ WEATHER = re.compile(r"વરસાદ|માવઠ|વાવાઝોડ|આગ
 # stock photo searches when the AI gave none (or as extra tries): English, places and objects, never people's names
 STOCK_SEARCHES = {
     "crime": ["police checkpoint night", "police car lights night", "police barricade road"],
-    "politics": ["election rally crowd india", "microphones podium speech", "indian parliament"],
+    "politics": ["ballot box", "government building india", "indian parliament building"],
     "government": ["indian government office", "official documents stamp", "india road construction"],
     "trending": ["india city street traffic", "crowd india street", "smartphone news"],
     "good_news": ["indian students celebrating", "trophy medal winner", "indian festival celebration"],

@@ -156,6 +156,11 @@ def fetch_wikimedia_photo(keywords: list[str], out_path: Path) -> tuple[Path, st
             text = (page.get("title", "") + " " + _plain((meta.get("Categories") or {}).get("value", ""))).lower()
             if re.search(r"black and white|black-and-white|monochrome|sepia|historical|19\d\d|18\d\d|map|logo|diagram|drawing|coat of arms|bird|heron|egret|insect|butterfly|animal|flower|museum", text):
                 continue
+            # never a real person: no portraits, politicians, leaders, celebrities, rallies or speeches
+            if re.search(r"portrait|people of|politician|minister|president|leader|\bmodi\b|gandhi|\bshah\b|\bpatel\b|bjp|"
+                         r"congress|\baap\b|\bmla\b|\bmp\b|actor|actress|cricketer|celebrit|selfie|rally|speech|campaign|"
+                         r"election|politic|\bsmt\b|\bshri\b|addressing|meeting with|interview", text):
+                continue
             year = re.search(r"(20\d\d)", (meta.get("DateTimeOriginal") or {}).get("value", "") or "")
             score = (int(year.group(1)) if year else 2005) * 10 + min(info["width"] // 1000, 6)
             found.append((score, info, lic, _plain((meta.get("Artist") or {}).get("value", ""))[:40]))

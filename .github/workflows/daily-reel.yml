@@ -3,9 +3,6 @@ name: Valsad View reel
 # Fully automatic: news -> poster (AI poster from the Gemini-style prompt, else the template design) -> reel -> post.
 # Regular posting (every 2 hours) is done by scheduler.yml (GitHub's own schedule dropped runs); this one is for manual runs.
 on:
-  # a change to post/request.txt makes (and posts) one reel, also from a branch that is not merged yet
-  push:
-    paths: ["post/request.txt"]
   workflow_dispatch:
     inputs:
       category:
