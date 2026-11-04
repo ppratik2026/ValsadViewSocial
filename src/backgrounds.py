@@ -91,8 +91,11 @@ def fetch_openverse_photo(keywords: list[str], out_path: Path) -> tuple[Path, st
         except (requests.RequestException, ValueError) as e:
             print(f"Openverse search failed: {e}")
             continue
-        random.shuffle(results)
-        for r in results[:4]:
+        # the biggest, sharpest photos first (they look best full screen), a little shuffled
+        results.sort(key=lambda r: -(r.get("width") or 0) * (r.get("height") or 0))
+        top = results[:6]
+        random.shuffle(top)
+        for r in top[:4]:
             try:
                 with requests.get(r["url"], headers={"User-Agent": "ValsadViewReels/1.0"}, timeout=60) as dl:
                     if dl.status_code != 200 or not dl.headers.get("content-type", "").startswith("image/"):
