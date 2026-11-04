@@ -1,0 +1,35 @@
+name: Check accounts
+
+# Checks the Instagram and Facebook secrets (prints account names, ids and permission names, never a token).
+# Runs when check/request.txt changes (so it also works from a branch that is not merged yet), or by hand.
+on:
+  push:
+    paths: ["check/request.txt"]
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests PyYAML python-dotenv
+      - name: Which secrets are set
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          for v in IG_ACCESS_TOKEN IG_USER_ID FB_PAGE_ID GEMINI_API_KEY; do
+            if [ -n "${!v}" ]; then echo "$v: set"; else echo "$v: MISSING"; fi
+          done
+          case "$IG_ACCESS_TOKEN" in EAA*) echo "IG_ACCESS_TOKEN kind: Facebook system-user token";; IG*) echo "IG_ACCESS_TOKEN kind: Instagram-login token";; esac
+      - name: Check
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+        run: python main.py check

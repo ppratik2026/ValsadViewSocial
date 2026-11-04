@@ -562,6 +562,24 @@ def cmd_stats(args, cfg):
 def cmd_check(args, cfg):
     me = instagram(cfg).me()
     print(f"Token OK: @{me['username']} ({me['account_type']}), user_id={me['user_id']}")
+    import requests
+    token = os.environ["IG_ACCESS_TOKEN"].strip()
+    if token.startswith("EAA"):   # which permissions the system-user token has (names only, never the token)
+        base = f"https://graph.facebook.com/{cfg['instagram']['api_version']}"
+        try:
+            perms = requests.get(f"{base}/me/permissions", params={"access_token": token}, timeout=30).json().get("data", [])
+            granted = sorted(p["permission"] for p in perms if p.get("status") == "granted")
+            print(f"Permissions: {', '.join(granted) or 'none listed'}")
+            need = {"instagram_basic", "instagram_content_publish", "pages_manage_posts", "pages_read_engagement"}
+            missing = sorted(need - set(granted))
+            if granted and missing:
+                print(f"Missing permissions: {', '.join(missing)}")
+        except (requests.RequestException, ValueError) as e:
+            print(f"Could not list the permissions: {e}")
+        limit = requests.get(f"{base}/{me['user_id']}/content_publishing_limit",
+                             params={"access_token": token}, timeout=30).json()
+        print("Instagram publishing: OK" if "data" in limit
+              else f"Instagram publishing: NOT allowed ({(limit.get('error') or {}).get('message', limit)})")
     from src import facebook
     if facebook.configured():
         import requests
