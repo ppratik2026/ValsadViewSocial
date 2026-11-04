@@ -12,7 +12,7 @@ edges fade out. Where the picture sits, how the headline is set, how the facts a
   quote     a big quotation: giant quote mark, headline as the quote, sub as the attribution
   steps     light page, picture on top, points on a numbered timeline
   bento     picture fading into a dark page, headline on it, then rounded tiles: number, place, points
-  ribbon    the headline on a folded ribbon banner, points as chat bubbles
+  ribbon    the headline on a folded ribbon banner, numbered points in one panel
   film      sprocket holes over a soft-edged picture, movie-title headline, points as credits
   infographic  stat cards with bars over a blurred picture
   tape      picture crossed by two "police line" tapes, headline below
@@ -31,12 +31,12 @@ from src.viral_more import _pts
 
 def _hl(story, n=None, cls="hl") -> str:
     """Headline in 2 lines (3 when long); every word is its own span (.w) so the reel can bring the words in one by one,
-    the highlight words also get .hi."""
+    the highlight words also get .key (not .hi: the shared live motion would put a glow filter on it)."""
     n = n or (2 if len(story.headline) < 44 else 3)
     hi = set(story.highlight.split()) if story.highlight else set()
     lines = []
     for line in _lines(story.headline, n):
-        words = " ".join(f'<span class="w{" hi" if w in hi else ""}">{esc(w)}</span>' for w in line.split())
+        words = " ".join(f'<span class="w{" key" if w in hi else ""}">{esc(w)}</span>' for w in line.split())
         lines.append(f"<div>{words}</div>")
     return f'<div class="{cls}">{"".join(lines)}</div>'
 
@@ -78,7 +78,7 @@ def _wrap(css, font, body, top, min_top):
 COMMON = """
   .w { display: inline-block; }
   .hl div { padding: 2px 6px 6px; }
-  .hl .hi { font-size: 1em; }
+  .hl .key { font-size: 1em; }
   .askx { display: flex; align-items: center; gap: 16px; font-size: var(--ask); font-weight: 800; line-height: 1.25; }
   .askx .qi { flex-shrink: 0; }
   .num { font-weight: 800; }
@@ -98,7 +98,7 @@ DIAGONAL = """
   #main { left: 50px; right: 50px; gap: 20px; }
   .hl { align-items: flex-start; }
   .hl div { text-align: left; font-size: calc(var(--hl) * .92); color: #fff; padding-left: 0; text-shadow: 0 6px 0 #5c000b; }
-  .hl .hi { color: #ffd60a; }
+  .hl .key { color: #ffd60a; }
   .sub { font-size: calc(var(--hl) * .42); font-weight: 700; color: #ffd0d6; line-height: 1.3; border-left: 8px solid #ffd60a; padding-left: 20px; }
   .pt { display: flex; gap: 16px; align-items: center; font-size: var(--pt); font-weight: 600; color: #fff; line-height: 1.3; }
   .pt .ic { width: calc(var(--pt) * 1.3); height: calc(var(--pt) * 1.3); }
@@ -131,7 +131,7 @@ TV = """
   .tab small { font-family: inherit; font-size: 32px; letter-spacing: 0; background: #ffd60a; color: #111; padding: 2px 14px 6px; }
   .hl { background: #fff; align-items: flex-start; padding: 14px 36px 10px; margin: 0 36px; border-left: 14px solid #d00000; }
   .hl div { text-align: left; color: #0a0a0a; font-size: calc(var(--hl) * .8); padding: 0 0 4px; }
-  .hl .hi { color: #d00000; }
+  .hl .key { color: #d00000; }
   .sub { background: #0039a6; color: #fff; font-size: calc(var(--hl) * .38); font-weight: 700; padding: 12px 36px 16px; margin: 0 36px; line-height: 1.3; }
   .pts { margin: 24px 36px 0; display: flex; flex-direction: column; gap: 10px; }
   .pt { display: flex; gap: 14px; align-items: center; color: #fff; font-size: var(--pt); font-weight: 600; line-height: 1.3; }
@@ -161,7 +161,7 @@ PAPER = """
   .dateline { display: flex; justify-content: space-between; border-top: 4px solid #151515; border-bottom: 1.5px solid #151515;
     padding: 8px 4px 10px; font-size: 26px; font-weight: 700; }
   .hl div { color: #111; font-size: calc(var(--hl) * .86); padding: 0; }
-  .hl .hi { color: #b5001b; }
+  .hl .key { color: #b5001b; }
   .photo { height: 600px; margin: 0 -44px; background: center/cover no-repeat; flex-shrink: 0; position: relative; filter: saturate(1.1);
     -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 14%, #000 82%, transparent 100%); }
   .photo .sym { right: 12px; bottom: 12px; }
@@ -192,7 +192,7 @@ BIGNUM = """
   #main { left: 50px; right: 50px; gap: 22px; align-items: center; justify-content: center; }
   .place { font-size: 36px; font-weight: 800; color: #0b0b14; background: #00e0b8; padding: 6px 26px 10px; border-radius: 40px; }
   .hl div { font-size: calc(var(--hl) * .72); color: #fff; }
-  .hl .hi { color: #00e0b8; }
+  .hl .key { color: #00e0b8; }
   .big { font: 900 300px/1 'Arial Black', Arial, sans-serif; letter-spacing: -6px; background: center/cover no-repeat;
     -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 5px #fff; white-space: nowrap;
     filter: drop-shadow(0 20px 30px rgba(0,224,184,.35)); padding: 0 10px; }
@@ -243,7 +243,7 @@ MAGAZINE = """
   .place { color: #ffd60a; font-size: 34px; font-weight: 800; letter-spacing: 2px; }
   .hl { align-items: flex-start; }
   .hl div { text-align: left; color: #fff; font-size: calc(var(--hl) * .95); padding: 0; line-height: 1.12; }
-  .hl .hi { color: #ffd60a; }
+  .hl .key { color: #ffd60a; }
   .sub { font-size: calc(var(--hl) * .36); color: #ffb4a2; font-weight: 700; line-height: 1.3; }
   .askx { color: #fff; font-size: calc(var(--ask) * .9); }
   .askx .qi { background: #c1121f; padding: 4px 14px 8px; border-radius: 8px; font-size: 26px; }
@@ -273,7 +273,7 @@ QUOTE = """
   .place { color: #f4a261; font-size: 34px; font-weight: 800; letter-spacing: 3px; }
   .hl { align-items: flex-start; }
   .hl div { text-align: left; color: #fff; font-size: calc(var(--hl) * .82); padding: 0; font-style: italic; }
-  .hl .hi { color: #f4a261; }
+  .hl .key { color: #f4a261; }
   .sub { font-size: calc(var(--hl) * .38); color: #f4a261; font-weight: 700; line-height: 1.3; }
   .sub::before { content: "— "; }
   .line { height: 3px; background: linear-gradient(90deg, #f4a261, transparent); }
@@ -303,7 +303,7 @@ STEPS = """
   .place { align-self: flex-start; background: #2563eb; color: #fff; font-size: 32px; font-weight: 800; padding: 6px 24px 10px; border-radius: 12px; }
   .hl { align-items: flex-start; }
   .hl div { text-align: left; color: #0f172a; font-size: calc(var(--hl) * .8); padding: 0; }
-  .hl .hi { color: #2563eb; }
+  .hl .key { color: #2563eb; }
   .sub { font-size: calc(var(--hl) * .37); color: #ea580c; font-weight: 700; line-height: 1.3; }
   .tl { position: relative; padding-left: 80px; display: flex; flex-direction: column; gap: 16px; margin-top: 6px; }
   .tl::before { content: ""; position: absolute; left: 28px; top: 20px; bottom: 20px; width: 6px; background: #c7d2fe; border-radius: 6px; }
@@ -335,9 +335,9 @@ BENTO = """
   #main { left: 36px; right: 36px; gap: 16px; justify-content: flex-end; }
   .hl { align-items: flex-start; }
   .hl div { text-align: left; color: #fff; font-size: calc(var(--hl) * .8); padding: 0; text-shadow: 0 4px 20px rgba(0,0,0,.8); }
-  .hl .hi { color: #ffd60a; }
+  .hl .key { color: #ffd60a; }
   .sub { font-size: calc(var(--hl) * .36); color: #9ad1ff; font-weight: 700; line-height: 1.3; margin-bottom: 6px; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .tile { border-radius: 32px; padding: 22px 24px; position: relative; overflow: hidden; }
   .tile .lbl { font-size: 24px; font-weight: 800; letter-spacing: 1px; opacity: .8; }
   .t-num { background: linear-gradient(135deg, #ffd60a, #ff9f1c); color: #1a1200; }
@@ -359,7 +359,7 @@ def bento(story, font, image_url, date, handle, place, asks):
            if f else f'<div class="tile t-num"><div class="lbl">ખાસ</div><b>!</b></div>')
     where = esc((place or story.kicker).split(" - ")[0])
     body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div><div class="sym">{_credit(story)}</div>
-  <div id="main">{_hl(story)}{_sub(story)}<div class="grid">{num}
+  <div id="main">{_hl(story)}{_sub(story)}<div class="bgrid">{num}
   <div class="tile t-place"><div class="lbl">{esc(date)}</div><b>📍 {where}</b>{icon_img("pin", "bigic")}</div>
   <div class="tile t-pts">{_pts_html(story, 3)}</div></div>{_askx(story, asks, "💬")}
   <div class="foot2"><span>{esc(handle)}</span><span>સ્રોત: {esc(story.source_name)}</span></div></div>"""
@@ -383,9 +383,10 @@ FILM = """
   .scene { position: absolute; top: 50px; right: 40px; color: #f5d08a; font: 700 28px/1 'Courier New', monospace; z-index: 3; }
   #main { left: 60px; right: 60px; gap: 20px; align-items: center; }
   .place { color: #f5d08a; font-size: 32px; font-weight: 700; letter-spacing: 8px; }
-  .hl div { font-size: calc(var(--hl) * .82); background: linear-gradient(180deg, #fff6d5 0%, #f5c46b 55%, #b8761f 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 6px 10px rgba(0,0,0,.8)); }
-  .hl .hi { color: transparent; }
+  .hl div { font-size: calc(var(--hl) * .82); color: #f5c46b; }
+  .hl .w { background: linear-gradient(180deg, #fff6d5 0%, #f5c46b 55%, #b8761f 100%); -webkit-background-clip: text; background-clip: text;
+    color: transparent; filter: drop-shadow(0 6px 10px rgba(0,0,0,.8)); padding: 0 2px; }
+  .hl .key { background: linear-gradient(180deg, #ffffff 0%, #ffe08a 50%, #ff9f1c 100%); -webkit-background-clip: text; background-clip: text; }
   .sub { text-align: center; font-size: calc(var(--hl) * .36); color: #fff; font-style: italic; font-weight: 500; line-height: 1.3; }
   .credits { display: flex; flex-direction: column; gap: 6px; text-align: center; }
   .credits p { font-size: calc(var(--pt) * .85); color: #cbbfa8; line-height: 1.3; letter-spacing: 1px; }
@@ -419,7 +420,7 @@ TAPE = """
   #main { left: 50px; right: 50px; gap: 18px; }
   .place { align-self: center; color: #ffd60a; font-size: 34px; font-weight: 800; letter-spacing: 2px; }
   .hl div { color: #fff; font-size: calc(var(--hl) * .85); text-shadow: 0 6px 0 #000; }
-  .hl .hi { color: #ffd60a; }
+  .hl .key { color: #ffd60a; }
   .sub { text-align: center; font-size: calc(var(--hl) * .38); color: #ff8fa3; font-weight: 700; line-height: 1.3; }
   .pts { display: flex; flex-direction: column; gap: 8px; border-top: 2px solid #333; padding-top: 16px; }
   .pt { display: flex; gap: 14px; align-items: center; color: #ddd; font-size: calc(var(--pt) * .92); font-weight: 600; line-height: 1.3; }
@@ -453,7 +454,7 @@ GLASS = """
   .place { align-self: center; margin-top: -40px; font-size: 32px; font-weight: 800; color: #fff; background: rgba(0,0,0,.35);
     padding: 6px 24px 10px; border-radius: 30px; backdrop-filter: blur(8px); }
   .hl div { color: #fff; font-size: calc(var(--hl) * .72); text-shadow: 0 4px 18px rgba(0,0,0,.4); }
-  .hl .hi { color: #ffe066; }
+  .hl .key { color: #ffe066; }
   .sub { text-align: center; font-size: calc(var(--hl) * .34); color: #c8f7ff; font-weight: 700; line-height: 1.3; }
   .pt { display: flex; gap: 14px; align-items: center; color: #fff; font-size: calc(var(--pt) * .85); font-weight: 600; line-height: 1.3; }
   .pt .ic { width: 50px; height: 50px; }
@@ -484,7 +485,7 @@ PLACE = """
   .sym { right: 30px; top: 30px; }
   #main { left: 50px; right: 50px; gap: 18px; }
   .hl div { color: #fff; font-size: calc(var(--hl) * .82); }
-  .hl .hi { color: #ff7b00; }
+  .hl .key { color: #ff7b00; }
   .sub { text-align: center; font-size: calc(var(--hl) * .37); color: #ffd6a5; font-weight: 700; line-height: 1.3; }
   .row { display: flex; gap: 14px; }
   .cell { flex: 1; text-align: center; border-top: 4px solid #ff7b00; padding-top: 14px; color: #eee; font-size: calc(var(--pt) * .78);
@@ -514,7 +515,7 @@ TOPLINE = """
   .place { font-size: 34px; font-weight: 800; color: #ffd54f; }
   .hl { align-items: flex-start; }
   .hl div { text-align: left; color: #fff; font-size: calc(var(--hl) * .9); padding: 0; line-height: 1.15; }
-  .hl .hi { color: #ffd54f; }
+  .hl .key { color: #ffd54f; }
   .sub { font-size: calc(var(--hl) * .37); color: #a7ffeb; font-weight: 700; line-height: 1.3; }
   .ph { margin: 0 -50px; flex: 1 1 auto; min-height: 520px; background: center/cover no-repeat; position: relative;
     -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 12%, #000 85%, transparent 100%); }
@@ -552,12 +553,15 @@ RIBBON = """
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 30% 50%); }
   .hl::before { left: -80px; } .hl::after { right: -80px; transform: scaleX(-1); }
   .hl div { color: #fff; font-size: calc(var(--hl) * .72); }
-  .hl .hi { color: #ffd166; }
+  .hl .key { color: #ffd166; }
   .sub { text-align: center; margin: 22px 60px 0; font-size: calc(var(--hl) * .36); color: #ffd166; font-weight: 700; line-height: 1.3; }
-  .bubbles { display: flex; flex-direction: column; gap: 16px; padding: 0 50px; }
-  .bb { position: relative; align-self: flex-start; max-width: 88%; background: #fff; color: #1a0633; border-radius: 30px; padding: 14px 26px 18px;
-    font-size: calc(var(--pt) * .88); font-weight: 600; line-height: 1.3; }
-  .bb:nth-child(even) { align-self: flex-end; background: #ffd166; }
+  .plist { margin: 0 50px; background: rgba(255,255,255,.07); border: 2px solid rgba(255,255,255,.14); border-radius: 30px;
+    padding: 10px 26px; display: flex; flex-direction: column; }
+  .pr { display: flex; gap: 18px; align-items: center; padding: 14px 0; color: #f4ecff; font-size: calc(var(--pt) * .88); font-weight: 600;
+    line-height: 1.3; }
+  .pr + .pr { border-top: 1px solid rgba(255,255,255,.12); }
+  .pr i { flex-shrink: 0; width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg, #ef476f, #c9184a); color: #fff;
+    font: 900 28px/54px Arial, sans-serif; text-align: center; font-style: normal; box-shadow: 0 6px 14px rgba(239,71,111,.4); }
   .grow { flex: 1; }
   .askx { justify-content: center; color: #fff; margin: 0 50px; border-bottom: 4px solid #ef476f; padding-bottom: 14px; }
   .foot2 { font-size: 22px; color: #a99bc0; text-align: center; padding-bottom: 6px; }
@@ -565,9 +569,9 @@ RIBBON = """
 
 
 def ribbon(story, font, image_url, date, handle, place, asks):
-    bubbles = "".join(f'<div class="bb">{highlight_numbers(p)}</div>' for p in _pts(story, 3))
+    rows = "".join(f'<div class="pr"><i>{i}</i><span>{highlight_numbers(p)}</span></div>' for i, p in enumerate(_pts(story, 3), 1))
     body = f"""<div class="pic" style="{_pic(image_url)}"></div><div class="handle">{esc(handle)}</div><div class="sym">{_credit(story)}</div>
-  <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}<div class="bubbles">{bubbles}</div>
+  <div id="main"><div class="place">📍 {esc(place or story.kicker)}</div>{_hl(story)}{_sub(story)}<div class="plist">{rows}</div>
   <div class="grow"></div>{_askx(story, asks, "💬")}<div class="foot2">{esc(date)} • સ્રોત: {esc(story.source_name)}</div></div>"""
     return _wrap(RIBBON, font, body, 980, 860)
 
@@ -584,7 +588,7 @@ INFO = """
   .place { align-self: flex-start; color: #2ec4b6; font-size: 34px; font-weight: 800; }
   .hl { align-items: flex-start; }
   .hl div { text-align: left; color: #fff; font-size: calc(var(--hl) * .8); padding: 0; }
-  .hl .hi { color: #2ec4b6; }
+  .hl .key { color: #2ec4b6; }
   .sub { font-size: calc(var(--hl) * .36); color: #ffbf69; font-weight: 700; line-height: 1.3; }
   .stats { display: flex; gap: 18px; }
   .stat { flex: 1; background: rgba(255,255,255,.08); border: 2px solid rgba(46,196,182,.5); border-radius: 26px; padding: 18px 22px; }
@@ -670,11 +674,11 @@ LAYOUT_MOTION = {
                  (".askx", "slideFarL", S + 4.1, .4, 0), (".foot2", "fadeIn", S + 4.4, .4, 0)),
     "xsteps": _m((".place", "popIn", S, .35, 0), (".hl .w", "wordRise", S + .3, .45, .1), (".sub", "fadeIn", S + 1.7, .4, 0),
                  (".st", "slideFarR", S + 2.1, .4, .35), (".askx", "riseUp", S + 3.7, .4, 0), (".foot2", "fadeIn", S + 4.0, .4, 0)),
-    "xbento": _m((".hl .w", "popIn", S + .1, .35, .09), (".sub", "fadeIn", S + 1.4, .4, 0), (".tile", "popIn", S + 1.8, .4, .3),
+    "xbento": _m((".hl .w", "popIn", S + .1, .35, .09), (".sub", "fadeIn", S + 1.4, .4, 0), (".tile", "riseUp", S + 1.8, .45, .3),
                  (".askx", "riseUp", S + 3.2, .4, 0), (".foot2", "fadeIn", S + 3.5, .4, 0),
                  live=[[".bigic", "float 2s ease-in-out {start}s infinite"]]),
     "xribbon": _m((".place", "dropIn", S, .4, 0), (".hl", "unfold", S + .3, .5, 0), (".hl .w", "fadeIn", S + .7, .25, .08),
-                  (".sub", "fadeIn", S + 1.9, .4, 0), (".bb", "popIn", S + 2.3, .35, .45), (".askx", "riseUp", S + 3.8, .4, 0),
+                  (".sub", "fadeIn", S + 1.9, .4, 0), (".plist", "fadeIn", S + 2.2, .4, 0), (".pr", "slideFarL", S + 2.4, .4, .4), (".askx", "riseUp", S + 3.8, .4, 0),
                   (".foot2", "fadeIn", S + 4.1, .4, 0)),
     "xfilm": _m((".scene", "typeIn", S, .5, 0), (".place", "flickerOn", S + .3, .6, 0), (".hl .w", "flickerOn", S + .6, .6, .12),
                 (".sub", "fadeIn", S + 2.2, .5, 0), (".credits p", "riseUp", S + 2.6, .45, .35), (".askx", "popIn", S + 3.9, .35, 0),
