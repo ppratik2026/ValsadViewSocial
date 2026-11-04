@@ -100,7 +100,7 @@ def render(cfg: dict, stories_file: Path) -> None:
         card = render_card(story, cfg, work / "card.png", background, work / "intro", "viral")
         mood = mood_of(story)
         build_video(card, cfg["video"], work / "reel.mp4", pick_track(mood), work / "intro",
-                    reel_seconds(mood, len(story.points)))
+                    reel_seconds(mood, len(story.points), story.style.get("template")))
         shutil.rmtree(work / "intro", ignore_errors=True)
         print(f"   saved {work.relative_to(ROOT)}/reel.mp4")
 

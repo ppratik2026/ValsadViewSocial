@@ -206,7 +206,7 @@ def cmd_run(args, cfg):
     music = pick_music(mood_of(story))
     story.style["music"] = music.stem if music else ""
     print(f"   Music: {music.name if music else 'none (add mp3 files to assets/music/)'}")
-    seconds = reel_seconds(mood_of(story), len(story.points))
+    seconds = reel_seconds(mood_of(story), len(story.points), story.style.get("template"))
     video = build_video(card, cfg["video"], work_dir / "reel.mp4", music, intro_dir, seconds)
     print(f"   Saved {video.relative_to(ROOT)}")
 

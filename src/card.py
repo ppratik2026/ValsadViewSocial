@@ -539,7 +539,7 @@ def render_card(story: NewsStory, cfg: dict, out_path: Path, background: Path | 
                 from src.video_builder import reel_seconds
                 from src.viral import VIRAL_STEPS
                 # the whole reel moves (picture, reading guide, blinking ...), not only its first seconds
-                live = reel_seconds(mood, len(story.points)) if vcfg.get("full_motion", True) else None
+                live = reel_seconds(mood, len(story.points), story.style.get("template")) if vcfg.get("full_motion", True) else None
                 _capture_intro(page, intro_dir, vcfg.get("intro_seconds", 3.4), vcfg["fps"], VIRAL_STEPS, flash=False,
                                live_until=live, template=story.style.get("template"))
             else:

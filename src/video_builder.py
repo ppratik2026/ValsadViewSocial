@@ -32,9 +32,16 @@ def pick_music(mood: str = "") -> Path | None:
 MOOD_SECONDS = {"breaking": 9, "money": 10, "info": 11, "happy": 9}
 
 
-def reel_seconds(mood: str, n_points: int = 0) -> float:
-    """Length of the reel: longer when there is more to read."""
-    return MOOD_SECONDS.get(mood, 10) + (2 if n_points > 4 else 0)
+def reel_seconds(mood: str, n_points: int = 0, template: str | None = None) -> float:
+    """Length of the reel: longer when there is more to read; with one of the slow layouts (src/layouts15.py), long
+    enough for its whole intro plus a few seconds on the finished poster."""
+    base = MOOD_SECONDS.get(mood, 10) + (2 if n_points > 4 else 0)
+    if template:
+        from src.layouts15 import HOLD, intro_end
+        end = intro_end(template, max(n_points, 3))
+        if end:
+            return float(min(max(base, round(end + HOLD)), 20))
+    return base
 
 
 def build_video(image: Path, vcfg: dict, out_path: Path, music: Path | None = None,

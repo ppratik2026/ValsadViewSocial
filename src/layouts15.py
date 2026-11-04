@@ -615,13 +615,24 @@ LAYOUTS15 = {"x" + f.__name__: _with_hero(f) for f in (diagonal, tv, paper, bign
 # ---------------------------------------------------------------------------------------------- motion
 # image first (S seconds), then the headline word by word, then the rest one element at a time, in each layout's own way
 # (steps in the src/card.ANIM_JS format: selector, animation, start, duration, stagger)
-S = 1.1
-_HERO = [".hero", "heroOut", S - 0.25, 0.55, 0]
+S = 1.1          # the step times below are written on this scale ...
+ALONE = 1.9      # ... and played slowly: the picture stays alone this long,
+SLOW = 1.6       # every gap and stagger is this much longer,
+LONGER = 1.8     # and every single animation this much longer
+HOLD = 4.0       # seconds the finished poster stays on screen at the end
 _ZOOM = [[".pic, .blur, .ph, .photo, .frame", "kbZoom {end}s linear 0s both"]]
 
 
 def _m(*steps, live=None):
-    return {"intro": [_HERO] + [list(x) for x in steps], "live": _ZOOM + (live or []), "spot": None}
+    slow = [[sel, anim, round(ALONE + (start - S) * SLOW, 2), round(dur * LONGER, 2), round(stagger * SLOW, 2)]
+            for sel, anim, start, dur, stagger in steps]
+    return {"intro": [[".hero", "heroOut", ALONE - 0.5, 0.9, 0]] + slow, "live": _ZOOM + (live or []), "spot": None}
+
+
+def intro_end(template: str, n_items: int = 4) -> float:
+    """When the last element of this layout's slow intro has arrived (0 for other templates)."""
+    m = LAYOUT_MOTION.get(template)
+    return max((start + dur + stagger * (n_items - 1) for _, _, start, dur, stagger in m["intro"]), default=0) if m else 0
 
 
 LAYOUT_MOTION = {
