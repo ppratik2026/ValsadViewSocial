@@ -79,12 +79,16 @@ def fetch_openverse_photo(keywords: list[str], out_path: Path) -> tuple[Path, st
     for keyword in keywords:
         try:
             resp = requests.get(OPENVERSE, headers={"User-Agent": "ValsadViewReels/1.0"}, timeout=30, params={
-                "q": keyword, "license_type": "commercial", "mature": "false", "size": "large", "page_size": 20})
+                "q": keyword, "license_type": "commercial", "mature": "false", "size": "large", "page_size": 20,
+                "category": "photograph", "license": "cc0,by,by-sa"})
             if resp.status_code != 200:
                 print(f"Openverse search failed for {keyword!r}: {resp.status_code}")
                 continue
+            # modern colour photos only: no museum/library archives (old black-and-white scans)
             results = [r for r in resp.json().get("results", [])
-                       if (r.get("width") or 0) >= 900 and (r.get("height") or 0) >= 600]
+                       if (r.get("width") or 0) >= 900 and (r.get("height") or 0) >= 600
+                       and not any(k in f"{r.get('source', '')} {r.get('provider', '')} {r.get('creator', '')}".lower()
+                                   for k in ("library", "museum", "archive", "getty", "smithsonian", "nasa", "union mission"))]
         except requests.Timeout:
             print("Openverse is not answering, skipping it this time.")
             return None
