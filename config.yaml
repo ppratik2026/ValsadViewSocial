@@ -8,7 +8,7 @@ provider: "free"
 #               and a ready Gemini prompt; make the poster in the free Gemini app and upload it as a comment on the
 #               issue; it becomes an animated reel (src/poster_reel.py) and is posted (publish-from-issue.yml).
 #   auto:       fully automatic posters from the code templates (scheduler.yml).
-flow: "gemini_app"
+flow: "auto"
 
 # What the reels are about.
 content:
@@ -55,7 +55,12 @@ card:
                clipboard, tvs, balloons, station, detective, stamps]
   # layouts of the viral design (each like a popular Gujarati news poster); the story picks one that fits and
   # the layouts of the last few posts are skipped, so the grid keeps changing. Remove any you don't want.
-  viral_templates: [police, storm, bignews, tips, card]
+  # 15 layouts with different structures (src/layouts15.py): the picture alone first, then the headline word by word,
+  # then the rest of the text; the layout follows the kind of news (crime -> tape/tv/diagonal, money -> bignum/infographic,
+  # good news -> magazine/ribbon, government -> steps/topline ...), never the same one as the last 3 posts.
+  # The earlier six patterns are still there: brk, gold, neon, stack, card2, glitch
+  viral_templates: [xdiagonal, xtv, xpaper, xbignum, xglass, xplace_big, xmagazine, xtopline, xquote, xsteps, xbento, xribbon,
+                    xfilm, xinfographic, xtape]
   # more layouts that can be turned on by adding them above: tv, paper, quote, timeline, versus, alert, notice,
   # stats, polaroid, magazine, chat, diagonal, ticket, map, calendar, receipt, scoreboard, comic, neon, lockscreen,
   # chalkboard, filmstrip, notebook, billboard, letter, crimetape, collage, radio, countdown, percent, folder, roadsign
@@ -137,8 +142,14 @@ gemini:
   cartoon_models: []   # empty: no image quota needed, the cartoon scenes are drawn in code (src/scenes.py)
 
 schedule:
-  every_hours: 2                  # one reel every 2 hours from 10:00 to midnight IST (10, 12, 14 ... 22, 0)
-  max_breaking_per_day: 3         # extra posts for really big breaking news, between the regular posts
+  # 5 reels a day at these hours (IST); with 15 layouts each one comes back after 3 days
+  hours: [9, 12, 15, 18, 21]
+  every_hours: 2                  # used only when "hours" is empty: one reel every 2 hours from 10:00 to midnight
+  max_breaking_per_day: 0         # extra posts for really big breaking news between the regular ones (0 = exactly 5 a day)
+
+facebook:
+  # the same reel also on the Facebook Page (needs the FB_PAGE_ID secret, and FB_PAGE_TOKEN or a system-user token)
+  enabled: true
 
 instagram:
   api_version: "v21.0"

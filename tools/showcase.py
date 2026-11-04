@@ -36,7 +36,7 @@ def collect(cfg: dict) -> None:
 
 
 def render(cfg: dict, stories_file: Path) -> None:
-    from src.backgrounds import fetch_openverse_photo, fetch_stock_background, generate_free_ai_image
+    from src.backgrounds import fetch_openverse_photo, fetch_stock_background, fetch_wikimedia_photo, generate_free_ai_image
     from src.card import render_card
     from src.designs import mood_of
     from src.music import pick_track
@@ -58,13 +58,41 @@ def render(cfg: dict, stories_file: Path) -> None:
         shutil.rmtree(work, ignore_errors=True)
         work.mkdir(parents=True)
         print(f"\n=== {n}. {template}: {story.headline}")
+        if os.environ.get("SHOWCASE_GEMINI") and os.environ.get("GEMINI_API_KEY"):
+            # first choice: the whole poster from Gemini (like the reference posters), as an animated reel
+            from src.poster import make_poster
+            from src.poster_reel import render as poster_reel
+            story.cta = story.cta or "તમારો અભિપ્રાય કોમેન્ટમાં જણાવો 👇"
+            poster = make_poster(story, cfg, work / "card.png")
+            if poster:
+                mood = mood_of(story)
+                poster_reel(poster, work / "reel.mp4", "auto", pick_track(mood), 12, True, cfg["card"]["handle"])
+                print(f"   Gemini poster reel saved {work.relative_to(ROOT)}/reel.mp4")
+                continue
+            print("   No Gemini poster (see the errors above); making the story-pattern poster instead")
         keywords = stock_keywords(story)
         background = None
+        if os.environ.get("SHOWCASE_PICTURE") == "ai" and data.get("image_prompt"):
+            if n > 1:   # the keyless free AI allows one picture every ~45 seconds
+                import time
+                time.sleep(46)
+            # a rich AI picture of the story (free Pollinations), like the reference posters' pictures, no text
+            background = generate_free_ai_image(
+                data["image_prompt"] + ", dramatic cinematic 3D news poster illustration, hyper detailed, vivid colours, "
+                "volumetric light", work / "ai.jpg", "photo")
+        if not background:   # a free Wikimedia Commons photo first (the Wikipedia pictures)
+            found = fetch_wikimedia_photo(keywords, work / "wikimedia.jpg")
+            if found:
+                background, story.photo_credit = found
         try:
+            if background:
+                raise StopIteration
             background = fetch_stock_background(keywords, work / "photo.jpg")
+        except StopIteration:
+            pass
         except Exception as e:
             print(f"   Pexels failed: {e}")
-        if not background:
+        if not background and os.environ.get("SHOWCASE_PICTURE") != "ai":
             found = fetch_openverse_photo(keywords, work / "openverse.jpg")
             if found:
                 background, story.photo_credit = found
@@ -76,7 +104,7 @@ def render(cfg: dict, stories_file: Path) -> None:
         card = render_card(story, cfg, work / "card.png", background, work / "intro", "viral")
         mood = mood_of(story)
         build_video(card, cfg["video"], work / "reel.mp4", pick_track(mood), work / "intro",
-                    reel_seconds(mood, len(story.points)))
+                    reel_seconds(mood, len(story.points), story.style.get("template")))
         shutil.rmtree(work / "intro", ignore_errors=True)
         print(f"   saved {work.relative_to(ROOT)}/reel.mp4")
 

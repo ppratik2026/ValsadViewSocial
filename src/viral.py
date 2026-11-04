@@ -192,6 +192,19 @@ def _chips(story) -> str:
 
 # which layouts fit which kind of story (the first ones fit best); every story can also use the general ones
 TEMPLATE_RULES = [
+    # image-first story patterns (src/story_patterns.py), by the kind of news
+    ("crime", ["brk", "glitch"]),
+    ("weather", ["neon", "brk"]),
+    ("trending", ["neon", "glitch", "stack"]),
+    ("viral", ["glitch", "neon"]),
+    ("good_news", ["gold", "stack"]),
+    ("event", ["gold", "neon"]),
+    ("government", ["card2", "gold"]),
+    ("money", ["stack", "card2"]),
+    ("prices", ["stack"]),
+    ("numbers", ["stack", "card2"]),
+    ("politics", ["glitch", "card2"]),
+    ("education", ["card2"]),
     ("weather", ["storm", "alert", "magazine"]),
     ("crime", ["police", "tv", "diagonal", "alert"]),
     ("politics", ["quote", "tv", "paper"]),
@@ -216,13 +229,30 @@ TEMPLATE_RULES = [
     ("travel", ["roadsign", "billboard"]),
     ("government", ["letter", "folder"]),
     ("education", ["notebook"]),
+    ("crime", ["detective", "crackglass"]),
+    ("weather", ["weatherapp"]),
+    ("travel", ["flapboard"]),
+    ("government", ["telegram", "openbook"]),
+    ("event", ["spotlight"]),
+    ("viral", ["graffiti", "retrotv", "laptop"]),
+    ("good_news", ["spotlight", "openbook"]),
+    ("crime", ["hero3d", "cinema"]),
+    ("weather", ["hero3d", "glass3d"]),
+    ("trending", ["poppop", "glass3d", "hero3d"]),
+    ("money", ["poppop", "glass3d"]),
+    ("government", ["glass3d", "cinema"]),
+    ("good_news", ["cinema", "hero3d"]),
 ]
 GENERAL = ["card", "diagonal", "paper", "chat", "polaroid", "lockscreen", "comic", "neon", "map", "billboard", "collage",
-           "radio", "notebook", "letter"]
+           "radio", "notebook", "letter", "retrotv", "laptop", "graffiti", "openbook"]
 ALL_TEMPLATES = ["police", "storm", "bignews", "tips", "card", "tv", "paper", "quote", "timeline", "versus", "alert",
                  "notice", "stats", "polaroid", "magazine", "chat", "diagonal", "ticket", "map", "calendar", "receipt",
                  "scoreboard", "comic", "neon", "lockscreen", "chalkboard", "filmstrip", "notebook", "billboard", "letter",
-                 "crimetape", "collage", "radio", "countdown", "percent", "folder", "roadsign"]
+                 "crimetape", "collage", "radio", "countdown", "percent", "folder", "roadsign", "crackglass", "spotlight",
+                 "retrotv", "detective", "weatherapp", "graffiti", "telegram", "flapboard", "laptop", "openbook", "hero3d", "glass3d", "poppop", "cinema", "typo", "fullbleed", "splitv", "ring", "cutout", "droste",
+                 "brk", "gold", "neon", "stack", "card2", "glitch",
+                 "xdiagonal", "xtv", "xpaper", "xbignum", "xglass", "xplace_big", "xmagazine", "xtopline", "xquote", "xsteps",
+                 "xbento", "xribbon", "xfilm", "xinfographic", "xtape"]
 TOPIC_WORDS = {
     "travel": r"ટ્રેન|રેલ|બસ|એસટી|ફ્લાઇટ|વિમાન|હાઇવે|train|bus|flight|railway",
     "sports": r"ક્રિકેટ|મેચ|સ્પર્ધા|મેડલ|ખેલ|ટુર્નામેન્ટ|ગોલ્ડ|ચેમ્પિયન|cricket|match",
@@ -272,6 +302,8 @@ def choose_template(story, mood: str, allowed: list[str] | None = None) -> str:
         return forced
     allowed = [t for t in (allowed or ALL_TEMPLATES) if t in ALL_TEMPLATES] or ALL_TEMPLATES
     kinds = _kinds(story, mood)
+    if set(allowed) <= set(PATTERN_BY_KIND_ALL):
+        return _pattern_for(story, kinds, allowed)
     fitting = []
     for kind, names in TEMPLATE_RULES:
         if kind in kinds:
@@ -290,6 +322,49 @@ def choose_template(story, mood: str, allowed: list[str] | None = None) -> str:
     return weighted_choice(fresh[:6], "template")
 
 
+# image-first story patterns: the most important kind of the news decides; the second choice is used when the
+# last post already had the first one, so two posts in a row never look the same
+PATTERN_PRIORITY = [
+    ("crime", ["brk", "glitch"]),
+    ("weather", ["neon", "brk"]),
+    ("money", ["stack", "card2"]),
+    ("prices", ["stack", "card2"]),
+    ("good_news", ["gold", "stack"]),
+    ("event", ["gold", "neon"]),
+    ("government", ["card2", "gold"]),
+    ("education", ["card2", "stack"]),
+    ("politics", ["glitch", "card2"]),
+    ("trending", ["neon", "glitch"]),
+    ("viral", ["glitch", "neon"]),
+]
+PATTERN_BY_KIND_ALL = ["brk", "gold", "neon", "stack", "card2", "glitch"] + [t for t in ALL_TEMPLATES if t.startswith("x")]
+
+
+def _pattern_for(story, kinds: set, allowed: list[str]) -> str:
+    from src.history import load_history
+    history = load_history()
+    if all(t.startswith("x") for t in allowed):   # the 15 layouts (src/layouts15.py): first fitting one not used lately
+        from src.layouts15 import LAYOUT_DEFAULT, LAYOUT_PRIORITY
+        # every layout once before any comes back (15 layouts, 5 posts a day: a full round every 3 days);
+        # among the ones not used yet in this round, the best fit for the kind of news
+        used = []
+        for p in reversed(history):
+            t = (p.get("style") or {}).get("template")
+            if t in allowed and t not in used:
+                used.append(t)
+                if len(used) == len(allowed) - 1:
+                    break
+            elif t in used:
+                break   # a layout seen twice: the current round started after it
+        fresh = [t for t in allowed if t not in used] or allowed
+        fitting = next((names for kind, names in LAYOUT_PRIORITY if kind in kinds), LAYOUT_DEFAULT)
+        return next((t for t in fitting if t in fresh), next((t for t in LAYOUT_DEFAULT if t in fresh), fresh[0]))
+    choice = next((names for kind, names in PATTERN_PRIORITY if kind in kinds), ["card2", "gold"])
+    choice = [t for t in choice if t in allowed] or allowed
+    last = (history[-1].get("style") or {}).get("template") if history else None
+    return choice[1] if len(choice) > 1 and choice[0] == last else choice[0]
+
+
 def _from_compare(story) -> bool:
     from src.viral_more import versus_parts
     return versus_parts(story) is not None
@@ -303,8 +378,15 @@ def viral_page(story, font: str, image_url: str | None, date: str, handle: str, 
         from src.viral_layouts import LAYOUTS
         from src.viral_extra import EXTRA_LAYOUTS
         from src.viral_more import MORE_LAYOUTS
+        from src.viral_new import NEW_LAYOUTS
         from src.viral_plus import PLUS_LAYOUTS
-        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS, **PLUS_LAYOUTS}.get(template)
+        from src.viral_bold import BOLD_LAYOUTS
+        from src.viral_pro import PRO_LAYOUTS
+        from src.story_patterns import PATTERNS
+        from src.layouts15 import LAYOUTS15
+        story_patterns = {("card2" if k == "card" else k): v for k, v in PATTERNS.items()}
+        page = {**LAYOUTS, **MORE_LAYOUTS, **EXTRA_LAYOUTS, **PLUS_LAYOUTS, **NEW_LAYOUTS, **PRO_LAYOUTS, **BOLD_LAYOUTS,
+                **story_patterns, **LAYOUTS15}.get(template)
         if page:
             return page(story, font, image_url, date, handle, _place_tag(story, places or []), ASKS)
     tag_text, looks = MOOD_LOOK.get(mood, MOOD_LOOK["info"])

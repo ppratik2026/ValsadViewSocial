@@ -1,4 +1,9 @@
-"""Publish Reels with the Instagram API (Instagram Login): from a public video URL, or a resumable upload."""
+"""Publish Reels with the Instagram API: from a public video URL, or a resumable upload.
+
+Works with both kinds of token Meta hands out:
+- an Instagram-login token ("IG..."), used on graph.instagram.com, valid 60 days (refreshed every week);
+- a Facebook / unified-login token ("EAA...", e.g. a system-user token that never expires), used on graph.facebook.com.
+"""
 import json
 import time
 from pathlib import Path
@@ -6,6 +11,11 @@ from pathlib import Path
 import requests
 
 GRAPH = "https://graph.instagram.com"
+FB_GRAPH = "https://graph.facebook.com"
+
+
+def is_facebook_token(token: str) -> bool:
+    return token.strip().startswith("EAA")
 RUPLOAD = "https://rupload.facebook.com/ig-api-upload"
 
 
@@ -31,9 +41,17 @@ class Instagram:
         self.collaborators = [c.strip().lstrip("@") for c in (collaborators or []) if c.strip()][:3]
         self.token = token
         self.version = api_version
-        self.base = f"{GRAPH}/{api_version}"
+        self.facebook = is_facebook_token(token)
+        self.base = f"{FB_GRAPH if self.facebook else GRAPH}/{api_version}"
 
     def me(self) -> dict:
+        if self.facebook:   # a Facebook token belongs to a person / system user: ask about the Instagram account itself
+            data = _check(requests.get(
+                f"{self.base}/{self.user_id}",
+                params={"fields": "id,username,name", "access_token": self.token},
+                timeout=30,
+            ))
+            return {"user_id": data["id"], "username": data.get("username", ""), "account_type": "BUSINESS (Facebook token)"}
         return _check(requests.get(
             f"{self.base}/me",
             params={"fields": "user_id,username,account_type", "access_token": self.token},
@@ -139,7 +157,10 @@ class Instagram:
 
 
 def refresh_token(token: str) -> dict:
-    """Extend a long-lived token by 60 days. The token must be at least 24 hours old."""
+    """Extend a long-lived token by 60 days. The token must be at least 24 hours old. A Facebook system-user token
+    never expires: it is returned as it is."""
+    if is_facebook_token(token):
+        return {"access_token": token, "expires_in": 0, "never_expires": True}
     return _check(requests.get(
         f"{GRAPH}/refresh_access_token",
         params={"grant_type": "ig_refresh_token", "access_token": token},

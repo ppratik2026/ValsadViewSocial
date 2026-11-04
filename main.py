@@ -36,8 +36,18 @@ def post_reel(cfg: dict, video: Path, caption: str, ig=None) -> dict:
     except Exception as e:   # hosting is best effort: the direct upload is still tried
         print(f"   Could not host the video: {e}")
         sources = []
-    return (ig or instagram(cfg)).publish_reel(video, caption, cfg["instagram"]["share_to_feed"],
-                                               sources=sources, thumb_offset_ms=int(at * 1000))
+    result = (ig or instagram(cfg)).publish_reel(video, caption, cfg["instagram"]["share_to_feed"],
+                                                 sources=sources, thumb_offset_ms=int(at * 1000))
+    # the same reel on the Facebook Page too (best effort: never undoes the Instagram post)
+    from src import facebook
+    if cfg.get("facebook", {}).get("enabled", True) and facebook.configured():
+        try:
+            fb = facebook.publish_reel(video, caption, cfg["instagram"]["api_version"])
+            result["facebook"] = fb
+            print(f"   Facebook reel: {fb.get('permalink') or fb['video_id']}")
+        except Exception as e:
+            print(f"   Facebook post failed (Instagram is fine): {e}")
+    return result
 
 
 def instagram(cfg: dict):
@@ -137,19 +147,24 @@ def cmd_run(args, cfg):
         background = cutout = None
         story.stamp = "" if not cfg["card"].get("stamps", False) else story.stamp
         if cfg["card"].get("picture", "cutout") == "photo":
-            # the viral design: a free stock photo (Pexels with the free key, else an openly licensed photo from
-            # Openverse), else a realistic AI picture, else a drawn scene; never a real person's photo
+            # the viral design: a free photo (Wikimedia Commons, else Pexels with the free key, else an openly licensed
+            # photo from Openverse), else a realistic AI picture, else a drawn scene; never a real person's photo
             story.person = ""
             if "viral" in cfg["card"].get("designs", []):
                 design = "viral"
-            from src.backgrounds import fetch_openverse_photo, fetch_stock_background, generate_free_ai_image
+            from src.backgrounds import (fetch_openverse_photo, fetch_stock_background, fetch_wikimedia_photo,
+                                         generate_free_ai_image)
             from src.scenes import BY_CATEGORY, draw_scene
             from src.viral import stock_keywords
             keywords = stock_keywords(story)
             print(f"   Photo searches: {keywords}")
             background = None
+            # first choice: a free photo from Wikimedia Commons (the Wikipedia pictures), with its credit on the poster
+            found = fetch_wikimedia_photo(keywords, work_dir / "wikimedia.jpg")
+            if found:
+                background, story.photo_credit = found
             try:
-                background = fetch_stock_background(keywords, work_dir / "background.jpg")
+                background = background or fetch_stock_background(keywords, work_dir / "background.jpg")
             except Exception as e:   # Pexels is optional
                 print(f"   Pexels failed: {e}")
             if not background:
@@ -206,7 +221,7 @@ def cmd_run(args, cfg):
     music = pick_music(mood_of(story))
     story.style["music"] = music.stem if music else ""
     print(f"   Music: {music.name if music else 'none (add mp3 files to assets/music/)'}")
-    seconds = reel_seconds(mood_of(story), len(story.points))
+    seconds = reel_seconds(mood_of(story), len(story.points), story.style.get("template"))
     video = build_video(card, cfg["video"], work_dir / "reel.mp4", music, intro_dir, seconds)
     print(f"   Saved {video.relative_to(ROOT)}")
 
@@ -503,13 +518,20 @@ def cmd_scheduler(args, cfg):
     max_extra = cfg.get("schedule", {}).get("max_breaking_per_day", 6)
     every = max(1, int(cfg.get("schedule", {}).get("every_hours", 1)))
 
-    def post_hour(hour: int) -> bool:   # 10:00, 10 + every, ... up to midnight
+    fixed = sorted(int(h) for h in cfg.get("schedule", {}).get("hours", []) or [])
+
+    def post_hour(hour: int) -> bool:   # the fixed hours (schedule.hours), else 10:00, 10 + every, ... up to midnight
+        if fixed:
+            return hour in fixed
         return (hour >= 10 or hour == 0) and ((hour - 10) % 24) % every == 0
+
+    def active(hour: int) -> bool:
+        return fixed[0] <= hour <= fixed[-1] if fixed else (hour >= 10 or hour == 0)
 
     checked_hour = ""
     while True:
         now = datetime.now(IST)
-        if now.hour >= 10 or now.hour == 0:   # 10:00 ... 23:00 and midnight
+        if active(now.hour):   # the posting hours of the day
             sync()
             posts = posts_ist()
             if post_hour(now.hour) and not any(p.strftime("%Y%m%d%H") == now.strftime("%Y%m%d%H") for p in posts):
@@ -521,8 +543,8 @@ def cmd_scheduler(args, cfg):
                 checked_hour = now.strftime("%Y%m%d%H")   # one breaking news check an hour (saves the AI quota)
                 # between the regular posts: a really big breaking story goes out at once (a few a day at most)
                 today = sum(1 for p in posts if p.date() == now.date())
-                hours_so_far = sum(1 for h in range(10, now.hour + 1) if post_hour(h)) if now.hour >= 10 else 1
-                if today - hours_so_far < max_extra:
+                hours_so_far = sum(1 for h in range(0, now.hour + 1) if post_hour(h)) or 1
+                if max_extra > 0 and today - hours_so_far < max_extra:
                     print(f"\n=== {now:%d %b %H:%M} IST: breaking news check ===", flush=True)
                     if attempt(["run", "--breaking"]):
                         save(stats=False)
@@ -547,12 +569,44 @@ def cmd_stats(args, cfg):
 def cmd_check(args, cfg):
     me = instagram(cfg).me()
     print(f"Token OK: @{me['username']} ({me['account_type']}), user_id={me['user_id']}")
+    import requests
+    token = os.environ["IG_ACCESS_TOKEN"].strip()
+    if token.startswith("EAA"):   # which permissions the system-user token has (names only, never the token)
+        base = f"https://graph.facebook.com/{cfg['instagram']['api_version']}"
+        try:
+            perms = requests.get(f"{base}/me/permissions", params={"access_token": token}, timeout=30).json().get("data", [])
+            granted = sorted(p["permission"] for p in perms if p.get("status") == "granted")
+            print(f"Permissions: {', '.join(granted) or 'none listed'}")
+            need = {"instagram_basic", "instagram_content_publish", "pages_manage_posts", "pages_read_engagement"}
+            missing = sorted(need - set(granted))
+            if granted and missing:
+                print(f"Missing permissions: {', '.join(missing)}")
+        except (requests.RequestException, ValueError) as e:
+            print(f"Could not list the permissions: {e}")
+        limit = requests.get(f"{base}/{me['user_id']}/content_publishing_limit",
+                             params={"access_token": token}, timeout=30).json()
+        print("Instagram publishing: OK" if "data" in limit
+              else f"Instagram publishing: NOT allowed ({(limit.get('error') or {}).get('message', limit)})")
+    from src import facebook
+    if facebook.configured():
+        import requests
+        page_id, version = os.environ["FB_PAGE_ID"].strip(), cfg["instagram"]["api_version"]
+        token = facebook.page_token(page_id, os.environ.get("FB_PAGE_TOKEN", "").strip()
+                                    or os.environ["IG_ACCESS_TOKEN"].strip(), version)
+        page = facebook._check(requests.get(f"{facebook.GRAPH}/{version}/{page_id}",
+                                            params={"fields": "name", "access_token": token}, timeout=30))
+        print(f"Facebook Page OK: {page.get('name')} (id {page_id})")
+    else:
+        print("Facebook: not set up (add the FB_PAGE_ID secret to post there too)")
 
 
 def cmd_refresh(args, cfg):
     from src.publisher import refresh_token
 
     data = refresh_token(require_env("IG_ACCESS_TOKEN"))
+    if data.get("never_expires"):
+        print("Facebook system-user token: it never expires, nothing to refresh.")
+        return
     days = int(data.get("expires_in", 0)) // 86400
     # Written to a git-ignored file instead of printed, so the token never lands in logs.
     out = ROOT / ".new_token"

@@ -37,7 +37,8 @@ def update_stats(token: str, api_version: str = "v21.0", max_posts: int = 150) -
         if age < MIN_AGE_HOURS:
             continue
         try:
-            resp = requests.get(f"https://graph.instagram.com/{api_version}/{media_id}/insights",
+            host = "graph.facebook.com" if token.strip().startswith("EAA") else "graph.instagram.com"
+            resp = requests.get(f"https://{host}/{api_version}/{media_id}/insights",
                                 params={"metric": METRICS, "access_token": token}, timeout=30)
             data = resp.json()
         except (requests.RequestException, ValueError):

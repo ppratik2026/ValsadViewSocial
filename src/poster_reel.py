@@ -115,7 +115,8 @@ def _at(keys, t):
     return keys[-1][1:]
 
 
-def render(poster: Path, out: Path, style: str = "auto", music: Path | None = None, seconds: float = 12.0) -> Path:
+def render(poster: Path, out: Path, style: str = "auto", music: Path | None = None, seconds: float = 12.0,
+           fx: bool = True, handle: str = "@valsadview") -> Path:
     img = _fit(Image.open(poster))
     bnds = bands(img)
     if style == "auto":
@@ -126,6 +127,12 @@ def render(poster: Path, out: Path, style: str = "auto", music: Path | None = No
     dim = ImageEnhance.Brightness(img).enhance(.35)
     n = int(seconds * FPS)
     focus_step = (seconds - 3.4) / max(len(bnds), 1)
+    effects = None
+    if fx:   # motion graphics on top: light sweeps, sparkles, glitch cuts, glow, stickers (src/poster_fx.py)
+        from src.poster_fx import PosterFX
+        cuts = ([0.8 + k * focus_step for k in range(len(bnds))] if style == "focus"
+                else sorted({round(k[0], 2) for k in keys if 0.3 < k[0] < seconds - 0.5}))
+        effects = PosterFX(seconds, cuts, handle, tmp / "fx", seed=poster.name)
     for i in range(n):
         t = i / FPS
         cx, cy, zoom, tilt = _at(keys, t)
@@ -147,6 +154,8 @@ def render(poster: Path, out: Path, style: str = "auto", music: Path | None = No
         if t > seconds - 2.6:   # gentle "breathing" on the full poster at the end
             s = 1 + 0.015 * math.sin((t - seconds + 2.6) * 5)
             frame = _view(frame, W / 2, H / 2, s)
+        if effects:
+            frame = effects.apply(frame, t)
         frame.save(tmp / f"f{i:04d}.jpg", quality=90)
     args = ["ffmpeg", "-y", "-framerate", str(FPS), "-i", str(tmp / "f%04d.jpg")]
     if music:
@@ -168,8 +177,10 @@ def main() -> None:
     ap.add_argument("--style", default="auto", choices=["auto", "scan", "punch", "zigzag", "focus"])
     ap.add_argument("--music", type=Path)
     ap.add_argument("--seconds", type=float, default=12)
+    ap.add_argument("--no-fx", action="store_true", help="camera moves only, no motion graphics")
+    ap.add_argument("--handle", default="@valsadview")
     a = ap.parse_args()
-    sys.exit(0 if render(a.poster, a.out, a.style, a.music, a.seconds) else 1)
+    sys.exit(0 if render(a.poster, a.out, a.style, a.music, a.seconds, not a.no_fx, a.handle) else 1)
 
 
 if __name__ == "__main__":
