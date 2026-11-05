@@ -19,7 +19,7 @@ from pathlib import Path
 from src.config import ROOT, load_config, require_env
 
 
-def post_reel(cfg: dict, video: Path, caption: str, ig=None) -> dict:
+def post_reel(cfg: dict, video: Path, caption: str, ig=None, publish_at: float | None = None) -> dict:
     """Publish the reel. Its cover is the frame 2.5 s before the end (the finished poster), never the first
     frame, which is the white flash of the intro."""
     import subprocess
@@ -37,7 +37,7 @@ def post_reel(cfg: dict, video: Path, caption: str, ig=None) -> dict:
         print(f"   Could not host the video: {e}")
         sources = []
     result = (ig or instagram(cfg)).publish_reel(video, caption, cfg["instagram"]["share_to_feed"],
-                                                 sources=sources, thumb_offset_ms=int(at * 1000))
+                                                 sources=sources, thumb_offset_ms=int(at * 1000), publish_at=publish_at)
     # the same reel on the Facebook Page too (best effort: never undoes the Instagram post)
     from src import facebook
     if cfg.get("facebook", {}).get("enabled", True) and facebook.configured():
@@ -232,7 +232,17 @@ def cmd_run(args, cfg):
 
     print("4/4 Publishing to Instagram...")
     ig = ig or instagram(cfg)
-    result = post_reel(cfg, video, caption, ig)
+    publish_at = None
+    if getattr(args, "at", None):   # the regular post's exact time (IST, HH:MM): the reel waits for it
+        from datetime import timedelta
+        from src.news import IST
+        h, m = map(int, args.at.split(":"))
+        now = datetime.now(IST)
+        target = now.replace(hour=h, minute=m, second=0, microsecond=0)
+        if target < now - timedelta(hours=12):
+            target += timedelta(days=1)
+        publish_at = target.timestamp()
+    result = post_reel(cfg, video, caption, ig, publish_at)
     add_entry(story.title_en, result["media_id"], result.get("permalink"), story.category, story.style)
     print(f"Published: {result.get('permalink') or result['media_id']}")
     if story.comment and cfg["instagram"].get("first_comment", True):
@@ -506,9 +516,9 @@ def cmd_scheduler(args, cfg):
         """One `main.py` run. A run that hangs (e.g. an AI service that never answers) is stopped after 25
         minutes, so it cannot block the posts of the following hours."""
         try:
-            return subprocess.run([sys.executable, "-u", "main.py", *command], timeout=25 * 60).returncode == 0
+            return subprocess.run([sys.executable, "-u", "main.py", *command], timeout=45 * 60).returncode == 0
         except subprocess.TimeoutExpired:
-            print("   The run took over 25 minutes and was stopped; trying again later.", flush=True)
+            print("   The run took over 45 minutes and was stopped; trying again later.", flush=True)
             return False
 
     if cfg.get("flow") == "gemini_app":
@@ -560,7 +570,8 @@ def cmd_scheduler(args, cfg):
             posts = posts_ist()
             if slot and not any(slot - timedelta(minutes=30) <= p < slot + timedelta(hours=1) for p in posts):
                 print(f"\n=== {now:%d %b %H:%M} IST: regular post for {slot:%H:%M} ===", flush=True)
-                if attempt(["run"]):
+                late = now >= slot
+                if attempt(["run"] if late else ["run", "--at", slot.strftime("%H:%M")]):
                     save(stats=slot.hour % 3 == 1)
                 else:   # try again in a few minutes, not an hour later
                     retry_soon = True
@@ -651,6 +662,7 @@ def main():
     run.add_argument("--category", choices=["crime", "good_news", "government"], help="limit to one category")
     run.add_argument("--skip-titles", help="file with headlines to avoid (one per line)")
     run.add_argument("--breaking", action="store_true", help="post only if there is a really big breaking story")
+    run.add_argument("--at", help="publish at exactly this time (IST, HH:MM) once the reel is ready")
     run.set_defaults(func=cmd_run)
 
     pub = sub.add_parser("publish", help="publish an existing video file")

@@ -59,9 +59,11 @@ class Instagram:
         ))
 
     def publish_reel(self, video_path: Path, caption: str, share_to_feed: bool = True, timeout_s: int = 600,
-                     sources: list[dict] | None = None, thumb_offset_ms: int | None = None) -> dict:
+                     sources: list[dict] | None = None, thumb_offset_ms: int | None = None,
+                     publish_at: float | None = None) -> dict:
         """Create the reel from the first public source Instagram can process ({"video_url", "cover_url"});
-        without sources, upload the file. The cover is cover_url, else the frame at thumb_offset_ms."""
+        without sources, upload the file. The cover is cover_url, else the frame at thumb_offset_ms. With
+        publish_at (a unix time), the processed reel waits and goes live at exactly that moment."""
         container_id = None
         extra = {"thumb_offset": str(thumb_offset_ms)} if thumb_offset_ms is not None else {}
         for source in sources or []:
@@ -75,6 +77,10 @@ class Instagram:
         if not container_id:
             container_id = self._upload(video_path, caption, share_to_feed, extra)
             self._wait(container_id, timeout_s)
+        if publish_at and publish_at > time.time():
+            print(f"Reel ready; publishing at {time.strftime('%H:%M:%S', time.localtime(publish_at))} "
+                  f"(in {publish_at - time.time():.0f} s)", flush=True)
+            time.sleep(publish_at - time.time())
 
         published = _check(requests.post(
             f"{self.base}/{self.user_id}/media_publish",
