@@ -528,16 +528,42 @@ def cmd_scheduler(args, cfg):
     def active(hour: int) -> bool:
         return fixed[0] <= hour <= fixed[-1] if fixed else (hour >= 10 or hour == 0)
 
+    lead = timedelta(minutes=int(cfg.get("schedule", {}).get("start_early_minutes", 15)))
+
+    def slot_of(now: datetime) -> datetime | None:
+        """The regular post this moment belongs to: from `lead` minutes before its hour (making a reel takes ~8
+        minutes, so it is out on time) until the end of that hour."""
+        for day in (now.date(), (now + timedelta(days=1)).date()):
+            for h in range(24):
+                if post_hour(h):
+                    at = datetime(day.year, day.month, day.day, h, tzinfo=IST)
+                    if at - lead <= now < at + timedelta(hours=1):
+                        return at
+        return None
+
+    def next_slot_start(now: datetime) -> datetime:
+        for day in (now.date(), (now + timedelta(days=1)).date()):
+            for h in range(24):
+                if post_hour(h):
+                    start = datetime(day.year, day.month, day.day, h, tzinfo=IST) - lead
+                    if start > now:
+                        return start
+        return now + timedelta(hours=1)
+
     checked_hour = ""
     while True:
         now = datetime.now(IST)
-        if active(now.hour):   # the posting hours of the day
+        retry_soon = False
+        slot = slot_of(now)
+        if slot or active(now.hour):
             sync()
             posts = posts_ist()
-            if post_hour(now.hour) and not any(p.strftime("%Y%m%d%H") == now.strftime("%Y%m%d%H") for p in posts):
-                print(f"\n=== {now:%d %b %H:%M} IST: regular post ===", flush=True)
+            if slot and not any(slot - timedelta(minutes=30) <= p < slot + timedelta(hours=1) for p in posts):
+                print(f"\n=== {now:%d %b %H:%M} IST: regular post for {slot:%H:%M} ===", flush=True)
                 if attempt(["run"]):
-                    save(stats=now.hour % 3 == 1)
+                    save(stats=slot.hour % 3 == 1)
+                else:   # try again in a few minutes, not an hour later
+                    retry_soon = True
             elif (25 <= now.minute <= 45 and checked_hour != now.strftime("%Y%m%d%H")
                     and (not posts or (now - max(posts)).total_seconds() >= 20 * 60)):
                 checked_hour = now.strftime("%Y%m%d%H")   # one breaking news check an hour (saves the AI quota)
@@ -548,9 +574,11 @@ def cmd_scheduler(args, cfg):
                     print(f"\n=== {now:%d %b %H:%M} IST: breaking news check ===", flush=True)
                     if attempt(["run", "--breaking"]):
                         save(stats=False)
-        # wake at the next hour, or in 20 minutes for the breaking news check
-        next_hour = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
-        wake = min(next_hour + timedelta(seconds=20), datetime.now(IST) + timedelta(minutes=20))
+        # wake for the next regular post (a little before its hour), in 3 minutes after a failed try, or in
+        # 20 minutes for the breaking news check
+        now = datetime.now(IST)
+        wake = now + timedelta(minutes=3) if retry_soon else min(next_slot_start(now) + timedelta(seconds=20),
+                                                                  now + timedelta(minutes=20))
         wait = (wake - datetime.now(IST)).total_seconds()
         if time.time() + wait > stop_at:
             print("Time is up for this run; the next scheduler run takes over.", flush=True)
