@@ -144,7 +144,7 @@ gemini:
 schedule:
   # 5 reels a day at these hours (IST); with 15 layouts each one comes back after 3 days
   hours: [9, 12, 15, 18, 21]
-  start_early_minutes: 15         # start making each reel this long before its hour, so it is out on time
+  start_early_minutes: 30         # make each reel this long before its hour; it waits and goes live exactly on the hour
   every_hours: 2                  # used only when "hours" is empty: one reel every 2 hours from 10:00 to midnight
   max_breaking_per_day: 0         # extra posts for really big breaking news between the regular ones (0 = exactly 5 a day)
 
