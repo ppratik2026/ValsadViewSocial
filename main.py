@@ -268,8 +268,31 @@ def _checked_card(story, cfg, card: Path, background, intro_dir, design: str, cu
     # other designs first; with only one design allowed it is made again (another colour look and font)
     # the brand template looks the same every time: a low score is only logged (nothing to vary)
     retries = [] if design == "brand" and not others else (others + [design, design])[:2]
+    min_score = cfg["card"].get("min_check_score", 7)
+    best_credit = story.photo_credit
+    if best_score < min_score and background and design == "viral":
+        # the picture is the usual reason for a low score (a photo that does not fit the story): the same poster
+        # with a drawn scene of the topic instead, with its own animation, before anything else is tried
+        from src.scenes import BY_CATEGORY, draw_scene
+        scene = draw_scene(story.scene or BY_CATEGORY.get(story.category, "city"), story.props,
+                           card.with_name("scene-retry.png"))
+        story.photo_credit = ""
+        retry_intro = intro_dir.with_name("intro-retry") if intro_dir else None
+        attempt = render_card(story, cfg, card.with_name("card-scene.png"), scene, retry_intro, design, cutout)
+        again = review(attempt, story)
+        if again is not None:
+            print(f"   with a drawn scene: {again[0]}/10 {'; '.join(again[1])[:300]}")
+        if again is not None and again[0] > best_score:
+            best_score, best_style, best_credit = again[0], dict(story.style), ""
+            shutil.copy(attempt, card)
+            if intro_dir and retry_intro and retry_intro.exists():
+                shutil.rmtree(intro_dir, ignore_errors=True)
+                shutil.move(str(retry_intro), str(intro_dir))
+            best = card
+            background = scene   # any further try keeps the drawn scene
+        story.photo_credit = best_credit
     for n, other in enumerate(retries):
-        if best_score >= cfg["card"].get("min_check_score", 7):
+        if best_score >= min_score:
             break
         if other != "bulletin" and cutout and not background:
             continue
