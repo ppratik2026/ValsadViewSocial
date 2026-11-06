@@ -46,4 +46,4 @@ def _key(title: str) -> set[str]:
 def is_repeat(title_en: str, recent: list[str]) -> bool:
     """True when a story with mostly the same main words (English title) was posted recently."""
     key = _key(title_en)
-    return bool(key) and any(len(key & k) / max(1, min(len(key), len(k))) >= 0.5 for k in map(_key, recent) if k)
+    return bool(key) and any(len(key & k) / max(1, min(len(key), len(k))) >= 0.4 for k in map(_key, recent) if k)
